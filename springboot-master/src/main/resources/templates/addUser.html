@@ -1,0 +1,50 @@
+<!DOCTYPE html>
+<html xmlns:layout="http://www.ultraq.net.nz/thymeleaf/layout"
+      xmlns:th="http://www.thymeleaf.org"
+      layout:decorate="~{layouts/main-layout}">
+
+<head>
+   <title>Add User</title>
+</head>
+
+<body>
+
+    <main layout:fragment="content" th:remove="tag">
+
+        <h2>Add User</h2>
+        <hr/>
+
+        <form th:action="@{/admin/addUser}" th:object="${user}" method="POST">
+            <div class="mb-3">
+                <label for="username" class="form-label">Username</label>
+                <input type="text" class="form-control" id="username" th:field="*{username}" th:readonly='${not #strings.isEmpty(user.username)}'>
+            </div>
+            <div class="mb-3">
+                <label for="fullname" class="form-label">Full Name</label>
+                <input type="text" class="form-control" id="fullname" th:field="*{fullname}" >
+            </div>
+            <div class="mb-3">
+                <label for="password" class="form-label" >password</label>
+                <input type="password" class="form-control" th:readonly='${not #strings.isEmpty(user.username)}' id="password" th:field="*{password}" >
+            </div>
+            <div class="mb-3">
+                <label for="eMail" class="form-label">Email address</label>
+                <input type="email" class="form-control" id="eMail" th:field="*{eMail}">
+                <div id="emailHelp" class="form-text">We'll never share your email with anyone else.</div>
+            </div>
+            <div class="mb-3">
+                <label for="tel" class="form-label">Telephone</label>
+                <input type="text" class="form-control" id="tel" th:field="*{tel}" >
+            </div>
+            <div class="mb-3">
+                <label for="birthData" class="form-label">Birthdate</label>
+                <input type="date" class="form-control" id="tel" th:field="*{birthDate}" >
+            </div>
+
+            <button type="submit" class="btn btn-primary">Save</button>
+        </form>
+			
+    </main>
+
+</body>
+</html>

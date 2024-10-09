@@ -1,0 +1,87 @@
+<!DOCTYPE html>
+<html xmlns:layout="http://www.ultraq.net.nz/thymeleaf/layout"
+      xmlns:th="http://www.thymeleaf.org"
+      layout:decorate="~{layouts/main-layout}"
+      xmlns:sec="https://www.thymeleaf.org/thymeleaf-extras-springsecurity5">
+
+<head>
+   <title>Spring Boot Thymeleaf Hello World Example</title>
+</head>
+
+<body>
+
+    <main layout:fragment="content" th:remove="tag">
+
+    <h2>Spring Boot Web Thymeleaf Example Hello</h2>
+ 
+		<div class="alert alert-success" role="alert" sec:authorize="isAuthenticated()"> <span th:text="${halloNachricht}+' '+${user}"></span></div>
+		<div class="alert alert-success" role="alert" sec:authorize="!isAuthenticated()"> <span th:text="${halloNachricht}+' - Du bist nicht angemeldet'"></span></div>
+		
+        <h3>Counters</h3>
+        <ul>
+            <li>
+                Service counter: <span class="badge text-bg-info rounded-pill" th:text="${message}"></span>
+            </li>
+            <li>
+                Session counter: <span class="badge text-bg-info rounded-pill" th:text="${session.count.toString()}"></span>
+            </li>
+        </ul>
+
+        <hr/>
+
+        <h3>Beans // IDs</h3>
+        <ul>
+            <li>
+                Singleton Bean: <span class="badge text-bg-primary rounded-pill" th:text="${beanSingleton}"></span>
+            </li>
+            <li>
+                Prototype Bean: <span class="badge text-bg-secondary rounded-pill" th:text="${beanPrototype}"></span>
+            </li>
+            <li>
+                Session Bean: <span class="badge text-bg-warning rounded-pill" th:text="${beanSession}"></span>
+            </li>
+        </ul>
+
+        <hr/>
+
+        <a href="admin/addUser" class="btn btn-primary">Add User</a>
+        
+        <a sec:authorize="isAuthenticated()" href="/logout" class="btn btn-primary">Logout</a>
+
+        <br/><br/>
+     
+        <div class="table-responsive">
+	        <table class="table table-hover table-bordered">
+	            <thead>
+	                <tr >
+	                    <th scope="col">First Name</th>
+	                    <th scope="col">Last Name</th>
+	                    <th scope="col">eMail</th>
+	                    <th scope="col">Tel</th>
+	                    <th scope="col">Geburtsdatum</th>
+	                    <th scope="col">Role</th>
+	                    <th scope="col">JWT Token</th>
+	                </tr>
+	            </thead>
+	            <tbody>
+	                	<tr th:each ="user : ${users}">
+	                	<td> <a th:href="@{/admin/addUser(username=${user.username})}" th:utext="${user.username}"></a> </td>	                    
+	                    <td th:utext="${user.fullname}">...</td>
+	                    <td th:utext="${user.eMail}">...</td>
+	                    <td th:utext="${user.tel}">...</td>
+	                    <td th:utext="${user.birthDate}">...</td>
+	                    <td th:utext="${user.role}">...</td>
+	                    <td th:utext="${user.jwttoken}">...</td>	                    
+	                </tr>
+	            </tbody>
+	        </table>
+        </div>
+        
+        <div class="alert alert-success" role="alert">
+            <span th:text="${authenticated}"></span>
+        </div>
+
+    </main>
+
+</body>
+</html>
