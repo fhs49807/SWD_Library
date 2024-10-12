@@ -13,7 +13,6 @@ import java.util.Arrays;
 import java.util.Date;
 import java.util.List;
 
-import org.junit.Before;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
@@ -33,7 +32,7 @@ import org.springframework.test.web.servlet.request.MockMvcRequestBuilders;
 import org.springframework.test.web.servlet.setup.MockMvcBuilders;
 import org.springframework.web.context.WebApplicationContext;
 import at.ac.fhsalzburg.swd.spring.controller.TemplateController;
-import at.ac.fhsalzburg.swd.spring.model.User;
+import at.ac.fhsalzburg.swd.spring.model.Customer;
 import at.ac.fhsalzburg.swd.spring.repository.UserRepository;
 
 
@@ -62,8 +61,8 @@ public class ControllerTest {
         // init webcontext
         this.mvc = MockMvcBuilders.webAppContextSetup(webApplicationContext)
         		.apply(SecurityMockMvcConfigurers.springSecurity())
-        		.build();       
-	
+        		.build();
+
     }
 
 
@@ -82,7 +81,7 @@ public class ControllerTest {
 
 
         mvc.perform(MockMvcRequestBuilders.get("/").session(session) // set the mocked session
-                .contentType(MediaType.TEXT_HTML))        
+                .contentType(MediaType.TEXT_HTML))
         		.andExpect(status().isOk())
                 .andExpect(model().attributeExists("users")).andExpect(view().name("index"))
                 .andExpect(request().sessionAttribute("count", is(4))); // check if session
@@ -115,9 +114,9 @@ public class ControllerTest {
     @WithMockUser(username="test", roles = {"USER"})
     public void givenCustomer_whenGetCustomer_thenReturnJsonArrayTest() throws Exception {
 
-        User customer = new User("Max", "Mustermann", "max@muster.com", "123", new Date(),"","USER",null);
+        Customer customer = new Customer("Max", "Mustermann", "max@muster.com", "123", new Date(),"","USER",null);
 
-        List<User> allCustomers = Arrays.asList(customer);
+        List<Customer> allCustomers = Arrays.asList(customer);
 
         // mock the repo: whenever findAll is called, we will get our predefined customer
         given(repo.findAll()).willReturn(allCustomers);

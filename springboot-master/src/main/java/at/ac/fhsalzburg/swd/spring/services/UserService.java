@@ -11,7 +11,7 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.context.annotation.Lazy;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
-import at.ac.fhsalzburg.swd.spring.model.User;
+import at.ac.fhsalzburg.swd.spring.model.Customer;
 import at.ac.fhsalzburg.swd.spring.repository.UserRepository;
 import at.ac.fhsalzburg.swd.spring.security.DemoPrincipal;
 import at.ac.fhsalzburg.swd.spring.security.TokenService;
@@ -22,13 +22,13 @@ public class UserService implements UserServiceInterface {
 
 	@Autowired
 	private PasswordEncoder passwordEncoder;
-	
+
 	private TokenService tokenService; // autowired using setter/field injection
-	
+
     public final static String DEFAULT_ROLE = "USER";
-	
+
 	int i;
-    
+
 
     @Autowired
     private UserRepository repo;
@@ -51,9 +51,9 @@ public class UserService implements UserServiceInterface {
                 && fullName != null && fullName.length() > 0) {
         	DemoPrincipal userDetails = new DemoPrincipal(username, password, role, null);
         	userDetails.setJwtToken(tokenService.generateToken(userDetails));
-            User newCustomer = new User(username, fullName, eMail, Tel, BirthDate,            		
+            Customer newCustomer = new Customer(username, fullName, eMail, Tel, BirthDate,
             		passwordEncoder.encode(password), role, userDetails.getJwtToken());
-            
+
             repo.save(newCustomer);
             return true;
         }
@@ -63,10 +63,10 @@ public class UserService implements UserServiceInterface {
     }
 
     @Override
-    public boolean addUser(User user) {
+    public boolean addUser(Customer user) {
 
     	if (user.getRole()==null) user.setRole(DEFAULT_ROLE);
-    	
+
     	if ((user.getUsername()!=null) && (user.getUsername().length()>0))
     	{
     		DemoPrincipal userDetails = new DemoPrincipal(user.getUsername(), user.getPassword(), user.getRole(), null);
@@ -74,27 +74,27 @@ public class UserService implements UserServiceInterface {
     		user.setJwttoken(userDetails.getJwtToken());
     	}
     	user.setPassword(passwordEncoder.encode(user.getPassword()));
-    	
-    	
-        repo.save(user);        
+
+
+        repo.save(user);
 
         return false;
 
     }
 
     @Override
-    public Collection<User> getAll() {
-    	List<User> result = 
+    public Collection<Customer> getAll() {
+    	List<Customer> result =
     			  StreamSupport.stream(repo.findAll().spliterator(), false)
     			    .collect(Collectors.toList());
-        
+
         return result;
     }
 
 
 
     @Override
-    public boolean hasCredit(User customer) {
+    public boolean hasCredit(Customer customer) {
         if (customer.getCredit() > 0)
             return true;
         else
@@ -102,10 +102,10 @@ public class UserService implements UserServiceInterface {
     }
 
 	@Override
-	public User getByUsername(String username) {
+	public Customer getByUsername(String username) {
 		return repo.findByUsername(username);
 	}
-	
+
 	@Autowired
     public void setTokenService(@Lazy TokenService tokenService) {
         this.tokenService = tokenService;
@@ -117,12 +117,12 @@ public class UserService implements UserServiceInterface {
 
 	@Override
 	public boolean deleteUser(String username) {
-		
+
 		repo.deleteById(username);
-		
+
 		return true;
 	}
-	
 
-   
+
+
 }

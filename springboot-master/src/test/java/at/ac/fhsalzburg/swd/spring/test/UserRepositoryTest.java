@@ -7,11 +7,10 @@ import org.junit.jupiter.api.extension.ExtendWith;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.autoconfigure.orm.jpa.DataJpaTest;
 import org.springframework.boot.test.autoconfigure.orm.jpa.TestEntityManager;
-import org.springframework.boot.test.context.SpringBootTest;
 import org.springframework.test.context.ActiveProfiles;
 import org.springframework.test.context.junit.jupiter.SpringExtension;
 
-import at.ac.fhsalzburg.swd.spring.model.User;
+import at.ac.fhsalzburg.swd.spring.model.Customer;
 import at.ac.fhsalzburg.swd.spring.repository.UserRepository;
 
 @ExtendWith(SpringExtension.class)
@@ -28,12 +27,12 @@ public class UserRepositoryTest {
     @Test
     public void whenFindByUsername_thenReturnCustomer() {
         // given
-        User givenUser = new User("Max", "Max Mustermann", "max@muster.com", "123", new Date(),"","USER",null);
+        Customer givenUser = new Customer("Max", "Max Mustermann", "max@muster.com", "123", new Date(),"","USER",null);
         entityManager.persist(givenUser);
         entityManager.flush();
 
         // when
-        User foundUser = userRepository.findByUsername(givenUser.getUsername());
+        Customer foundUser = userRepository.findByUsername(givenUser.getUsername());
 
         // then
         assertEquals(givenUser, foundUser);

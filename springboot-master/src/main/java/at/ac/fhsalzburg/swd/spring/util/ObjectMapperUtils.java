@@ -16,24 +16,24 @@ import org.springframework.web.context.request.ServletRequestAttributes;
 import org.springframework.web.context.support.WebApplicationContextUtils;
 
 import at.ac.fhsalzburg.swd.spring.dto.UserDTO;
-import at.ac.fhsalzburg.swd.spring.model.User;
+import at.ac.fhsalzburg.swd.spring.model.Customer;
 import at.ac.fhsalzburg.swd.spring.services.UserService;
 
 // initial version from https://stackoverflow.com/questions/47929674/modelmapper-mapping-list-of-entites-to-list-of-dto-objects
 public class ObjectMapperUtils {
-	
+
 	private final static ModelMapper modelMapper;
-	
+
 	/**
     * Hide from public usage.
     */
     private ObjectMapperUtils() {
     }
-	
+
 	static
 	{
 		modelMapper = new ModelMapper();
-        
+
         // https://github.com/modelmapper/modelmapper/issues/319
         // string blank condition
 		Condition<?, ?> isStringBlank = (Condition<?, ?>) new AbstractCondition<Object, Object>() {
@@ -46,40 +46,40 @@ public class ObjectMapperUtils {
 			}
 		    }
 		};
-        
+
         // initial configuration
         modelMapper.getConfiguration().setMatchingStrategy(MatchingStrategies.STRICT)
         								.setSkipNullEnabled(true) // skip null fields
-        								.setPropertyCondition(isStringBlank); // skip empty strings 
-        
-        
+        								.setPropertyCondition(isStringBlank); // skip empty strings
+
+
         // create a typemap to override default behaviour for DTO to entity mapping
-        TypeMap<UserDTO, User> typeMap = modelMapper.getTypeMap(UserDTO.class, User.class);
-    	if (typeMap == null) {	    		
-    		typeMap = modelMapper.createTypeMap(UserDTO.class, User.class);
-    	}	    	
+        TypeMap<UserDTO, Customer> typeMap = modelMapper.getTypeMap(UserDTO.class, Customer.class);
+    	if (typeMap == null) {
+    		typeMap = modelMapper.createTypeMap(UserDTO.class, Customer.class);
+    	}
     	// create a provider to be able to merge the dto data with the data in the database:
-    	// whenever we are mapping UserDTO to User, the data from UserDTO and the existing User in the database are merged    
-    	Provider<User> userDelegatingProvider = new Provider<User>() {
-       	
-            public User get(ProvisionRequest<User> request) {
+    	// whenever we are mapping UserDTO to User, the data from UserDTO and the existing User in the database are merged
+    	Provider<Customer> userDelegatingProvider = new Provider<Customer>() {
+
+            public Customer get(ProvisionRequest<Customer> request) {
             	// it is also possible to get a service instance from the application context programmatically
             	UserService userService = (UserService) WebApplicationContextUtils.getWebApplicationContext(
             			((ServletRequestAttributes) RequestContextHolder.getRequestAttributes()).getRequest().getServletContext())
             			.getBean("userService");
            	 	return userService.getByUsername(((UserDTO)request.getSource()).getUsername());
             }
-    	};  
-    	    	    	    	
+    	};
+
     	// a provider to fetch a user instance from a repository
         typeMap.setProvider(userDelegatingProvider);
-    	
-        
-	}
-	    
 
-    
-    
+
+	}
+
+
+
+
     //public static ModelMapper getModelMapper() {
     //	return modelMapper;
     //}
@@ -123,6 +123,6 @@ public class ObjectMapperUtils {
         return destination;
     }
 
-        
-    
+
+
 }

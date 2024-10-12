@@ -4,12 +4,12 @@ import org.springframework.data.repository.CrudRepository;
 import org.springframework.stereotype.Repository;
 import org.springframework.transaction.annotation.Transactional;
 
-import at.ac.fhsalzburg.swd.spring.model.User;
+import at.ac.fhsalzburg.swd.spring.model.Customer;
 
 @Repository
-public interface UserRepository extends CrudRepository<User, String> {
+public interface UserRepository extends CrudRepository<Customer, String> {
 
 	@Transactional(timeout = 10)
-    User findByUsername(String username);
+    Customer findByUsername(String username);
 
 }

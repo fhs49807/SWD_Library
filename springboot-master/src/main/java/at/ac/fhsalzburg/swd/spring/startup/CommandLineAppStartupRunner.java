@@ -8,7 +8,7 @@ import org.springframework.stereotype.Component;
 import org.springframework.transaction.annotation.Transactional;
 
 import at.ac.fhsalzburg.swd.spring.services.UserServiceInterface;
-import at.ac.fhsalzburg.swd.spring.model.User;
+import at.ac.fhsalzburg.swd.spring.model.Customer;
 import at.ac.fhsalzburg.swd.spring.services.OrderServiceInterface;
 import at.ac.fhsalzburg.swd.spring.services.ProductServiceInterface;
 
@@ -23,23 +23,23 @@ public class CommandLineAppStartupRunner implements CommandLineRunner {
 
     @Autowired
     OrderServiceInterface orderService;
-  
+
 
     // Initialize System with preset accounts and stocks
     @Override
     @Transactional // this method runs within one database transaction; performing a commit at the
                    // end
     public void run(String... args) throws Exception {
-    	
+
     	if (userService.getByUsername("admin")!=null) return; // data already exists -> return
-    	
+
     	userService.addUser("admin", "Administrator", "admin@work.org", "123", new Date(), "admin","ADMIN");
-    	
+
         productService.addProduct("first product", 3.30f);
-        User user = userService.getAll().iterator().next();
+        Customer user = userService.getAll().iterator().next();
         user.setCredit(100l);
         user = userService.getByUsername("admin");
         orderService.addOrder(new Date(), user, productService.getAll());
-        
+
     }
 }

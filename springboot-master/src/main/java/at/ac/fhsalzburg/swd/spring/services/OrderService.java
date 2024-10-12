@@ -8,7 +8,7 @@ import org.springframework.stereotype.Service;
 
 import at.ac.fhsalzburg.swd.spring.model.Order;
 import at.ac.fhsalzburg.swd.spring.model.Product;
-import at.ac.fhsalzburg.swd.spring.model.User;
+import at.ac.fhsalzburg.swd.spring.model.Customer;
 import at.ac.fhsalzburg.swd.spring.repository.OrderRepository;
 
 
@@ -19,7 +19,7 @@ public class OrderService implements OrderServiceInterface {
 
     private final OrderRepository repo;
 
-    
+
     public OrderService(UserServiceInterface userService, OrderRepository orderRepo) {
     	this.userService = userService;
     	this.repo = orderRepo;
@@ -27,7 +27,7 @@ public class OrderService implements OrderServiceInterface {
 
 
     @Override
-    public Order addOrder(Date date, User customer, Iterable<Product> products) {
+    public Order addOrder(Date date, Customer customer, Iterable<Product> products) {
         List<Product> productlist = new ArrayList<Product>();
         products.forEach(productlist::add);
 
