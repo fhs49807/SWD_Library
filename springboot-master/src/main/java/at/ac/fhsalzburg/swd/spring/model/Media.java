@@ -1,5 +1,7 @@
 package at.ac.fhsalzburg.swd.spring.model;
 
+import java.sql.Date;
+
 import javax.persistence.Entity;
 import javax.persistence.GeneratedValue;
 import javax.persistence.GenerationType;
@@ -8,18 +10,19 @@ import javax.persistence.Id;
 @Entity
 public class Media {
 
-    @Id
+	@Id
+	private int barcode;
+	
     @GeneratedValue(strategy = GenerationType.AUTO)
     private boolean availabilityStatus;
-    private int barcode;
-    private String dueDate;
+    private Date dueDate;
     private int ISBN_number;
     private String mediaType;
     private String name;
 
     protected Media() { }
 
-    public Media(boolean availabilityStatus, int barcode, String dueDate, int ISBN_number, String mediaType,
+    public Media(boolean availabilityStatus, int barcode, Date dueDate, int ISBN_number, String mediaType,
         String name) {
         this.availabilityStatus = availabilityStatus;
         this.barcode = barcode;
@@ -45,11 +48,11 @@ public class Media {
         this.barcode = barcode;
     }
 
-    public String getDueDate() {
+    public Date getDueDate() {
         return dueDate;
     }
 
-    public void setDueDate(String dueDate) {
+    public void setDueDate(Date dueDate) {
         this.dueDate = dueDate;
     }
 

@@ -10,8 +10,9 @@ import java.util.Date;
 public class Customer {
 
     @Id
-    private String category;
     private int customerID;
+    
+    private String category;
     private int loanAmount;
     private String name;
 

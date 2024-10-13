@@ -1,9 +1,8 @@
 package at.ac.fhsalzburg.swd.spring.model;
 
-import javax.persistence.*;
-
 
 public class LibraryManagementSystem {
+	
     private boolean acceptance;
 
 

@@ -1,8 +1,15 @@
 package at.ac.fhsalzburg.swd.spring.model;
 
+import javax.persistence.Entity;
+import javax.persistence.Id;
+
+@Entity
 public class Invoice {
+	
+	@Id
+	private String invoiceID;
+    
     private double amount;
-    private String invoiceID;
     private boolean paymentStatus;
 
     public Invoice() { }
