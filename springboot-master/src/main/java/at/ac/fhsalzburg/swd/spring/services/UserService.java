@@ -22,13 +22,13 @@ public class UserService implements UserServiceInterface {
 
 	@Autowired
 	private PasswordEncoder passwordEncoder;
-	
+
 	private TokenService tokenService; // autowired using setter/field injection
-	
+
     public final static String DEFAULT_ROLE = "USER";
-	
+
 	int i;
-    
+
 
     @Autowired
     private UserRepository repo;
@@ -51,9 +51,9 @@ public class UserService implements UserServiceInterface {
                 && fullName != null && fullName.length() > 0) {
         	DemoPrincipal userDetails = new DemoPrincipal(username, password, role, null);
         	userDetails.setJwtToken(tokenService.generateToken(userDetails));
-            User newCustomer = new User(username, fullName, eMail, Tel, BirthDate,            		
+            User newCustomer = new User(username, fullName, eMail, Tel, BirthDate,
             		passwordEncoder.encode(password), role, userDetails.getJwtToken());
-            
+
             repo.save(newCustomer);
             return true;
         }
@@ -66,7 +66,7 @@ public class UserService implements UserServiceInterface {
     public boolean addUser(User user) {
 
     	if (user.getRole()==null) user.setRole(DEFAULT_ROLE);
-    	
+
     	if ((user.getUsername()!=null) && (user.getUsername().length()>0))
     	{
     		DemoPrincipal userDetails = new DemoPrincipal(user.getUsername(), user.getPassword(), user.getRole(), null);
@@ -74,9 +74,9 @@ public class UserService implements UserServiceInterface {
     		user.setJwttoken(userDetails.getJwtToken());
     	}
     	user.setPassword(passwordEncoder.encode(user.getPassword()));
-    	
-    	
-        repo.save(user);        
+
+
+        repo.save(user);
 
         return false;
 
@@ -84,10 +84,10 @@ public class UserService implements UserServiceInterface {
 
     @Override
     public Collection<User> getAll() {
-    	List<User> result = 
+    	List<User> result =
     			  StreamSupport.stream(repo.findAll().spliterator(), false)
     			    .collect(Collectors.toList());
-        
+
         return result;
     }
 
@@ -105,7 +105,12 @@ public class UserService implements UserServiceInterface {
 	public User getByUsername(String username) {
 		return repo.findByUsername(username);
 	}
-	
+
+    @Override
+    public  User getByEmail(String email) {
+        return repo.findByEmail(email);
+    }
+
 	@Autowired
     public void setTokenService(@Lazy TokenService tokenService) {
         this.tokenService = tokenService;
@@ -117,12 +122,12 @@ public class UserService implements UserServiceInterface {
 
 	@Override
 	public boolean deleteUser(String username) {
-		
+
 		repo.deleteById(username);
-		
+
 		return true;
 	}
-	
 
-   
+
+
 }
