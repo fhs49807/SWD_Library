@@ -11,7 +11,7 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.context.annotation.Lazy;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
-import at.ac.fhsalzburg.swd.spring.model.Customer;
+import at.ac.fhsalzburg.swd.spring.model.User;
 import at.ac.fhsalzburg.swd.spring.repository.UserRepository;
 import at.ac.fhsalzburg.swd.spring.security.DemoPrincipal;
 import at.ac.fhsalzburg.swd.spring.security.TokenService;
@@ -51,7 +51,8 @@ public class UserService implements UserServiceInterface {
                 && fullName != null && fullName.length() > 0) {
         	DemoPrincipal userDetails = new DemoPrincipal(username, password, role, null);
         	userDetails.setJwtToken(tokenService.generateToken(userDetails));
-            Customer newCustomer = new Customer("student", 1, 3, username);
+            User newCustomer = new User(username, fullName, eMail, Tel, BirthDate,
+            		passwordEncoder.encode(password), role, userDetails.getJwtToken());
 
             repo.save(newCustomer);
             return true;
@@ -62,7 +63,7 @@ public class UserService implements UserServiceInterface {
     }
 
     @Override
-    public boolean addUser(Customer user) {
+    public boolean addUser(User user) {
 
     	if (user.getRole()==null) user.setRole(DEFAULT_ROLE);
 
@@ -82,8 +83,8 @@ public class UserService implements UserServiceInterface {
     }
 
     @Override
-    public Collection<Customer> getAll() {
-    	List<Customer> result =
+    public Collection<User> getAll() {
+    	List<User> result =
     			  StreamSupport.stream(repo.findAll().spliterator(), false)
     			    .collect(Collectors.toList());
 
@@ -93,7 +94,7 @@ public class UserService implements UserServiceInterface {
 
 
     @Override
-    public boolean hasCredit(Customer customer) {
+    public boolean hasCredit(User customer) {
         if (customer.getCredit() > 0)
             return true;
         else
@@ -101,9 +102,14 @@ public class UserService implements UserServiceInterface {
     }
 
 	@Override
-	public Customer getByUsername(String username) {
+	public User getByUsername(String username) {
 		return repo.findByUsername(username);
 	}
+
+    @Override
+    public  User getByEmail(String email) {
+        return repo.findByEmail(email);
+    }
 
 	@Autowired
     public void setTokenService(@Lazy TokenService tokenService) {

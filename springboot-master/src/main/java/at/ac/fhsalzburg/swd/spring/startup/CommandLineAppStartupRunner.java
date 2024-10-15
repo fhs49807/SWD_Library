@@ -8,7 +8,7 @@ import org.springframework.stereotype.Component;
 import org.springframework.transaction.annotation.Transactional;
 
 import at.ac.fhsalzburg.swd.spring.services.UserServiceInterface;
-import at.ac.fhsalzburg.swd.spring.model.Customer;
+import at.ac.fhsalzburg.swd.spring.model.User;
 import at.ac.fhsalzburg.swd.spring.services.OrderServiceInterface;
 import at.ac.fhsalzburg.swd.spring.services.ProductServiceInterface;
 
@@ -36,10 +36,22 @@ public class CommandLineAppStartupRunner implements CommandLineRunner {
     	userService.addUser("admin", "Administrator", "admin@work.org", "123", new Date(), "admin","ADMIN");
 
         productService.addProduct("first product", 3.30f);
-        Customer user = userService.getAll().iterator().next();
+        User user = userService.getAll().iterator().next();
         user.setCredit(100l);
         user = userService.getByUsername("admin");
         orderService.addOrder(new Date(), user, productService.getAll());
 
+
+        // add second user
+        userService.addUser("John", "Wick", "john.wick@work.org", "123", new Date(), "john123","ADMIN");
+
+        // find user by email
+        User userByEmail = userService.getByEmail("john.wick@work.org");
+
+        // update password from user John Wick
+        userByEmail.setPassword("updatedPassword");
+
+        // delete user John Wick
+        userService.deleteUser("John");
     }
 }

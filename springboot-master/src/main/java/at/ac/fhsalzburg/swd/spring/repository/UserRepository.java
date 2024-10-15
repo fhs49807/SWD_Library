@@ -15,4 +15,6 @@ public interface UserRepository extends CrudRepository<Customer, String> {
 	@Transactional(timeout = 10)
     Customer findByUsername(String username);
 
+    @Transactional(timeout = 10)
+    User findByEmail(String email);
 }
