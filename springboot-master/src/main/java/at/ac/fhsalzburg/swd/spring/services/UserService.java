@@ -51,8 +51,7 @@ public class UserService implements UserServiceInterface {
                 && fullName != null && fullName.length() > 0) {
         	DemoPrincipal userDetails = new DemoPrincipal(username, password, role, null);
         	userDetails.setJwtToken(tokenService.generateToken(userDetails));
-            Customer newCustomer = new Customer(username, fullName, eMail, Tel, BirthDate,
-            		passwordEncoder.encode(password), role, userDetails.getJwtToken());
+            Customer newCustomer = new Customer("student", 1, 3, username);
 
             repo.save(newCustomer);
             return true;
