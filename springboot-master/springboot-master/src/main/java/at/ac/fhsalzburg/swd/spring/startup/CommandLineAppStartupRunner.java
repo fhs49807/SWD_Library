@@ -41,5 +41,20 @@ public class CommandLineAppStartupRunner implements CommandLineRunner {
         user = userService.getByUsername("admin");
         orderService.addOrder(new Date(), user, productService.getAll());
         
+        
+//        create library (physical?)
+        
+//        create media --> genre, name, physical location, etc?
+        
+//        create customers
+        
+//        reserve media
+        
+//        loan media
+        
+//        return media
+        
+//        create invoice
+        
     }
 }
