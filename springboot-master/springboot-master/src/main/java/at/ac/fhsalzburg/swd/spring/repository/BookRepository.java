@@ -1,5 +1,16 @@
 package at.ac.fhsalzburg.swd.spring.repository;
 
-public class BookRepository {
+import org.springframework.data.repository.CrudRepository;
+import org.springframework.stereotype.Repository;
+import org.springframework.transaction.annotation.Transactional;
 
+import at.ac.fhsalzburg.swd.spring.model.Book;
+import at.ac.fhsalzburg.swd.spring.model.Media;
+
+@Repository
+public interface BookRepository extends CrudRepository<Book, Integer>{
+
+	@Transactional(timeout = 10)
+    Media findById(int id);
+	
 }
