@@ -7,7 +7,7 @@ import org.springframework.transaction.annotation.Transactional;
 import at.ac.fhsalzburg.swd.spring.model.Customer;
 
 @Repository
-public interface CustomerRepository extends CrudRepository<Customer, String>{
+public interface CustomerRepository extends CrudRepository<Customer, Integer>{
 
 	@Transactional(timeout = 10)
     Customer findByUsername(String username);

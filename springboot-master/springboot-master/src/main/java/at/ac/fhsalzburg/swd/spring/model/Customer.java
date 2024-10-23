@@ -15,8 +15,8 @@ public class Customer {
 	
 	
 	@Id
-    @Column(name = "CUSTOMER_ID")
-    @GeneratedValue(strategy = GenerationType.AUTO)
+//    @Column(name = "CUSTOMER_ID")
+//    @GeneratedValue(strategy = GenerationType.AUTO)
 	private int customerID;
     private Date birthDate;
     private String customerType; //remove?
