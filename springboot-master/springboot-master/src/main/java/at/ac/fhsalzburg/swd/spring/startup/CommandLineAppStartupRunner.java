@@ -51,7 +51,6 @@ public class CommandLineAppStartupRunner implements CommandLineRunner {
 
 		// -------------------------------------------------------------
 
-		// Create a new customer and save it to the database
 		Customer customer = new Customer(1, null, "Student", 5, "Test Name");
 		customerRepository.save(customer);
 

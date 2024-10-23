@@ -7,7 +7,8 @@ import javax.persistence.Entity;
 @Entity
 public class Media {
 
-	private int barcode;
+	//TODO: add id?
+	private int barcode;//id?
 	private String availabilityStatus;
 	private Date dueDate; //remove??
 	private String name;
@@ -17,5 +18,5 @@ public class Media {
 	
 	//TODO: generate constructor including mediaType
 }
-
+	
 	//TODO: generate getters and setters
