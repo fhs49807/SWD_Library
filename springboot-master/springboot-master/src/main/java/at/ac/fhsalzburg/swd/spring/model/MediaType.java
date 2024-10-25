@@ -9,15 +9,13 @@ import javax.persistence.Id;
 public class MediaType {
 
 	@Id
-    @GeneratedValue(strategy = GenerationType.IDENTITY)
-    private int typeID;
+	@GeneratedValue(strategy = GenerationType.IDENTITY)
+	private int typeID;
 
 	private String type;
 
-	
-	//TODO: @ManyToOne Media??
-	
-	
+	// TODO: @ManyToOne Media??
+
 	public MediaType(String type) {
 		this.type = type;
 	}
@@ -37,6 +35,5 @@ public class MediaType {
 	public void setType(String type) {
 		this.type = type;
 	}
-	
-	
+
 }

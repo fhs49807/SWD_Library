@@ -4,48 +4,43 @@ import java.sql.Date;
 
 import javax.persistence.ManyToOne;
 
-public class ReturnMedia {//extends mediaTransaction??
-	
+public class ReturnMedia {// extends mediaTransaction??
+
 	private String returnCondition;
-    private Date returnDate;
+	private Date returnDate;
 
-    //TODO: change?
-    
-    @ManyToOne 
-    private Customer customer; 
+	@ManyToOne
+	private MediaTransaction mediaTransaction;// media transaction can have multiple return entries??
 
-    public ReturnMedia(String returnCondition, Date returnDate, Customer customer) { 
-        this.returnCondition = returnCondition;
-        this.returnDate = returnDate;
-        this.customer = customer;
-        }
+	public ReturnMedia(String returnCondition, Date returnDate, MediaTransaction mediaTransaction) {
+		super();
+		this.returnCondition = returnCondition;
+		this.returnDate = returnDate;
+		this.mediaTransaction = mediaTransaction;
+	}
 
-    // Default constructor
-    public ReturnMedia() {
-    }
+	public String getReturnCondition() {
+		return returnCondition;
+	}
 
-    // Getters and Setters
-    public String getReturnCondition() {
-        return returnCondition;
-    }
+	public void setReturnCondition(String returnCondition) {
+		this.returnCondition = returnCondition;
+	}
 
-    public void setReturnCondition(String returnCondition) {
-        this.returnCondition = returnCondition;
-    }
+	public Date getReturnDate() {
+		return returnDate;
+	}
 
-    public Date getReturnDate() {
-        return returnDate;
-    }
+	public void setReturnDate(Date returnDate) {
+		this.returnDate = returnDate;
+	}
 
-    public void setReturnDate(Date returnDate) {
-        this.returnDate = returnDate;
-    }
+	public MediaTransaction getMediaTransaction() {
+		return mediaTransaction;
+	}
 
-    public Customer getCustomer() { 
-        return customer;
-    }
+	public void setMediaTransaction(MediaTransaction mediaTransaction) {
+		this.mediaTransaction = mediaTransaction;
+	}
 
-    public void setCustomer(Customer customer) { 
-        this.customer = customer;
-    }
 }
