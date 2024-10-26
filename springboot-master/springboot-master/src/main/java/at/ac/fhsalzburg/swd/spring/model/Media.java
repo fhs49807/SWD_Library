@@ -7,8 +7,11 @@ import javax.persistence.Inheritance;
 import javax.persistence.InheritanceType;
 import javax.persistence.ManyToOne;
 
+import lombok.NoArgsConstructor;
+
 @Entity
 @Inheritance(strategy = InheritanceType.JOINED)
+@NoArgsConstructor
 public class Media {
 
 	// TODO: add id?
@@ -22,9 +25,6 @@ public class Media {
 
 	@ManyToOne
 	private Library library;// one library can have multiple media
-
-	public Media() {
-	}
 
 	public Media(int barcode, String availabilityStatus, Date dueDate, String name, MediaType mediaType,
 			Library library) {

@@ -10,5 +10,5 @@ import at.ac.fhsalzburg.swd.spring.model.Invoice;
 public interface InvoiceRepository extends CrudRepository<Invoice, Integer>{
 
 	@Transactional(timeout = 10)
-    Invoice findByid(int id);
+    Invoice findById(int id);
 }

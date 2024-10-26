@@ -1,5 +1,5 @@
 package at.ac.fhsalzburg.swd.spring.services;
 
-public class CustomerServiceInterface {
+public interface CustomerServiceInterface {
 
 }

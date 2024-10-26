@@ -7,24 +7,23 @@ import javax.persistence.Id;
 import javax.persistence.ManyToOne;
 import javax.persistence.Table;
 
+import lombok.NoArgsConstructor;
+
 @Entity
 @Table(name = "EDITIONS")
+@NoArgsConstructor
 public class Edition {
 
 	@Id
-    @GeneratedValue(strategy = GenerationType.IDENTITY)
-    private int editionID;
+	@GeneratedValue(strategy = GenerationType.IDENTITY)
+	private int editionID;
 	private String editionYear;
-	
+
 	@ManyToOne
-    private Media media;//one media can have multiple editions
-	
+	private Media media;// one media can have multiple editions
+
 	public Edition(Media m) {
 		this.media = m;
-	}
-	
-	public Edition() {
-		
 	}
 
 	public int getEditionID() {
@@ -50,7 +49,5 @@ public class Edition {
 	public void setMedia(Media media) {
 		this.media = media;
 	}
-	
-	
-	
+
 }

@@ -9,8 +9,11 @@ import javax.persistence.GenerationType;
 import javax.persistence.Id;
 import javax.persistence.Table;
 
+import lombok.NoArgsConstructor;
+
 @Entity
 @Table(name = "CUSTOMER")
+@NoArgsConstructor
 public class Customer {
 	
 	

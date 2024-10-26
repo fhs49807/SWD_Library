@@ -3,21 +3,23 @@ package at.ac.fhsalzburg.swd.spring.model;
 import javax.persistence.Entity;
 import javax.persistence.ManyToOne;
 
+import lombok.NoArgsConstructor;
+
 @Entity
+@NoArgsConstructor
 public class Price {
 
 	private double amount;
 
 	@ManyToOne
-	private User user;
+	private Customer customer;
 
-	// TODO: generate constructor including user?? and amount
-	public Price(User user, double amount) {
-		this.user = user;
+	// TODO: generate constructor including customer?? and amount
+	public Price(Customer customer, double amount) {
+		this.customer = customer;
 		this.amount = amount;
 	}
 
-	// TODO: generate getters and setters
 	public double getAmount() {
 		return amount;
 	}
@@ -26,11 +28,11 @@ public class Price {
 		this.amount = amount;
 	}
 
-	public User getUser() {
-		return user;
+	public Customer getCustomer() {
+		return customer;
 	}
 
-	public void setUser(User user) {
-		this.user = user;
+	public void setCustomer(Customer customer) {
+		this.customer = customer;
 	}
 }

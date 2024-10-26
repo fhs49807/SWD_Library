@@ -2,8 +2,13 @@ package at.ac.fhsalzburg.swd.spring.model;
 
 import java.sql.Date;
 
+import javax.persistence.Entity;
 import javax.persistence.ManyToOne;
 
+import lombok.NoArgsConstructor;
+
+@Entity
+@NoArgsConstructor
 public class ReturnMedia {// extends mediaTransaction??
 
 	private String returnCondition;

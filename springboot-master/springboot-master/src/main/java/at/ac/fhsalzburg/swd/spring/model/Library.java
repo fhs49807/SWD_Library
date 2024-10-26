@@ -2,7 +2,10 @@ package at.ac.fhsalzburg.swd.spring.model;
 
 import javax.persistence.Entity;
 
+import lombok.NoArgsConstructor;
+
 @Entity
+@NoArgsConstructor
 public class Library {
 
 	private int row;

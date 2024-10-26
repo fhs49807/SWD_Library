@@ -20,14 +20,14 @@ import java.util.Date;
 @Component
 public class CommandLineAppStartupRunner implements CommandLineRunner {
 
-	@Autowired
-	UserServiceInterface userService;
-
-	@Autowired
-	ProductServiceInterface productService;
-
-	@Autowired
-	OrderServiceInterface orderService;
+//	@Autowired
+//	UserServiceInterface userService;
+//
+//	@Autowired
+//	ProductServiceInterface productService;
+//
+//	@Autowired
+//	OrderServiceInterface orderService;
 
 	@Autowired
 	CustomerServiceInterface customerService;
@@ -39,15 +39,15 @@ public class CommandLineAppStartupRunner implements CommandLineRunner {
 	@Transactional
 	public void run(String... args) throws Exception {
 
-		if (userService.getByUsername("admin") != null)
-			return;
-
-		userService.addUser("admin", "Administrator", "admin@work.org", "123", new Date(), "admin", "ADMIN");
-
-		productService.addProduct("first product", 3.30f);
-		User user = userService.getByUsername("admin");
-		user.setCredit(100L);
-		orderService.addOrder(new Date(), user, productService.getAll());
+//		if (userService.getByUsername("admin") != null)
+//			return;
+//
+//		userService.addUser("admin", "Administrator", "admin@work.org", "123", new Date(), "admin", "ADMIN");
+//
+//		productService.addProduct("first product", 3.30f);
+//		User user = userService.getByUsername("admin");
+//		user.setCredit(100L);
+//		orderService.addOrder(new Date(), user, productService.getAll());
 
 		// -------------------------------------------------------------
 

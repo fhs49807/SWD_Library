@@ -9,7 +9,10 @@ import javax.persistence.Id;
 import javax.persistence.ManyToOne;
 import javax.persistence.OneToOne;
 
+import lombok.NoArgsConstructor;
+
 @Entity
+@NoArgsConstructor
 public class MediaTransaction {
 
 	@Id
