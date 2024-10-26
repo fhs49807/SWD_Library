@@ -11,6 +11,7 @@ import lombok.NoArgsConstructor;
 
 @Entity
 @Inheritance(strategy = InheritanceType.JOINED)
+//@DiscriminatorColumn   TODO: ??
 @NoArgsConstructor
 public class Media {
 
