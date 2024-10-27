@@ -38,28 +38,28 @@ public class CommandLineAppStartupRunner implements CommandLineRunner {
 	@Transactional
 	public void run(String... args) throws Exception {
 
-		if (userService.getByUsername("admin") != null) return;
+//		if (userService.getByUsername("admin") != null) return;
+//		
+//		userService.addUser("admin", "Admin", "admin@gmail.com", "123", new Date(123), "123", "ADMIN");
+//		
+//		productService.addProduct("firstArticle", 2.00f);
+//        User user = userService.getAll().iterator().next();	// User user = userService.getByUsername("admin");
+//        user.setCredit(100l);
+//        user = userService.getByUsername("admin");
+//        orderService.addOrder(new Date(), user, productService.getAll());
 		
-		userService.addUser("admin", "Admin", "admin@gmail.com", "123", new Date(123), "123", "ADMIN");
-		
-		productService.addProduct("firstArticle", 2.00f);
-        User user = userService.getAll().iterator().next();	// User user = userService.getByUsername("admin");
-        user.setCredit(100l);
-        user = userService.getByUsername("admin");
-        orderService.addOrder(new Date(), user, productService.getAll());
-		
-		// Customer customer = new Customer(1, null, "Student", 5, "Test Name");
-		// customerRepository.save(customer);
+		 Customer customer = new Customer(1, null, "Student", 5, "Test Name");
+		 customerRepository.save(customer);
 
-		// System.out.println("Customer created: " + customer.getName() + " with ID: " +
-		// customer.getCustomerID());
+		 System.out.println("Customer created: " + customer.getName() + " with ID: " +
+		 customer.getCustomerID());
 
-		createMedia();
+//		createMedia();
     }
 
 	public void createMedia() {
-		mediaService.saveGenre(new Genre("Fantasy"));
-        Genre fantasy = mediaService.searchGenreByName("Fantasy");
+//		mediaService.saveGenre(new Genre("Fantasy"));
+//        Genre fantasy = mediaService.searchGenreByName("Fantasy");
 	}
 
 	// create library (physical?)
