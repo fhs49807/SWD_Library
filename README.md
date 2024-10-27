@@ -1,7 +1,9 @@
 # TODO
 - Fix Class Diagram✅
 - Component diagram✅
-
+- Complement the class diagram with the defined interfaces and corresponding implementation classes
+- Assign the business objects to their responsible component/service on class diagram
+</br></br>
 - Create classes for your business entities (package: model)✅
 - Create repositories for persisting your business entities (package: repository)✅
 - Create, Read, Update, Delete an entity via the CommandLineStartupRunner
