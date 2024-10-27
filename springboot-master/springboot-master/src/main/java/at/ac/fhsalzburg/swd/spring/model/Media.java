@@ -13,9 +13,8 @@ import lombok.NoArgsConstructor;
 @Inheritance(strategy = InheritanceType.JOINED)
 //@DiscriminatorColumn   TODO: ??
 @NoArgsConstructor
-public class Media {
+public class Media extends BaseEntity {
 
-	// TODO: add id?
 	private int barcode;// id?
 	private String availabilityStatus;
 	private Date dueDate; // remove??

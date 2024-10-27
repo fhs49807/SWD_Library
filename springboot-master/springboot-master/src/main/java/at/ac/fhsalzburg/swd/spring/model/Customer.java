@@ -1,91 +1,65 @@
 package at.ac.fhsalzburg.swd.spring.model;
 
-import java.sql.Date;
-
-import javax.persistence.Column;
-import javax.persistence.Entity;
-import javax.persistence.GeneratedValue;
-import javax.persistence.GenerationType;
-import javax.persistence.Id;
-import javax.persistence.Table;
-
 import lombok.NoArgsConstructor;
+
+import javax.persistence.Entity;
+import javax.persistence.Table;
+import java.sql.Date;
 
 @Entity
 @Table(name = "CUSTOMER")
 @NoArgsConstructor
-public class Customer {
-	
-	
-	@Id
-//    @Column(name = "CUSTOMER_ID")
-//    @GeneratedValue(strategy = GenerationType.AUTO)
-	private int customerID;
+public class Customer extends BaseEntity {
+
     private Date birthDate;
     private String customerType; //remove?
     private int loanLimit;
     private String name;
-    
-    
-	public Customer(int customerID, Date birthDate, String customerType, int loanLimit, String name) {
-		super();
-		this.customerID = customerID;
-		this.birthDate = birthDate;
-		this.customerType = customerType;
-		this.loanLimit = loanLimit;
-		this.name = name;
-	}
+
+    public Customer(Date birthDate, String customerType, int loanLimit, String name) {
+        super();
+        this.birthDate = birthDate;
+        this.customerType = customerType;
+        this.loanLimit = loanLimit;
+        this.name = name;
+    }
+
+    public Date getBirthDate() {
+        return birthDate;
+    }
 
 
-	public int getCustomerID() {
-		return customerID;
-	}
+    public void setBirthDate(Date birthDate) {
+        this.birthDate = birthDate;
+    }
 
 
-	public void setCustomerID(int customerID) {
-		this.customerID = customerID;
-	}
+    public String getCustomerType() {
+        return customerType;
+    }
 
 
-	public Date getBirthDate() {
-		return birthDate;
-	}
+    public void setCustomerType(String customerType) {
+        this.customerType = customerType;
+    }
 
 
-	public void setBirthDate(Date birthDate) {
-		this.birthDate = birthDate;
-	}
+    public int getLoanLimit() {
+        return loanLimit;
+    }
 
 
-	public String getCustomerType() {
-		return customerType;
-	}
+    public void setLoanLimit(int loanLimit) {
+        this.loanLimit = loanLimit;
+    }
 
 
-	public void setCustomerType(String customerType) {
-		this.customerType = customerType;
-	}
+    public String getName() {
+        return name;
+    }
 
 
-	public int getLoanLimit() {
-		return loanLimit;
-	}
-
-
-	public void setLoanLimit(int loanLimit) {
-		this.loanLimit = loanLimit;
-	}
-
-
-	public String getName() {
-		return name;
-	}
-
-
-	public void setName(String name) {
-		this.name = name;
-	}
-    	
-    
-    
+    public void setName(String name) {
+        this.name = name;
+    }
 }

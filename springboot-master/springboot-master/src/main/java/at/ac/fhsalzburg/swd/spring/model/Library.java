@@ -1,36 +1,35 @@
 package at.ac.fhsalzburg.swd.spring.model;
 
-import javax.persistence.Entity;
-
 import lombok.NoArgsConstructor;
+
+import javax.persistence.Entity;
 
 @Entity
 @NoArgsConstructor
-public class Library {
+public class Library extends BaseEntity {
 
-	private int row;
-	private int shelf;
+    private int cell;
+    private int shelf;
 
-	public Library(int row, int shelf) {
-		super();
-		this.row = row;
-		this.shelf = shelf;
-	}
+    public Library(int cell, int shelf) {
+        super();
+        this.cell = cell;
+        this.shelf = shelf;
+    }
 
-	public int getRow() {
-		return row;
-	}
+    public int getShelf() {
+        return shelf;
+    }
 
-	public void setRow(int row) {
-		this.row = row;
-	}
+    public void setShelf(int shelf) {
+        this.shelf = shelf;
+    }
 
-	public int getShelf() {
-		return shelf;
-	}
+    public int getCell() {
+        return cell;
+    }
 
-	public void setShelf(int shelf) {
-		this.shelf = shelf;
-	}
-
+    public void setCell(int cell) {
+        this.cell = cell;
+    }
 }

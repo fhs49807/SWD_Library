@@ -9,7 +9,7 @@ import lombok.NoArgsConstructor;
 
 @Entity
 @NoArgsConstructor
-public class ReturnMedia {// extends mediaTransaction??
+public class ReturnMedia extends BaseEntity {// extends mediaTransaction??
 
 	private String returnCondition;
 	private Date returnDate;

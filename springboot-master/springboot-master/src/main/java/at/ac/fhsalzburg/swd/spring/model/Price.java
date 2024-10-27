@@ -7,7 +7,7 @@ import lombok.NoArgsConstructor;
 
 @Entity
 @NoArgsConstructor
-public class Price {
+public class Price extends BaseEntity {
 
 	private double amount;
 
