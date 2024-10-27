@@ -6,12 +6,14 @@ import org.springframework.context.annotation.Profile;
 import org.springframework.stereotype.Component;
 import org.springframework.transaction.annotation.Transactional;
 
+import at.ac.fhsalzburg.swd.spring.model.User;
 import at.ac.fhsalzburg.swd.spring.model.Customer;
 import at.ac.fhsalzburg.swd.spring.model.Genre;
 import at.ac.fhsalzburg.swd.spring.repository.CustomerRepository;
 import at.ac.fhsalzburg.swd.spring.services.OrderServiceInterface;
 import at.ac.fhsalzburg.swd.spring.services.ProductServiceInterface;
 import at.ac.fhsalzburg.swd.spring.services.UserServiceInterface;
+import at.ac.fhsalzburg.swd.spring.services.MediaService;
 import at.ac.fhsalzburg.swd.spring.services.MediaServiceInterface;
 
 import java.sql.Date;
@@ -26,10 +28,13 @@ public class CommandLineAppStartupRunner implements CommandLineRunner {
 	ProductServiceInterface productService;
 
 	@Autowired
-	MediaServiceInterface mediaService;
+	UserServiceInterface userService;
+
+	///@Autowired
+	///MediaServiceInterface mediaService;
 
 	@Autowired
-	UserServiceInterface userService;
+	private MediaService mediaService;
 
 	@Autowired
 	private CustomerRepository customerRepository;// TODO: remove --> autowire this in customerService
@@ -44,9 +49,9 @@ public class CommandLineAppStartupRunner implements CommandLineRunner {
 		
 		productService.addProduct("firstArticle", 2.00f);
         User user = userService.getAll().iterator().next();	// User user = userService.getByUsername("admin");
-        user.setCredit(100l);
+        user.setCredit(5l);
         user = userService.getByUsername("admin");
-        orderService.addOrder(new Date(), user, productService.getAll());
+        orderService.addOrder(new Date(123), user, productService.getAll());
 		
 		// Customer customer = new Customer(1, null, "Student", 5, "Test Name");
 		// customerRepository.save(customer);
@@ -55,11 +60,13 @@ public class CommandLineAppStartupRunner implements CommandLineRunner {
 		// customer.getCustomerID());
 
 		createMedia();
+		mediaService.saveGenre(new Genre());
+		searchGenreByName(String name);
     }
 
 	public void createMedia() {
-		mediaService.saveGenre(new Genre("Fantasy"));
-        Genre fantasy = mediaService.searchGenreByName("Fantasy");
+		mediaService.saveGenre(new Genre("Action"));
+        Genre fantasy = mediaService.searchGenreByName("Action");
 	}
 
 	// create library (physical?)
