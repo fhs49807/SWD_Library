@@ -14,20 +14,20 @@ import at.ac.fhsalzburg.swd.spring.services.OrderServiceInterface;
 import at.ac.fhsalzburg.swd.spring.services.ProductServiceInterface;
 import at.ac.fhsalzburg.swd.spring.services.UserServiceInterface;
 
-import java.util.Date;
+import java.sql.Date;
 
 @Profile("!test")
 @Component
 public class CommandLineAppStartupRunner implements CommandLineRunner {
 
-//	@Autowired
-//	UserServiceInterface userService;
-//
-//	@Autowired
-//	ProductServiceInterface productService;
-//
-//	@Autowired
-//	OrderServiceInterface orderService;
+	// @Autowired
+	// UserServiceInterface userService;
+	//
+	// @Autowired
+	// ProductServiceInterface productService;
+	//
+	// @Autowired
+	// OrderServiceInterface orderService;
 
 	@Autowired
 	CustomerServiceInterface customerService;
@@ -39,15 +39,16 @@ public class CommandLineAppStartupRunner implements CommandLineRunner {
 	@Transactional
 	public void run(String... args) throws Exception {
 
-//		if (userService.getByUsername("admin") != null)
-//			return;
-//
-//		userService.addUser("admin", "Administrator", "admin@work.org", "123", new Date(), "admin", "ADMIN");
-//
-//		productService.addProduct("first product", 3.30f);
-//		User user = userService.getByUsername("admin");
-//		user.setCredit(100L);
-//		orderService.addOrder(new Date(), user, productService.getAll());
+		// if (userService.getByUsername("admin") != null)
+		// return;
+		//
+		// userService.addUser("admin", "Administrator", "admin@work.org", "123", new
+		// Date(), "admin", "ADMIN");
+		//
+		// productService.addProduct("first product", 3.30f);
+		// User user = userService.getByUsername("admin");
+		// user.setCredit(100L);
+		// orderService.addOrder(new Date(), user, productService.getAll());
 
 		// -------------------------------------------------------------
 
@@ -56,25 +57,53 @@ public class CommandLineAppStartupRunner implements CommandLineRunner {
 
 		System.out.println("Customer created: " + customer.getName() + " with ID: " + customer.getCustomerID());
 
-    
 	}
-	
+
 	public void createMedia() {
-		//TODO
+		// TODO
 	}
-	
-//  create library (physical?)
 
-//  create media --> genre, name, physical location, etc?
+	// create library (physical?)
 
-//  create customers
+	// create media --> genre, name, physical location, etc?
 
-//  reserve media
+	// create customers
 
-//  loan media
+	// reserve media
 
-//  return media
+	// loan media
 
-//  create invoice    
-	
+	// return media
+
+	// create invoice
+
+	@Component
+	public class CommandLineStartupRunner implements CommandLineRunner {
+		@Autowired
+		private CustomerRepository customerRepository;
+
+		@Override
+		public void run(String... args) throws Exception {
+			// Create: Erstelle ein Customer-Objekt und speichere es
+			Customer newCustomer = new Customer(1, Date.valueOf("1990-01-01"), "Standard", 5, "John Doe");
+			customerRepository.save(newCustomer);
+			System.out.println("Customer created: " + newCustomer);
+
+			// Read: Lade einen Customer anhand seiner ID
+			Customer customer = customerRepository.findById(1).orElse(null);
+			System.out.println("Customer read: " + customer);
+
+			// Update: Ändere die Attribute des geladenen Customer und speichere das
+			// aktualisierte Objekt
+			if (customer != null) {
+				customer.setLoanLimit(10);
+				customerRepository.save(customer);
+				System.out.println("Customer updated: " + customer);
+			}
+
+			// Delete: Lösche den Customer anhand seiner ID
+			customerRepository.deleteById(1);
+			System.out.println("Customer deleted with ID 1");
+		}
+	}
 }
