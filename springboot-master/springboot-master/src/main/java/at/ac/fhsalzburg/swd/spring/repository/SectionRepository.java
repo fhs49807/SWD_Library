@@ -7,7 +7,7 @@ import org.springframework.transaction.annotation.Transactional;
 import at.ac.fhsalzburg.swd.spring.model.Section;
 
 @Repository
-public interface SectionRepository extends CrudRepository<Section, Integer> {
+public interface SectionRepository extends CrudRepository<Section, Long> {
 
 	@Transactional(timeout = 10)
 	Section findById(int id);

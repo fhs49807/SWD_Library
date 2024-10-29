@@ -7,7 +7,7 @@ import at.ac.fhsalzburg.swd.spring.model.Media;
 import at.ac.fhsalzburg.swd.spring.model.MediaType;
 
 @Repository
-public interface MediaRepository extends CrudRepository<Media, Integer> {
+public interface MediaRepository extends CrudRepository<Media, Long> {
 
     Media findByName(String name);
 

@@ -23,10 +23,10 @@ public class Media {
 	private String name;
 
 	@ManyToOne
-	private MediaType mediaType; // Uncommented for inclusion
+	private MediaType mediaType; //NullPointerException??
 
 	@ManyToOne
-	private Library library;
+	private Library library;//NullPointerException??
 
 	public Media(Long id, int barcode, String availabilityStatus, Date dueDate, String name, MediaType mediaType,
 			Library library) {

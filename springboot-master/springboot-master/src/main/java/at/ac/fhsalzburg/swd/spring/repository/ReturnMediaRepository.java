@@ -8,7 +8,7 @@ import java.sql.Date;
 import java.util.List;
 
 @Repository
-public interface ReturnMediaRepository extends CrudRepository<ReturnMedia, Integer> {
+public interface ReturnMediaRepository extends CrudRepository<ReturnMedia, Long> {
 
     // List<ReturnMedia> findByCustomer(Customer customer); // das gehört hier nicht hin
 

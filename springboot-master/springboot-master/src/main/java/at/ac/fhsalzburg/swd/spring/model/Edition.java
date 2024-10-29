@@ -18,8 +18,8 @@ public class Edition {
 
 	@Id
 	@GeneratedValue(strategy = GenerationType.IDENTITY)
-	private int editionID;
-	
+	private Long id;
+
 	private String editionYear;
 
 	@ManyToOne
@@ -29,12 +29,12 @@ public class Edition {
 		this.media = media;
 	}
 
-	public int getEditionID() {
-		return editionID;
+	public long getEditionID() {
+		return id;
 	}
 
-	public void setEditionID(int editionID) {
-		this.editionID = editionID;
+	public void setEditionID(long id) {
+		this.id = id;
 	}
 
 	public String getEditionYear() {

@@ -8,7 +8,7 @@ import at.ac.fhsalzburg.swd.spring.model.Media;
 import at.ac.fhsalzburg.swd.spring.model.Movie;
 
 @Repository
-public interface MovieRepository extends CrudRepository<Movie, Integer> {
+public interface MovieRepository extends CrudRepository<Movie, Long> {
 
     @Transactional(timeout = 10)
     Media findById(int id);

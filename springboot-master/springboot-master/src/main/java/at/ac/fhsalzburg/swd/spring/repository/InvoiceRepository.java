@@ -7,7 +7,7 @@ import org.springframework.transaction.annotation.Transactional;
 import at.ac.fhsalzburg.swd.spring.model.Invoice;
 
 @Repository
-public interface InvoiceRepository extends CrudRepository<Invoice, Integer>{
+public interface InvoiceRepository extends CrudRepository<Invoice, Long>{
 
 	@Transactional(timeout = 10)
     Invoice findById(int id);

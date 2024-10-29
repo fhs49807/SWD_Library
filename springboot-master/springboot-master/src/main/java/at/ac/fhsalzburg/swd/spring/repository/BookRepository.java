@@ -8,7 +8,7 @@ import at.ac.fhsalzburg.swd.spring.model.Book;
 import at.ac.fhsalzburg.swd.spring.model.Media;
 
 @Repository
-public interface BookRepository extends CrudRepository<Book, Integer>{
+public interface BookRepository extends CrudRepository<Book, Long>{
 
 	@Transactional(timeout = 10)
     Media findById(int id);

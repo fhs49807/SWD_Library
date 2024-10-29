@@ -13,7 +13,7 @@ public class Section {
     @Id
     @GeneratedValue(strategy = GenerationType.AUTO)
     @Column(name = "SECTION_ID")
-    private Integer sectionId;
+    private Long sectionId;
 
     @Column(name = "NAME")
     private String name;
@@ -35,11 +35,11 @@ public class Section {
     }
 
     // Getters and setters
-    public Integer getSectionId() {
+    public Long getSectionId() {
         return sectionId;
     }
 
-    public void setSectionId(Integer sectionId) {
+    public void setSectionId(Long sectionId) {
         this.sectionId = sectionId;
     }
 
