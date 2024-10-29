@@ -21,7 +21,9 @@ public class MediaTransaction {
 	@GeneratedValue(strategy = GenerationType.IDENTITY)
 	private Long id;
 
-	private String transactionStatus;
+	public enum TransactionStatus {
+		ACTIVE, COMPLETED, OVERDUE
+	}
 
 	@DateTimeFormat(pattern = "yyyy-MM-dd")
 	private Date expectedReturnDate;
@@ -39,24 +41,15 @@ public class MediaTransaction {
 	@ManyToOne
 	private Customer customer;
 
-	public MediaTransaction(Long id, String transactionStatus, Date expectedReturnDate, Date expirationDate,
-			Date transactionDate, Edition edition, Customer customer) {
+	public MediaTransaction(Long id, Date expectedReturnDate, Date expirationDate, Date transactionDate,
+			Edition edition, Customer customer) {
 		super();
 		this.id = id;
-		this.transactionStatus = transactionStatus;
 		this.expectedReturnDate = expectedReturnDate;
 		this.expirationDate = expirationDate;
 		this.transactionDate = transactionDate;
 		this.edition = edition;
 		this.customer = customer;
-	}
-
-	public String getTransactionStatus() {
-		return transactionStatus;
-	}
-
-	public void setTransactionStatus(String transactionStatus) {
-		this.transactionStatus = transactionStatus;
 	}
 
 	public Date getExpectedReturnDate() {
