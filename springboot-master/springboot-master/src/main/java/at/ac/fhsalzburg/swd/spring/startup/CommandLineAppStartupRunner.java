@@ -40,17 +40,17 @@ public class CommandLineAppStartupRunner implements CommandLineRunner {
     public void run(String... args) throws Exception {
 
 
-    	if (userService.getByUsername("admin")!=null) return; // data already exists -> return
-
-    	userService.addUser("admin", "Administrator", "admin@work.org", "123", new Date(123), "admin","ADMIN");
-
-        productService.addProduct("first product", 3.30f);
-        User user = userService.getAll().iterator().next();
-        user.setCredit(100l);
-        user = userService.getByUsername("admin");
-        orderService.addOrder(new Date(), user, productService.getAll());
-    	
-    	
+//    	if (userService.getByUsername("admin")!=null) return; // data already exists -> return
+//
+//    	userService.addUser("admin", "Administrator", "admin@work.org", "123", new Date(123), "admin","ADMIN");
+//
+//        productService.addProduct("first product", 3.30f);
+//        User user = userService.getAll().iterator().next();
+//        user.setCredit(100l);
+//        user = userService.getByUsername("admin");
+//        orderService.addOrder(new Date(), user, productService.getAll());
+//    	
+//    	
         Customer customer = new Customer(null, "Student", 5, "Test Name");
         customerRepository.save(customer);
 
