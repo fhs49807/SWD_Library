@@ -10,5 +10,5 @@ import at.ac.fhsalzburg.swd.spring.model.Customer;
 public interface CustomerRepository extends CrudRepository<Customer, Integer>{
 
 	@Transactional(timeout = 10)
-    Customer findByUsername(String username);
+    Customer findByName(String name);
 }

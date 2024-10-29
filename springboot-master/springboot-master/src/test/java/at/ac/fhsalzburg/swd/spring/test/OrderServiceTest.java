@@ -19,7 +19,7 @@ import at.ac.fhsalzburg.swd.spring.model.Order;
 import at.ac.fhsalzburg.swd.spring.model.Product;
 import at.ac.fhsalzburg.swd.spring.model.User;
 import at.ac.fhsalzburg.swd.spring.repository.OrderRepository;
-import at.ac.fhsalzburg.swd.spring.repository.ProductRepository1;
+import at.ac.fhsalzburg.swd.spring.repository.ProductRepository;
 import at.ac.fhsalzburg.swd.spring.repository.UserRepository;
 import at.ac.fhsalzburg.swd.spring.services.OrderService;
 import at.ac.fhsalzburg.swd.spring.services.OrderServiceInterface;
