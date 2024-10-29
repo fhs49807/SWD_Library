@@ -1,6 +1,6 @@
 package at.ac.fhsalzburg.swd.spring.model;
 
-import java.sql.Date;
+import java.util.Date;
 
 import javax.persistence.Entity;
 import javax.persistence.GeneratedValue;
@@ -9,36 +9,31 @@ import javax.persistence.Id;
 import javax.persistence.OneToOne;
 import javax.persistence.Table;
 
+import org.springframework.format.annotation.DateTimeFormat;
+
 import lombok.NoArgsConstructor;
 
 @Entity
-@Table(name = "Invoices")
+@Table(name = "INVOICES")
 @NoArgsConstructor
 public class Invoice {
 
 	@Id
 	@GeneratedValue(strategy = GenerationType.IDENTITY)
-	private int invoiceID;
+	private Long id;
+
+	@DateTimeFormat(pattern = "yyyy-MM-dd")
 	private Date dueDate;
 	private boolean paymentStatus;
 
-	@OneToOne
-	private Price price;
-
-	public Invoice(int invoiceID, Date dueDate, boolean paymentStatus, Price price) {
+//	@OneToOne
+//	private Price price;
+	
+	public Invoice(Long id, Date dueDate, boolean paymentStatus) {
 		super();
-		this.invoiceID = invoiceID;
+		this.id = id;
 		this.dueDate = dueDate;
 		this.paymentStatus = paymentStatus;
-		this.price = price;
-	}
-
-	public int getInvoiceID() {
-		return invoiceID;
-	}
-
-	public void setInvoiceID(int invoiceID) {
-		this.invoiceID = invoiceID;
 	}
 
 	public Date getDueDate() {
@@ -57,12 +52,8 @@ public class Invoice {
 		this.paymentStatus = paymentStatus;
 	}
 
-	public Price getPrice() {
-		return price;
-	}
-
-	public void setPrice(Price price) {
-		this.price = price;
+	public Long getId() {
+		return id;
 	}
 
 }

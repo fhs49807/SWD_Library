@@ -1,6 +1,6 @@
 package at.ac.fhsalzburg.swd.spring.model;
 
-import java.sql.Date;
+import java.util.Date;
 
 import javax.persistence.Entity;
 import javax.persistence.GeneratedValue;
@@ -8,6 +8,8 @@ import javax.persistence.GenerationType;
 import javax.persistence.Id;
 import javax.persistence.ManyToOne;
 import javax.persistence.OneToOne;
+
+import org.springframework.format.annotation.DateTimeFormat;
 
 import lombok.NoArgsConstructor;
 
@@ -17,11 +19,17 @@ public class MediaTransaction {
 
 	@Id
 	@GeneratedValue(strategy = GenerationType.IDENTITY)
-	private int transactionID;
+	private Long id;
 
 	private String transactionStatus;
+
+	@DateTimeFormat(pattern = "yyyy-MM-dd")
 	private Date expectedReturnDate;
+
+	@DateTimeFormat(pattern = "yyyy-MM-dd")
 	private Date expirationDate;
+
+	@DateTimeFormat(pattern = "yyyy-MM-dd")
 	private Date transactionDate;
 
 	@ManyToOne
@@ -31,24 +39,16 @@ public class MediaTransaction {
 	@ManyToOne
 	private Customer customer;
 
-	public MediaTransaction(int transactionID, String transactionStatus, Date expectedReturnDate, Date expirationDate,
+	public MediaTransaction(Long id, String transactionStatus, Date expectedReturnDate, Date expirationDate,
 			Date transactionDate, Edition edition, Customer customer) {
 		super();
-		this.transactionID = transactionID;
+		this.id = id;
 		this.transactionStatus = transactionStatus;
 		this.expectedReturnDate = expectedReturnDate;
 		this.expirationDate = expirationDate;
 		this.transactionDate = transactionDate;
 		this.edition = edition;
 		this.customer = customer;
-	}
-
-	public int getTransactionID() {
-		return transactionID;
-	}
-
-	public void setTransactionID(int transactionID) {
-		this.transactionID = transactionID;
 	}
 
 	public String getTransactionStatus() {
@@ -97,6 +97,10 @@ public class MediaTransaction {
 
 	public void setCustomer(Customer customer) {
 		this.customer = customer;
+	}
+
+	public Long getId() {
+		return id;
 	}
 
 }

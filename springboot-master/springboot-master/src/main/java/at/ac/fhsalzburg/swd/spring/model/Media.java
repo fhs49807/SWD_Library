@@ -1,40 +1,37 @@
 package at.ac.fhsalzburg.swd.spring.model;
 
-import java.sql.Date;
-
-import javax.persistence.Entity;
-import javax.persistence.GeneratedValue;
-import javax.persistence.GenerationType;
-import javax.persistence.Id;
-import javax.persistence.Inheritance;
-import javax.persistence.InheritanceType;
-import javax.persistence.ManyToOne;
-
+import java.util.Date;
+import javax.persistence.*;
+import org.springframework.format.annotation.DateTimeFormat;
 import lombok.NoArgsConstructor;
 
 @Entity
 @Inheritance(strategy = InheritanceType.JOINED)
-//@DiscriminatorColumn   TODO: ??
+//@DiscriminatorColumn(name = "media_type") ????
 @NoArgsConstructor
 public class Media {
-	
+
 	@Id
-    @GeneratedValue(strategy = GenerationType.IDENTITY)
-	private int barcode;// media Id
-	
+	@GeneratedValue(strategy = GenerationType.IDENTITY)
+	private Long id;
+
+	private int barcode;
 	private String availabilityStatus;
-	private Date dueDate; // remove??
+
+	@DateTimeFormat(pattern = "yyyy-MM-dd")
+	private Date dueDate;
 	private String name;
 
 	@ManyToOne
-	private MediaType mediaType;// one mediaType can have multiple medias??
+	private MediaType mediaType; // Uncommented for inclusion
 
 	@ManyToOne
-	private Library library;// one library can have multiple media
+	private Library library;
 
-	public Media(int barcode, String availabilityStatus, Date dueDate, String name, MediaType mediaType,
+	public Media(Long id, int barcode, String availabilityStatus, Date dueDate, String name, MediaType mediaType,
 			Library library) {
 		super();
+		this.id = id;
 		this.barcode = barcode;
 		this.availabilityStatus = availabilityStatus;
 		this.dueDate = dueDate;
@@ -89,6 +86,10 @@ public class Media {
 
 	public void setLibrary(Library library) {
 		this.library = library;
+	}
+
+	public Long getId() {
+		return id;
 	}
 
 }

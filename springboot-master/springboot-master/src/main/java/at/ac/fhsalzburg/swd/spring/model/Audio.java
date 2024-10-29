@@ -1,6 +1,6 @@
 package at.ac.fhsalzburg.swd.spring.model;
 
-import java.sql.Date;
+import java.util.Date;
 
 import javax.persistence.Entity;
 
@@ -12,9 +12,10 @@ public class Audio extends Media {
 
 	private String codec;
 
-	public Audio(int barcode, String availabilityStatus, Date dueDate, String name, MediaType mediaType,
-			Library library) {
-		super(barcode, availabilityStatus, dueDate, name, mediaType, library);
+	public Audio(Long id, int barcode, String availabilityStatus, Date dueDate, String name, MediaType mediaType,
+			Library library, String codec) {
+		super(id, barcode, availabilityStatus, dueDate, name, mediaType, library);
+		this.codec = codec;
 	}
 
 	public String getCodec() {

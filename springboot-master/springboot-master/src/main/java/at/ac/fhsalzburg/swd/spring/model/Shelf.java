@@ -15,8 +15,8 @@ public class Shelf {
     private Integer number;
 
     @ManyToOne
-    @JoinColumn(name = "SECTION_ID")
-    private Section section;
+    @JoinColumn(name = "SECTION_ID") // Consistent naming convention
+    private Section section; // Each Shelf belongs to one Section
 
     public Shelf(Integer number, Section section) {
         this.number = number;

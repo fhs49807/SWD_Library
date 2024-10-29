@@ -13,22 +13,16 @@ public class MediaType {
 
 	@Id
 	@GeneratedValue(strategy = GenerationType.IDENTITY)
-	private int typeID;
-
-	private String type;
+	private Long id;
 
 	// TODO: @ManyToOne Media??
 
-	public MediaType(String type) {
+	private String type;
+
+	public MediaType(Long id, String type) {
+		super();
+		this.id = id;
 		this.type = type;
-	}
-
-	public int getTypeID() {
-		return typeID;
-	}
-
-	public void setTypeID(int typeID) {
-		this.typeID = typeID;
 	}
 
 	public String getType() {
@@ -37,6 +31,10 @@ public class MediaType {
 
 	public void setType(String type) {
 		this.type = type;
+	}
+
+	public Long getId() {
+		return id;
 	}
 
 }

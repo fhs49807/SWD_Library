@@ -1,6 +1,6 @@
 package at.ac.fhsalzburg.swd.spring.model;
 
-import java.sql.Date;
+import java.util.Date;
 
 import javax.persistence.Entity;
 
@@ -12,9 +12,10 @@ public class Movie extends Media {
 
 	private String IMDb;
 
-	public Movie(int barcode, String availabilityStatus, Date dueDate, String name, MediaType mediaType,
-			Library library) {
-		super(barcode, availabilityStatus, dueDate, name, mediaType, library);
+	public Movie(Long id, int barcode, String availabilityStatus, Date dueDate, String name, MediaType mediaType,
+			Library library, String iMDb) {
+		super(id, barcode, availabilityStatus, dueDate, name, mediaType, library);
+		IMDb = iMDb;
 	}
 
 	public String getIMDb() {

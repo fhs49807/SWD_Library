@@ -2,15 +2,28 @@ package at.ac.fhsalzburg.swd.spring.model;
 
 import lombok.NoArgsConstructor;
 
+import javax.persistence.Column;
 import javax.persistence.Entity;
+import javax.persistence.GeneratedValue;
+import javax.persistence.GenerationType;
+import javax.persistence.Id;
 import javax.persistence.Table;
-import java.sql.Date;
+
+import org.springframework.format.annotation.DateTimeFormat;
+
+import java.util.Date;
 
 @Entity
 @Table(name = "CUSTOMER")
 @NoArgsConstructor
-public class Customer extends BaseEntity {
+public class Customer {
 
+	@Id
+    @Column(name = "CUSTOMER_ID")
+    @GeneratedValue(strategy = GenerationType.AUTO)
+	private Integer customerId;
+	
+	@DateTimeFormat(pattern = "yyyy-MM-dd")
     private Date birthDate;
     private String customerType; //remove?
     private int loanLimit;
@@ -24,6 +37,10 @@ public class Customer extends BaseEntity {
         this.name = name;
     }
 
+    public Integer getCustomerId() {
+        return customerId;
+    }
+    
     public Date getBirthDate() {
         return birthDate;
     }

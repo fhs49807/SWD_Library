@@ -15,36 +15,27 @@ import javax.persistence.Table;
 
 //library name, library id, address
 
-
 @Entity
 @NoArgsConstructor
 @Table(name = "LIBRARIES")
 public class Library {
 
 	@Id
-    @GeneratedValue(strategy = GenerationType.AUTO)
-    private int id;
-	
+	@GeneratedValue(strategy = GenerationType.IDENTITY)
+	private Long id;
+
 	private String name;
-    private String location;
+	private String location;
 
-    @OneToMany(mappedBy = "library", cascade = CascadeType.ALL, fetch = FetchType.LAZY)
-    private List<Section> sections;//one library has many sections
+	@OneToMany(mappedBy = "library", cascade = CascadeType.ALL, fetch = FetchType.LAZY)
+	private List<Section> sections;// one library has many sections
 
-	public Library(int id, String name, String location, List<Section> sections) {
+	public Library(Long id, String name, String location, List<Section> sections) {
 		super();
 		this.id = id;
 		this.name = name;
 		this.location = location;
 		this.sections = sections;
-	}
-
-	public int getId() {
-		return id;
-	}
-
-	public void setId(int id) {
-		this.id = id;
 	}
 
 	public String getName() {
@@ -70,7 +61,9 @@ public class Library {
 	public void setSections(List<Section> sections) {
 		this.sections = sections;
 	}
-    
-    
-    
+
+	public Long getId() {
+		return id;
+	}
+
 }

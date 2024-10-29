@@ -1,8 +1,6 @@
 package at.ac.fhsalzburg.swd.spring.model;
 
-import java.util.Collection;
 import java.util.List;
-
 import javax.persistence.*;
 
 import lombok.NoArgsConstructor;
@@ -12,22 +10,20 @@ import lombok.NoArgsConstructor;
 @Table(name = "SECTIONS")
 public class Section {
 
-    // Primary key
     @Id
     @GeneratedValue(strategy = GenerationType.AUTO)
     @Column(name = "SECTION_ID")
     private Integer sectionId;
-    
+
     @Column(name = "NAME")
     private String name;
 
     @ManyToOne
-    @JoinColumn(name = "LIBRARY_ID")
-    private Library library;
-    
-    @OneToMany(mappedBy = "section", cascade = CascadeType.ALL, fetch = FetchType.LAZY)
-    private List<Shelf> shelves;
+    @JoinColumn(name = "LIBRARY_ID") // Consistent naming convention
+    private Library library; // Each Library can have a list of Sections.
 
+    @OneToMany(mappedBy = "section", cascade = CascadeType.ALL, fetch = FetchType.LAZY)
+    private List<Shelf> shelves; // A single Section can contain multiple Shelves.
 
     public Section(String name) {
         this.name = name;
@@ -55,7 +51,7 @@ public class Section {
         this.name = name;
     }
 
-    public Collection<Shelf> getShelves() {
+    public List<Shelf> getShelves() { // Aligned getter type with field type
         return shelves;
     }
 
