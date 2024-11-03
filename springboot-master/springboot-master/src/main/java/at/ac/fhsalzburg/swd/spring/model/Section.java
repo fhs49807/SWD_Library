@@ -1,17 +1,21 @@
 package at.ac.fhsalzburg.swd.spring.model;
 
-import java.util.List;
-import javax.persistence.*;
-
+import lombok.Getter;
 import lombok.NoArgsConstructor;
+import lombok.Setter;
+
+import javax.persistence.*;
+import java.util.List;
 
 @Entity
+@Getter
+@Setter
 @NoArgsConstructor
 @Table(name = "SECTIONS")
 public class Section {
 
     @Id
-    @GeneratedValue(strategy = GenerationType.AUTO)
+    @GeneratedValue(strategy = GenerationType.IDENTITY) // ID bezieht sich auf die Tabelle
     @Column(name = "SECTION_ID")
     private Long sectionId;
 
@@ -19,43 +23,13 @@ public class Section {
     private String name;
 
     @ManyToOne
-    @JoinColumn(name = "LIBRARY_ID") // Consistent naming convention
     private Library library; // Each Library can have a list of Sections.
 
     @OneToMany(mappedBy = "section", cascade = CascadeType.ALL, fetch = FetchType.LAZY)
     private List<Shelf> shelves; // A single Section can contain multiple Shelves.
 
-    public Section(String name) {
+    public Section(String name, Library library) {
         this.name = name;
-    }
-
-    public Section(String name, List<Shelf> shelves) {
-        this.name = name;
-        this.shelves = shelves;
-    }
-
-    // Getters and setters
-    public Long getSectionId() {
-        return sectionId;
-    }
-
-    public void setSectionId(Long sectionId) {
-        this.sectionId = sectionId;
-    }
-
-    public String getName() {
-        return name;
-    }
-
-    public void setName(String name) {
-        this.name = name;
-    }
-
-    public List<Shelf> getShelves() { // Aligned getter type with field type
-        return shelves;
-    }
-
-    public void setShelves(List<Shelf> shelves) {
-        this.shelves = shelves;
+        this.library = library;
     }
 }

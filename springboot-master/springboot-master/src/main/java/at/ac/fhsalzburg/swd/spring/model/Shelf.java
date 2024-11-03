@@ -1,49 +1,30 @@
 package at.ac.fhsalzburg.swd.spring.model;
 
+import lombok.Getter;
+import lombok.NoArgsConstructor;
+import lombok.Setter;
+
 import javax.persistence.*;
 
-import lombok.NoArgsConstructor;
-
 @Entity
+@Getter
+@Setter
 @NoArgsConstructor
 @Table(name = "SHELVES")
 public class Shelf {
 
-	@Id
-	@GeneratedValue(strategy = GenerationType.AUTO)
-	private Long id;
-	private Integer number;
+    @Id
+    @GeneratedValue(strategy = GenerationType.IDENTITY)
+    private Long id;
 
-	@ManyToOne
-	@JoinColumn(name = "SECTION_ID") // Consistent naming convention
-	private Section section; // Each Shelf belongs to one Section
+    private Integer number;
 
-	public Shelf(Integer number, Section section) {
-		this.number = number;
-		this.section = section;
-	}
+    @ManyToOne
+    @JoinColumn(name = "SECTION_ID") // Consistent naming convention
+    private Section section; // Each Shelf belongs to one Section
 
-	public Long getShelfId() {
-		return id;
-	}
-
-	public void setShelfId(Long id) {
-		this.id = id;
-	}
-
-	public Integer getNumber() {
-		return number;
-	}
-
-	public void setNumber(Integer number) {
-		this.number = number;
-	}
-
-	public Section getSection() {
-		return section;
-	}
-
-	public void setSection(Section section) {
-		this.section = section;
-	}
+    public Shelf(Section section, Integer number) {
+        this.section = section;
+        this.number = number;
+    }
 }
