@@ -2,16 +2,8 @@ package at.ac.fhsalzburg.swd.spring.model;
 
 import lombok.NoArgsConstructor;
 
+import javax.persistence.*;
 import java.util.List;
-
-import javax.persistence.CascadeType;
-import javax.persistence.Entity;
-import javax.persistence.FetchType;
-import javax.persistence.GeneratedValue;
-import javax.persistence.GenerationType;
-import javax.persistence.Id;
-import javax.persistence.OneToMany;
-import javax.persistence.Table;
 
 //library name, library id, address
 
@@ -30,9 +22,7 @@ public class Library {
 	@OneToMany(mappedBy = "library", cascade = CascadeType.ALL, fetch = FetchType.LAZY)
 	private List<Section> sections;// one library has many sections
 
-	public Library(Long id, String name, String location, List<Section> sections) {
-		super();
-		this.id = id;
+	public Library(String name, String location, List<Section> sections) {
 		this.name = name;
 		this.location = location;
 		this.sections = sections;
@@ -66,4 +56,7 @@ public class Library {
 		return id;
 	}
 
+    public void setId(Long id) {
+        this.id = id;
+    }
 }

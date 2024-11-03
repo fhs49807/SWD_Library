@@ -12,9 +12,9 @@ public class Book extends Media {
 
 	private String ISBN;
 
-	public Book(Long id, int barcode, String availabilityStatus, Date dueDate, String name, MediaType mediaType,
+	public Book(int barcode, String availabilityStatus, Date dueDate, String name, MediaType mediaType,
 			Library library, String iSBN) {
-		super(id, barcode, availabilityStatus, dueDate, name, mediaType, library);
+		super(barcode, availabilityStatus, dueDate, name, mediaType, library);
 		ISBN = iSBN;
 	}
 

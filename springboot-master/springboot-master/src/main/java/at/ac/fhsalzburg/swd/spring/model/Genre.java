@@ -1,8 +1,8 @@
 package at.ac.fhsalzburg.swd.spring.model;
 
-import javax.persistence.*;
-
 import lombok.NoArgsConstructor;
+
+import javax.persistence.*;
 
 @Entity
 @NoArgsConstructor
@@ -15,22 +15,23 @@ public class Genre {
 	@Column(unique = true)
 	private String name;
 
-	public Genre(Long id, String name) {
-		super();
-		this.id = id;
-		this.name = name;
-	}
+    public Genre(String name) {
+        this.name = name;
+    }
 
-	public String getName() {
-		return name;
-	}
+    public String getName() {
+        return name;
+    }
 
-	public void setName(String name) {
-		this.name = name;
-	}
+    public void setName(String name) {
+        this.name = name;
+    }
 
-	public Long getId() {
-		return id;
-	}
+    public Long getId() {
+        return id;
+    }
 
+    public void setId(Long id) {
+        this.id = id;
+    }
 }
