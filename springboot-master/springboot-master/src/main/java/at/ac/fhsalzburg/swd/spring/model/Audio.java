@@ -2,6 +2,8 @@ package at.ac.fhsalzburg.swd.spring.model;
 
 import java.sql.Date;
 
+import org.springframework.http.MediaType;
+
 import javax.persistence.Entity;
 
 import lombok.NoArgsConstructor;

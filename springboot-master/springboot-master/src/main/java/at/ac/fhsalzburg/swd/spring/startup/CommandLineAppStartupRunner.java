@@ -61,12 +61,12 @@ public class CommandLineAppStartupRunner implements CommandLineRunner {
 
 		createMedia();
 		mediaService.saveGenre(new Genre());
-		searchGenreByName(String name);
+		//searchGenreByName(String name);
     }
 
 	public void createMedia() {
 		mediaService.saveGenre(new Genre("Action"));
-        Genre fantasy = mediaService.searchGenreByName("Action");
+       // Genre fantasy = mediaService.searchGenreByName("Action");
 	}
 
 	// create library (physical?)

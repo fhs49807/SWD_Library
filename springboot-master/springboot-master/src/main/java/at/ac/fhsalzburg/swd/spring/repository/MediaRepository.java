@@ -4,7 +4,7 @@ import org.springframework.data.repository.CrudRepository;
 import org.springframework.stereotype.Repository;
 
 import at.ac.fhsalzburg.swd.spring.model.Media;
-import at.ac.fhsalzburg.swd.spring.model.MediaType;
+import at.ac.fhsalzburg.swd.spring.model.Mediatype;
 
 @Repository
 public interface MediaRepository extends CrudRepository<Media, Integer> {
@@ -12,5 +12,5 @@ public interface MediaRepository extends CrudRepository<Media, Integer> {
     Media findByName(String name);
 
     Iterable<Media> findByAvailabilityStatus(String availabilityStatus);
-    Iterable<Media> findByMediaType(MediaType mediaType);
+    Iterable<Media> findByMediaType(Mediatype mediatype);
 }

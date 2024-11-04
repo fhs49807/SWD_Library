@@ -4,13 +4,13 @@ import org.springframework.data.repository.CrudRepository;
 import org.springframework.stereotype.Repository;
 import org.springframework.transaction.annotation.Transactional;
 
-import at.ac.fhsalzburg.swd.spring.model.MediaType;
+import at.ac.fhsalzburg.swd.spring.model.Mediatype;
 
 @Repository
-public interface MediaTypeRepository extends CrudRepository<MediaType, Integer> {
+public interface MediaTypeRepository extends CrudRepository<Mediatype, Integer> {
 
     @Transactional(timeout = 10)
-    MediaType findById(int id);
+    Mediatype findById(int id);
 
-    MediaType findByType(String type);
+    Mediatype findByType(String type);
 }

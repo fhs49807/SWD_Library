@@ -9,7 +9,7 @@ import lombok.NoArgsConstructor;
 
 @Entity
 @NoArgsConstructor
-public class MediaType {
+public class Mediatype {
 
 	@Id
 	@GeneratedValue(strategy = GenerationType.IDENTITY)
@@ -19,7 +19,7 @@ public class MediaType {
 
 	// TODO: @ManyToOne Media??
 
-	public MediaType(String type) {
+	public Mediatype(String type) {
 		this.type = type;
 	}
 

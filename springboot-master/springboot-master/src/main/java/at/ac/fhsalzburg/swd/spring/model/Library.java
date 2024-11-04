@@ -1,12 +1,15 @@
 package at.ac.fhsalzburg.swd.spring.model;
 
 import javax.persistence.Entity;
+import javax.persistence.Id;
 
 import lombok.NoArgsConstructor;
 
 @Entity
 @NoArgsConstructor
 public class Library {
+	@Id
+    private Long id; 
 
 	private int row;
 	private int shelf;

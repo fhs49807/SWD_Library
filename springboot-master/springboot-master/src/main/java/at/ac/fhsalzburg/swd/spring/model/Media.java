@@ -1,11 +1,16 @@
 package at.ac.fhsalzburg.swd.spring.model;
 
-import java.sql.Date;
-
 import javax.persistence.Entity;
+import javax.persistence.Id;
+import javax.persistence.GeneratedValue;
+import javax.persistence.GenerationType;
 import javax.persistence.Inheritance;
 import javax.persistence.InheritanceType;
 import javax.persistence.ManyToOne;
+
+import java.sql.Date;
+
+import org.springframework.http.MediaType;
 
 import lombok.NoArgsConstructor;
 
@@ -15,6 +20,10 @@ import lombok.NoArgsConstructor;
 @NoArgsConstructor
 public class Media {
 
+	@Id  //markiert das Feld als Primärschlüssel
+	@GeneratedValue(strategy = GenerationType.IDENTITY) //sorgt dafür, dass die ID automatisch generiert wird (z. B. bei Datenbank-Tabellen mit Auto-Increment-Funktion)
+    private Long id;
+	
 	// TODO: add id?
 	private int barcode;// id?
 	private String availabilityStatus;
