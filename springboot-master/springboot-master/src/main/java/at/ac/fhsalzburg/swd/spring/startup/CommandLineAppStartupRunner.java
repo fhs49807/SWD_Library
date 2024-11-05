@@ -56,9 +56,40 @@ public class CommandLineAppStartupRunner implements CommandLineRunner {
         Customer customer = new Customer(null, "Student", 5, "Test Name");
         customerRepository.save(customer);
 
+        // Call the CRUD operations for Customer
+        performCustomerCRUD();
+
         createLibrary();
 
         //		createMedia();
+    }
+
+    private void performCustomerCRUD() {
+        // CREATE
+        Customer customer = new Customer(new Date(), "Student", 5, "Test Name");
+        customer = customerRepository.save(customer); // Save and update reference with generated ID
+        System.out.println("Customer created: " + customer);
+
+        // READ
+        customerRepository.findById(String.valueOf(customer.getCustomerId()))
+            .ifPresentOrElse(
+                retrievedCustomer -> System.out.println("Customer retrieved: " + retrievedCustomer),
+                () -> System.out.println("Customer not found")
+                            );
+
+        // UPDATE
+        customerRepository.findById(String.valueOf(customer.getCustomerId())).ifPresent(retrievedCustomer -> {
+            retrievedCustomer.setName("Updated Name");
+            retrievedCustomer.setLoanLimit(10);
+            customerRepository.save(retrievedCustomer);
+            System.out.println("Customer updated: " + retrievedCustomer);
+        });
+
+        // DELETE
+        customerRepository.findById(String.valueOf(customer.getCustomerId())).ifPresent(retrievedCustomer -> {
+            customerRepository.delete(retrievedCustomer);
+            System.out.println("Customer deleted with ID: " + retrievedCustomer.getCustomerId());
+        });
     }
 
     private void createLibrary() {
@@ -85,4 +116,6 @@ public class CommandLineAppStartupRunner implements CommandLineRunner {
     // return media
 
     // create invoice
+
+
 }
