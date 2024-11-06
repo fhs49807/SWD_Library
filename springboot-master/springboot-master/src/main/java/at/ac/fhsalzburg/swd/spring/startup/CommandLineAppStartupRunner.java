@@ -143,11 +143,17 @@ public class CommandLineAppStartupRunner implements CommandLineRunner {
 
 		// Create a genre and media type for media items
 		// Create and save the genre and media type
-		Genre genre = new Genre();
-		genre.setName("Science Fiction");
-		genre.setPrice(10.0);
-		// Save the Genre entity before using it
-		genre = genreRepository.save(genre);
+		Genre scienceFictionGenre = new Genre();
+		scienceFictionGenre.setName("Science Fiction");
+		scienceFictionGenre.setPrice(10.0);
+		scienceFictionGenre = genreRepository.save(scienceFictionGenre);
+		
+		Genre FantasyGenre = new Genre();
+		FantasyGenre.setName("Fantasy Genre");
+		FantasyGenre.setPrice(10.0);
+		FantasyGenre = genreRepository.save(FantasyGenre);
+		
+		
 		;
 
 		MediaType mediaType = new MediaType();
@@ -158,14 +164,14 @@ public class CommandLineAppStartupRunner implements CommandLineRunner {
 		// Create media items and assign genre, type, and shelf
 		Media book1 = new Media();
 		book1.setName("The Time Machine");
-		book1.setGenre(genre);
+		book1.setGenre(scienceFictionGenre);
 		book1.setMediaType(mediaType);
 		book1.setShelf(shelfA1);
 		mediaService.save(book1);
 
 		Media book2 = new Media();
 		book2.setName("Dune");
-		book2.setGenre(genre);
+		book2.setGenre(FantasyGenre);
 		book2.setMediaType(mediaType);
 		book2.setShelf(shelfB1);
 		mediaService.save(book2);
