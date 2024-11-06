@@ -1,6 +1,7 @@
 package at.ac.fhsalzburg.swd.spring.repository;
 
 import java.util.Collection;
+import java.util.List;
 
 import org.springframework.data.repository.CrudRepository;
 import org.springframework.stereotype.Repository;
@@ -16,5 +17,5 @@ public interface EditionRepository extends CrudRepository<Edition, Long>{
     Edition findById(long id);
 
 	@Transactional(timeout = 10)
-    Collection<Edition> findEditionByMedia(Media media);
+    List<Edition> findEditionByMedia(Media media);
 }
