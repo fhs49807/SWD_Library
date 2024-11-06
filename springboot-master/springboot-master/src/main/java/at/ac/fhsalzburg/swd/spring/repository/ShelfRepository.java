@@ -4,13 +4,12 @@ import org.springframework.data.repository.CrudRepository;
 import org.springframework.stereotype.Repository;
 import org.springframework.transaction.annotation.Transactional;
 
-import at.ac.fhsalzburg.swd.spring.model.Audio;
-import at.ac.fhsalzburg.swd.spring.model.Media;
+import at.ac.fhsalzburg.swd.spring.model.Shelf;
 
 @Repository
-public interface AudioRepository extends CrudRepository<Audio, Long> {
+public interface ShelfRepository extends CrudRepository<Shelf, Long> {
 
 	@Transactional(timeout = 10)
-	Media findById(long id);
+	Shelf findById(int id);
 
 }

@@ -1,64 +1,37 @@
 package at.ac.fhsalzburg.swd.spring.model;
 
-import java.sql.Date;
-
-import javax.persistence.Entity;
-import javax.persistence.Inheritance;
-import javax.persistence.InheritanceType;
-import javax.persistence.ManyToOne;
-
+import javax.persistence.*;
 import lombok.NoArgsConstructor;
 
 @Entity
-@Inheritance(strategy = InheritanceType.JOINED)
-//@DiscriminatorColumn   TODO: ??
+@Inheritance(strategy = InheritanceType.JOINED) // create tables for inhereting classes
 @NoArgsConstructor
-public class Media extends BaseEntity {
+public class Media {
 
-	private int barcode;// id?
-	private String availabilityStatus;
-	private Date dueDate; // remove??
+	@Id
+	@GeneratedValue(strategy = GenerationType.AUTO)
+	private Long id;
 	private String name;
+	private double price;// set price automatically based on genre ('setGenre')
 
+	// Each Media item belongs to a single Genre
+	// One Genre can have multiple Media items
 	@ManyToOne
-	private MediaType mediaType;// one mediaType can have multiple medias??
+	private Genre genre;
 
+	// Each Media item has a single MediaType (book, audio, movie)
+	// One MediaType can have multiple Media items
 	@ManyToOne
-	private Library library;// one library can have multiple media
+	private MediaType mediaType;
 
-	public Media(int barcode, String availabilityStatus, Date dueDate, String name, MediaType mediaType,
-			Library library) {
+	public Media() {
+	}
+
+	public Media(Long id, String name, MediaType mediaType) {
 		super();
-		this.barcode = barcode;
-		this.availabilityStatus = availabilityStatus;
-		this.dueDate = dueDate;
+		this.id = id;
 		this.name = name;
 		this.mediaType = mediaType;
-		this.library = library;
-	}
-
-	public int getBarcode() {
-		return barcode;
-	}
-
-	public void setBarcode(int barcode) {
-		this.barcode = barcode;
-	}
-
-	public String getAvailabilityStatus() {
-		return availabilityStatus;
-	}
-
-	public void setAvailabilityStatus(String availabilityStatus) {
-		this.availabilityStatus = availabilityStatus;
-	}
-
-	public Date getDueDate() {
-		return dueDate;
-	}
-
-	public void setDueDate(Date dueDate) {
-		this.dueDate = dueDate;
 	}
 
 	public String getName() {
@@ -77,12 +50,27 @@ public class Media extends BaseEntity {
 		this.mediaType = mediaType;
 	}
 
-	public Library getLibrary() {
-		return library;
+	public Long getId() {
+		return id;
 	}
 
-	public void setLibrary(Library library) {
-		this.library = library;
+	public double getPrice() {
+		return price;
+	}
+
+	public void setPrice(double price) {
+		this.price = price;
+	}
+
+	public void setGenre(Genre genre) {
+		this.genre = genre;
+		if (genre != null) {
+			this.price = genre.getPrice(); // Preis aus dem Genre übernehmen
+		}
+	}
+
+	public Genre getGenre() {
+		return genre;
 	}
 
 }

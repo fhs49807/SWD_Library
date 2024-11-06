@@ -1,5 +1,7 @@
 package at.ac.fhsalzburg.swd.spring.model;
 
+import java.util.Date;
+
 import javax.persistence.Entity;
 import javax.persistence.GeneratedValue;
 import javax.persistence.GenerationType;
@@ -7,7 +9,11 @@ import javax.persistence.Id;
 import javax.persistence.ManyToOne;
 import javax.persistence.Table;
 
+import org.springframework.format.annotation.DateTimeFormat;
+
 import lombok.NoArgsConstructor;
+
+//edition = exemplar eines mediums
 
 @Entity
 @Table(name = "EDITIONS")
@@ -16,30 +22,29 @@ public class Edition {
 
 	@Id
 	@GeneratedValue(strategy = GenerationType.IDENTITY)
-	private int editionID;
-	private String editionYear;
+	private Long id;
 
+	@DateTimeFormat(pattern = "yyyy-MM-dd")
+	private Date dueDate;// due date (return date) for specific edition of medium
+
+	// one media can have multiple editions
+	// Each Edition is linked to one Media item
 	@ManyToOne
-	private Media media;// one media can have multiple editions
+	private Media media;
 
-	public Edition(Media m) {
-		this.media = m;
+	public Edition(Long id, Date dueDate, Media media) {
+		super();
+		this.id = id;
+		this.dueDate = dueDate;
+		this.media = media;
 	}
 
-	public int getEditionID() {
-		return editionID;
+	public Date getDueDate() {
+		return dueDate;
 	}
 
-	public void setEditionID(int editionID) {
-		this.editionID = editionID;
-	}
-
-	public String getEditionYear() {
-		return editionYear;
-	}
-
-	public void setEditionYear(String editionYear) {
-		this.editionYear = editionYear;
+	public void setDueDate(Date dueDate) {
+		this.dueDate = dueDate;
 	}
 
 	public Media getMedia() {
@@ -48,6 +53,10 @@ public class Edition {
 
 	public void setMedia(Media media) {
 		this.media = media;
+	}
+
+	public Long getId() {
+		return id;
 	}
 
 }

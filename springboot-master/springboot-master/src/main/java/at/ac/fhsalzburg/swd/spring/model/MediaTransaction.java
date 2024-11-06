@@ -1,62 +1,79 @@
 package at.ac.fhsalzburg.swd.spring.model;
 
-import java.sql.Date;
+import java.util.Collection;
+import java.util.Date;
 
 import javax.persistence.Entity;
 import javax.persistence.GeneratedValue;
 import javax.persistence.GenerationType;
 import javax.persistence.Id;
+import javax.persistence.ManyToMany;
 import javax.persistence.ManyToOne;
-import javax.persistence.OneToOne;
+import javax.persistence.Table;
+
+import org.springframework.format.annotation.DateTimeFormat;
 
 import lombok.NoArgsConstructor;
 
 @Entity
 @NoArgsConstructor
+@Table(name = "TRANSACTIONS")
 public class MediaTransaction {
 
 	@Id
-	@GeneratedValue(strategy = GenerationType.IDENTITY)
-	private int transactionID;
+	@GeneratedValue(strategy = GenerationType.AUTO)
+	private Long id;
 
-	private String transactionStatus;
-	private Date expectedReturnDate;
-	private Date expirationDate;
-	private Date transactionDate;
+	private TransactionStatus status;
+	private ReturnCondition condition;
 
-	@ManyToOne
-	private Edition edition;
+	@DateTimeFormat(pattern = "yyyy-MM-dd")
+	private Date expectedReturnDate;// transactionDate + days Loaned for
 
-	// TODO: @ManyToOne Customer??
+	@DateTimeFormat(pattern = "yyyy-MM-dd")
+	private Date expirationDate;// date when loan expires and penalties apply
+
+	@DateTimeFormat(pattern = "yyyy-MM-dd")
+	private Date transactionDate;// date when item was loaned or reserved
+
+	@DateTimeFormat(pattern = "yyyy-MM-dd")
+	private Date returnDate; // date when item was actually returned
+
+	@ManyToMany
+	private Collection<Edition> editions;// one transaction can have multiple items
+
 	@ManyToOne
 	private Customer customer;
 
-	public MediaTransaction(int transactionID, String transactionStatus, Date expectedReturnDate, Date expirationDate,
-			Date transactionDate, Edition edition, Customer customer) {
+	public MediaTransaction(Long id, TransactionStatus status, ReturnCondition condition, Date expectedReturnDate,
+			Date expirationDate, Date transactionDate, Date returnDate, Collection<Edition> editions,
+			Customer customer) {
 		super();
-		this.transactionID = transactionID;
-		this.transactionStatus = transactionStatus;
+		this.id = id;
+		this.status = status;
+		this.condition = condition;
 		this.expectedReturnDate = expectedReturnDate;
 		this.expirationDate = expirationDate;
 		this.transactionDate = transactionDate;
-		this.edition = edition;
+		this.returnDate = returnDate;
+		this.editions = editions;
 		this.customer = customer;
 	}
 
-	public int getTransactionID() {
-		return transactionID;
+	public TransactionStatus getStatus() {
+		return status;
 	}
 
-	public void setTransactionID(int transactionID) {
-		this.transactionID = transactionID;
+	public void setStatus(TransactionStatus status) {
+		this.status = status;
 	}
 
-	public String getTransactionStatus() {
-		return transactionStatus;
+	public ReturnCondition getCondition() {
+		return condition;
 	}
 
-	public void setTransactionStatus(String transactionStatus) {
-		this.transactionStatus = transactionStatus;
+	public void setCondition(ReturnCondition condition) {
+		this.condition = condition;
 	}
 
 	public Date getExpectedReturnDate() {
@@ -83,12 +100,20 @@ public class MediaTransaction {
 		this.transactionDate = transactionDate;
 	}
 
-	public Edition getEdition() {
-		return edition;
+	public Date getReturnDate() {
+		return returnDate;
 	}
 
-	public void setEdition(Edition edition) {
-		this.edition = edition;
+	public void setReturnDate(Date returnDate) {
+		this.returnDate = returnDate;
+	}
+
+	public Collection<Edition> getEditions() {
+		return editions;
+	}
+
+	public void setEditions(Collection<Edition> editions) {
+		this.editions = editions;
 	}
 
 	public Customer getCustomer() {
@@ -97,6 +122,18 @@ public class MediaTransaction {
 
 	public void setCustomer(Customer customer) {
 		this.customer = customer;
+	}
+
+	public Long getId() {
+		return id;
+	}
+
+	public enum TransactionStatus {
+		ACTIVE, COMPLETED, OVERDUE
+	}
+
+	public enum ReturnCondition {
+		GOOD, DAMAGED
 	}
 
 }

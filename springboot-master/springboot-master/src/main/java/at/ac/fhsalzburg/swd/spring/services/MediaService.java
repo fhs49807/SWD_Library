@@ -7,13 +7,14 @@ import at.ac.fhsalzburg.swd.spring.model.Genre;
 
 @Service
 public class MediaService implements MediaServiceInterface {
-    private final GenreRepository genreRepository;
+	//TODO: Autowired
+	//    private final GenreRepository genreRepository;
 
-    public MediaService(GenreRepository genreRepo) {
-        this.genreRepository = genreRepo;
-    }
-
-    public void saveGenre(Genre genre) {
-        genreRepository.save(genre);
-    }
+//    public MediaService(GenreRepository genreRepo) {
+//        this.genreRepository = genreRepo;
+//    }
+//
+//    public void saveGenre(Genre genre) {
+//        genreRepository.save(genre);
+//    }
 }

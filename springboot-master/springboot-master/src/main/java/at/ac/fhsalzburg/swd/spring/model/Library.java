@@ -2,34 +2,71 @@ package at.ac.fhsalzburg.swd.spring.model;
 
 import lombok.NoArgsConstructor;
 
+import java.util.List;
+
+import javax.persistence.CascadeType;
 import javax.persistence.Entity;
+import javax.persistence.FetchType;
+import javax.persistence.GeneratedValue;
+import javax.persistence.GenerationType;
+import javax.persistence.Id;
+import javax.persistence.OneToMany;
+import javax.persistence.Table;
+
+//library name, library id, address
+
+//-->manage inventory of library
+//Methods: addMedia, createEdition, delete...
 
 @Entity
 @NoArgsConstructor
-public class Library extends BaseEntity {
+@Table(name = "LIBRARIES")
+public class Library {
 
-    private int cell;
-    private int shelf;
+	@Id
+	@GeneratedValue(strategy = GenerationType.IDENTITY)
+	private Long id;
 
-    public Library(int cell, int shelf) {
-        super();
-        this.cell = cell;
-        this.shelf = shelf;
-    }
+	private String name;
+	private String location;
 
-    public int getShelf() {
-        return shelf;
-    }
+	@OneToMany(mappedBy = "library", cascade = CascadeType.ALL, fetch = FetchType.LAZY)
+	private List<Section> sections;// one library has many sections
 
-    public void setShelf(int shelf) {
-        this.shelf = shelf;
-    }
+	public Library(Long id, String name, String location, List<Section> sections) {
+		super();
+		this.id = id;
+		this.name = name;
+		this.location = location;
+		this.sections = sections;
+	}
 
-    public int getCell() {
-        return cell;
-    }
+	public String getName() {
+		return name;
+	}
 
-    public void setCell(int cell) {
-        this.cell = cell;
-    }
+	public void setName(String name) {
+		this.name = name;
+	}
+
+	public String getLocation() {
+		return location;
+	}
+
+	public void setLocation(String location) {
+		this.location = location;
+	}
+
+	public List<Section> getSections() {
+		return sections;
+	}
+
+	public void setSections(List<Section> sections) {
+		this.sections = sections;
+	}
+
+	public Long getId() {
+		return id;
+	}
+
 }

@@ -10,11 +10,11 @@ import at.ac.fhsalzburg.swd.spring.model.Edition;
 import at.ac.fhsalzburg.swd.spring.model.Media;
 
 @Repository
-public interface EditionRepository extends CrudRepository<Edition, Integer>{
+public interface EditionRepository extends CrudRepository<Edition, Long>{
 
 	@Transactional(timeout = 10)
-    Edition findById(int id);
+    Edition findById(long id);
 
-    @Transactional
+	@Transactional(timeout = 10)
     Collection<Edition> findEditionByMedia(Media media);
 }

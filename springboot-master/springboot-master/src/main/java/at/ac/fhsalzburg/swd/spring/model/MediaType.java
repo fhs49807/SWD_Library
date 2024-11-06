@@ -7,36 +7,35 @@ import javax.persistence.Id;
 
 import lombok.NoArgsConstructor;
 
+//MediaType = Audio, Book, 
+
 @Entity
 @NoArgsConstructor
 public class MediaType {
 
 	@Id
 	@GeneratedValue(strategy = GenerationType.IDENTITY)
-	private int typeID;
+	private Long id;
 
-	private String type;
+	private String typeName;
 
-	// TODO: @ManyToOne Media??
-
-	public MediaType(String type) {
-		this.type = type;
-	}
-
-	public int getTypeID() {
-		return typeID;
-	}
-
-	public void setTypeID(int typeID) {
-		this.typeID = typeID;
+	
+	public MediaType(Long id, String typeName) {
+		super();
+		this.id = id;
+		this.typeName = typeName;
 	}
 
 	public String getType() {
-		return type;
+		return typeName;
 	}
 
 	public void setType(String type) {
-		this.type = type;
+		this.typeName = type;
+	}
+
+	public Long getId() {
+		return id;
 	}
 
 }

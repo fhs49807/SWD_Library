@@ -3,6 +3,6 @@ package at.ac.fhsalzburg.swd.spring.services;
 import org.springframework.stereotype.Service;
 
 @Service
-public class InvoiceService {
+public class InvoiceService implements InvoiceServiceInterface{
 
 }
