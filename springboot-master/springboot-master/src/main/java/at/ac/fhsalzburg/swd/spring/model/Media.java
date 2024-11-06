@@ -23,9 +23,10 @@ public class Media {
 	// One MediaType can have multiple Media items
 	@ManyToOne
 	private MediaType mediaType;
-
-	public Media() {
-	}
+	
+	@ManyToOne
+    @JoinColumn(name = "shelf_id")
+    private Shelf shelf;
 
 	public Media(Long id, String name, MediaType mediaType) {
 		super();

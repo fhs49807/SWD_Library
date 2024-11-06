@@ -11,7 +11,8 @@ public interface MediaTypeRepository extends CrudRepository<MediaType, Long> {
 
     @Transactional(timeout = 10)
     MediaType findById(int id);
-
+	
 	@Transactional(timeout = 10)
-    MediaType findByType(String type);
+	MediaType findByTypeName(String typeName);
+
 }

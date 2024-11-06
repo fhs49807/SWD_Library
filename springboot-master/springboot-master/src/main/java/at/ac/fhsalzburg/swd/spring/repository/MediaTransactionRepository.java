@@ -17,7 +17,7 @@ public interface MediaTransactionRepository extends CrudRepository<MediaTransact
 	MediaTransaction findById(long id);
 
 	@Transactional(timeout = 10)
-	Collection<MediaTransaction> findByEdition(Edition edition);
+	Collection<MediaTransaction> findByEditions(Edition edition);
 
 	@Transactional(timeout = 10)
 	Collection<MediaTransaction> findByCustomer(Customer customer);

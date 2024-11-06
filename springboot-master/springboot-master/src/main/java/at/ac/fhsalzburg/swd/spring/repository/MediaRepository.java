@@ -14,8 +14,5 @@ public interface MediaRepository extends CrudRepository<Media, Long> {
 	Media findByName(String name);
 
 	@Transactional(timeout = 10)
-	Iterable<Media> findByAvailabilityStatus(String availabilityStatus);
-
-	@Transactional(timeout = 10)
 	Iterable<Media> findByMediaType(MediaType mediaType);
 }
