@@ -7,7 +7,7 @@ import javax.persistence.Id;
 
 import lombok.NoArgsConstructor;
 
-//MediaType = Audio, Book, 
+//MediaType = Audio, Book, Movie
 
 @Entity
 public class MediaType {

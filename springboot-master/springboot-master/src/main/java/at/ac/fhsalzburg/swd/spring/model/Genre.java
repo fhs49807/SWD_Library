@@ -4,6 +4,8 @@ import javax.persistence.*;
 
 import lombok.NoArgsConstructor;
 
+//Genre = Fantasy, SciFi, etc.
+
 @Entity
 public class Genre {
 

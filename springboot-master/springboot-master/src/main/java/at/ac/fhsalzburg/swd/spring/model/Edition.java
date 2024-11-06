@@ -27,6 +27,9 @@ public class Edition {
 	@DateTimeFormat(pattern = "yyyy-MM-dd")
 	private Date dueDate;// due date (return date) for specific edition of medium
 
+	
+	//	TODO: enum Status (loaned, reserved, available)
+	
 	// one media can have multiple editions
 	// Each Edition is linked to one Media item
 	@ManyToOne

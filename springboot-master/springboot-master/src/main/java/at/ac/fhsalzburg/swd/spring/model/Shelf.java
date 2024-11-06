@@ -1,5 +1,6 @@
 package at.ac.fhsalzburg.swd.spring.model;
 
+import java.util.Collection;
 import java.util.List;
 
 import javax.persistence.*;
@@ -21,7 +22,7 @@ public class Shelf {
 	private Section section; // Each Shelf belongs to one Section
 
 	@OneToMany(mappedBy = "shelf", cascade = CascadeType.ALL, fetch = FetchType.LAZY)
-    private List<Media> mediaItems;//one self can hold multiple media items
+    private Collection<Media> mediaItems;//one self can hold multiple media items
 	
 	public Shelf(Integer number, Section section) {
 		this.number = number;

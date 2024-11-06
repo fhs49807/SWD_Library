@@ -11,6 +11,7 @@ public class Media {
 	@GeneratedValue(strategy = GenerationType.AUTO)
 	private Long id;
 	private String name;
+	private int FSK;
 	private double price;// set price automatically based on genre ('setGenre')
 
 	// Each Media item belongs to a single Genre
@@ -87,4 +88,14 @@ public class Media {
     public void setShelf(Shelf shelf) {
         this.shelf = shelf;
     }
+
+
+	public int getFSK() {
+		return FSK;
+	}
+
+
+	public void setFSK(int fSK) {
+		FSK = fSK;
+	}
 }
