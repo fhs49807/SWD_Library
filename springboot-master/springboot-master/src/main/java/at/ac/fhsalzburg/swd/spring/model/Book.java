@@ -14,7 +14,7 @@ public class Book extends Media {
 
 	public Book(Long id, int barcode, String availabilityStatus, Date dueDate, String name, MediaType mediaType,
 			Library library, String ISBN) {
-		super(id, name, mediaType);
+		super();
 		this.ISBN = ISBN;
 	}
 

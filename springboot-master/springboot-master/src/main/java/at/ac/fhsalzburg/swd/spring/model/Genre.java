@@ -5,7 +5,6 @@ import javax.persistence.*;
 import lombok.NoArgsConstructor;
 
 @Entity
-@NoArgsConstructor
 public class Genre {
 
 	@Id
@@ -14,6 +13,9 @@ public class Genre {
 
 	private String name;
 	private double price;
+
+	public Genre() {
+	}
 
 	public Genre(Long id, String name, double price) {
 		super();

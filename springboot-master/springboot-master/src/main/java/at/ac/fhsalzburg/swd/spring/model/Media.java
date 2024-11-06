@@ -5,7 +5,6 @@ import lombok.NoArgsConstructor;
 
 @Entity
 @Inheritance(strategy = InheritanceType.JOINED) // create tables for inhereting classes
-@NoArgsConstructor
 public class Media {
 
 	@Id
@@ -28,50 +27,64 @@ public class Media {
     @JoinColumn(name = "shelf_id")
     private Shelf shelf;
 
-	public Media(Long id, String name, MediaType mediaType) {
-		super();
-		this.id = id;
-		this.name = name;
-		this.mediaType = mediaType;
-	}
-
-	public String getName() {
-		return name;
-	}
-
-	public void setName(String name) {
-		this.name = name;
-	}
-
-	public MediaType getMediaType() {
-		return mediaType;
-	}
-
-	public void setMediaType(MediaType mediaType) {
-		this.mediaType = mediaType;
-	}
+	public Media() {
+    }
+	
+	
+	public Media(String name, Genre genre, MediaType mediaType, Shelf shelf) {
+        this.name = name;
+        this.genre = genre;
+        this.mediaType = mediaType;
+        this.shelf = shelf;
+        if (genre != null) {
+            this.price = genre.getPrice();
+        }
+    }
 
 	public Long getId() {
-		return id;
-	}
+        return id;
+    }
 
-	public double getPrice() {
-		return price;
-	}
+    public String getName() {
+        return name;
+    }
 
-	public void setPrice(double price) {
-		this.price = price;
-	}
+    public void setName(String name) {
+        this.name = name;
+    }
 
-	public void setGenre(Genre genre) {
-		this.genre = genre;
-		if (genre != null) {
-			this.price = genre.getPrice(); // Preis aus dem Genre übernehmen
-		}
-	}
+    public double getPrice() {
+        return price;
+    }
 
-	public Genre getGenre() {
-		return genre;
-	}
+    public void setPrice(double price) {
+        this.price = price;
+    }
 
+    public Genre getGenre() {
+        return genre;
+    }
+
+    public void setGenre(Genre genre) {
+        this.genre = genre;
+        if (genre != null) {
+            this.price = genre.getPrice();
+        }
+    }
+
+    public MediaType getMediaType() {
+        return mediaType;
+    }
+
+    public void setMediaType(MediaType mediaType) {
+        this.mediaType = mediaType;
+    }
+
+    public Shelf getShelf() {
+        return shelf;
+    }
+
+    public void setShelf(Shelf shelf) {
+        this.shelf = shelf;
+    }
 }

@@ -4,6 +4,8 @@ import lombok.AllArgsConstructor;
 import lombok.NoArgsConstructor;
 
 import javax.persistence.Entity;
+import javax.persistence.EnumType;
+import javax.persistence.Enumerated;
 import javax.persistence.GeneratedValue;
 import javax.persistence.GenerationType;
 import javax.persistence.Id;
@@ -27,6 +29,7 @@ public class Customer {
 	private Date birthDate;
 
 	// customer role --> student, regular
+	@Enumerated(EnumType.STRING)
 	private CustomerType customerType;
 
 	private int loanLimit;// based on customerType enum

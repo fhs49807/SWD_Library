@@ -10,7 +10,6 @@ import lombok.NoArgsConstructor;
 //MediaType = Audio, Book, 
 
 @Entity
-@NoArgsConstructor
 public class MediaType {
 
 	@Id
@@ -20,9 +19,10 @@ public class MediaType {
 	private String typeName;
 
 	
-	public MediaType(Long id, String typeName) {
-		super();
-		this.id = id;
+	public MediaType() {
+	}
+	
+	public MediaType(String typeName) {
 		this.typeName = typeName;
 	}
 
@@ -30,12 +30,12 @@ public class MediaType {
 		return typeName;
 	}
 
-	public void setType(String type) {
-		this.typeName = type;
+	public void setTypeName(String typeName) {
+		this.typeName = typeName;
 	}
 
 	public Long getId() {
 		return id;
 	}
-
+		
 }

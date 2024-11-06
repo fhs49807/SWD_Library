@@ -14,7 +14,7 @@ public class Movie extends Media {
 
 	public Movie(Long id, int barcode, String availabilityStatus, Date dueDate, String name, MediaType mediaType,
 			Library library, String iMDb) {
-		super(id, name, mediaType);
+		super();
 		IMDb = iMDb;
 	}
 
