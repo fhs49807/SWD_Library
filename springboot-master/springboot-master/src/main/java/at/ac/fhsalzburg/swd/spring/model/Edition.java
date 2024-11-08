@@ -26,9 +26,10 @@ public class Edition {
 
 	@DateTimeFormat(pattern = "yyyy-MM-dd")
 	private Date dueDate;// due date (return date) for specific edition of medium
-
 	
-	//	TODO: enum Status (loaned, reserved, available)
+	//TODO: add to class diagram
+	private boolean available;//availability status
+	
 	
 	// one media can have multiple editions
 	// Each Edition is linked to one Media item
@@ -61,5 +62,13 @@ public class Edition {
 	public Long getId() {
 		return id;
 	}
+	
+	public boolean isAvailable() {
+        return available;
+    }
+
+    public void setAvailable(boolean available) {
+        this.available = available;
+    }
 
 }

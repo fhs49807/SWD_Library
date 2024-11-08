@@ -39,26 +39,27 @@ public class MediaTransaction {
 	@DateTimeFormat(pattern = "yyyy-MM-dd")
 	private Date returnDate; // date when item was actually returned
 
+	
+	//TODO: add to class diagram
 	@ManyToMany
-	private Collection<Edition> editions;// one transaction can have multiple items
+	private Collection<Media> media;// one transaction can reserve multiple media items
+	
+	@ManyToMany
+	private Collection<Edition> editions;// one transaction can loan multiple edition items
 
 	@ManyToOne
 	private Customer customer;
-
-	public MediaTransaction(Long id, TransactionStatus status, ReturnCondition condition, Date expectedReturnDate,
-			Date expirationDate, Date transactionDate, Date returnDate, Collection<Edition> editions,
-			Customer customer) {
-		super();
-		this.id = id;
-		this.status = status;
-		this.condition = condition;
-		this.expectedReturnDate = expectedReturnDate;
-		this.expirationDate = expirationDate;
-		this.transactionDate = transactionDate;
-		this.returnDate = returnDate;
-		this.editions = editions;
-		this.customer = customer;
+	
+	public MediaTransaction(Date transactionDate, Date expirationDate, Collection<Media> media, Collection<Edition> editions, Customer customer) {
+	    this.transactionDate = transactionDate;
+	    this.expirationDate = expirationDate;
+	    this.media = media;
+	    this.editions = editions;
+	    this.customer = customer;
+	    this.status = TransactionStatus.ACTIVE; // default status: ACTIVE
 	}
+
+
 
 	public TransactionStatus getStatus() {
 		return status;

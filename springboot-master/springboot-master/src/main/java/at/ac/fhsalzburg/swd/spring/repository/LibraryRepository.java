@@ -14,7 +14,4 @@ public interface LibraryRepository extends CrudRepository<Library, Long> {
 	@Transactional(timeout = 10)
 	List<Library> findByName(String name);
 
-	@Transactional(timeout = 10)
-	List<Library> findByLocation(String location);
-
 }

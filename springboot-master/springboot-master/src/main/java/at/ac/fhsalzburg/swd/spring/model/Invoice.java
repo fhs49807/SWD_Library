@@ -7,6 +7,7 @@ import javax.persistence.Entity;
 import javax.persistence.GeneratedValue;
 import javax.persistence.GenerationType;
 import javax.persistence.Id;
+import javax.persistence.ManyToOne;
 import javax.persistence.OneToMany;
 import javax.persistence.Table;
 import org.springframework.format.annotation.DateTimeFormat;
@@ -29,26 +30,31 @@ public class Invoice {
 
 	private boolean paymentStatus;// TODO: enum?
 
-	//	sum of all individual transaction amounts
+	// sum of all individual transaction amounts
 	private double totalAmount;
+
+	//TODO: add to class diagram
+	// one customer can have several invoices
+	@ManyToOne
+	private Customer customer;
 
 	// one invoice can have multiple transactions
 	@OneToMany
 	private List<MediaTransaction> transactions;
 
-	public Invoice(Date dueDate, boolean paymentStatus, List<MediaTransaction> transactions) {
+	public Invoice(Date dueDate, boolean paymentStatus, List<MediaTransaction> transactions, Customer customer) {
 		this.dueDate = dueDate;
 		this.paymentStatus = paymentStatus;
 		this.transactions = transactions;
+		this.customer = customer;
 		this.totalAmount = calculateTotalAmount();
 	}
 
 	// Calculate total amount based on the price of all editions in each transaction
 	public double calculateTotalAmount() {
-		return transactions.stream()
-		        .flatMap(transaction -> transaction.getEditions().stream())
-		        .mapToDouble(edition -> edition.getMedia().getPrice()) //.getGenre().getPrice()    ???   
-		        .sum();
+		return transactions.stream().flatMap(transaction -> transaction.getEditions().stream())
+				.mapToDouble(edition -> edition.getMedia().getPrice()) // .getGenre().getPrice() ???
+				.sum();
 	}
 
 	public Date getDueDate() {
@@ -77,5 +83,13 @@ public class Invoice {
 
 	public void setTotalAmount(double totalAmount) {
 		this.totalAmount = totalAmount;
+	}
+
+	public Customer getCustomer() {
+		return customer;
+	}
+
+	public void setCustomer(Customer customer) {
+		this.customer = customer;
 	}
 }

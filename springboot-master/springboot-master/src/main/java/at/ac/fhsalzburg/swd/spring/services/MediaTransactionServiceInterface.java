@@ -11,13 +11,13 @@ import at.ac.fhsalzburg.swd.spring.model.Shelf;
 
 public interface MediaTransactionServiceInterface {
 
-	public abstract MediaTransaction loanMedia(Date transactionDate, Date expirationDate, Date expectedReturnDate,
-			Shelf shelf, Customer customer, Collection<Edition> editions);
+	// create loan record
+	public abstract MediaTransaction createLoanRecord(Customer customer, Date dueDate, Collection<Edition> editions);
 
-	// reserveMedia applies to Medium and not edition
-	public abstract MediaTransaction reserveMedia(Date transactionDate, Customer customer,
-			Collection<Media> mediaItems);
+	// retrieve all loans associated to custmer
+	public abstract Collection<MediaTransaction> findLoansByUser(Customer customer);
 
-	public abstract MediaTransaction returnMedia(Date transactionDate, Customer customer, Collection<Edition> editions);
+	// retrieve all current loans
+	public abstract Collection<MediaTransaction> getAllLoans();
 
 }

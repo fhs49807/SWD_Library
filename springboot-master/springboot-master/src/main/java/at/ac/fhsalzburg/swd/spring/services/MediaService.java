@@ -10,22 +10,25 @@ import at.ac.fhsalzburg.swd.spring.model.Media;
 
 @Service
 public class MediaService implements MediaServiceInterface {
-	
+
 	@Autowired
-    private MediaRepository mediaRepository;
-	
-	//TODO: Autowired
-	private final GenreRepository genreRepository;
+	private MediaRepository mediaRepository;
 
-    public MediaService(GenreRepository genreRepo) {
-        this.genreRepository = genreRepo;
-    }
+	@Autowired
+	private GenreRepository genreRepository;
 
-    public void saveGenre(Genre genre) {
-        genreRepository.save(genre);
-    }
+	// constructor for injection of GenreRepo instance
+	public MediaService(GenreRepository genreRepo) {
+		this.genreRepository = genreRepo;
+	}
 
-    public void save(Media media) {
-        mediaRepository.save(media);
-    }
+	// saves genre entry to repository
+	public void saveGenre(Genre genre) {
+		genreRepository.save(genre);
+	}
+
+	// saves media to repository
+	public void save(Media media) {
+		mediaRepository.save(media);
+	}
 }

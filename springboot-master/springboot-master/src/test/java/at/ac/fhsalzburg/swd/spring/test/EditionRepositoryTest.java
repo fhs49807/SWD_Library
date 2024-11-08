@@ -39,7 +39,7 @@ public class EditionRepositoryTest {
         entityManager.persist(givenEdition);
         entityManager.flush();
 
-        List<Edition> foundEditions = editionRepository.findEditionByMedia(media);
+        List<Edition> foundEditions = editionRepository.findByMedia(media);
         assertEquals(givenEdition, foundEditions.get(0));
 
     }
