@@ -1,7 +1,6 @@
 package at.ac.fhsalzburg.swd.spring.model;
 
 import javax.persistence.*;
-import lombok.NoArgsConstructor;
 
 @Entity
 @Inheritance(strategy = InheritanceType.JOINED) // create tables for inhereting classes

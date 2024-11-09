@@ -2,8 +2,6 @@ package at.ac.fhsalzburg.swd.spring.model;
 
 import javax.persistence.*;
 
-import lombok.NoArgsConstructor;
-
 //Genre = Fantasy, SciFi, etc.
 
 @Entity

@@ -8,6 +8,7 @@ import at.ac.fhsalzburg.swd.spring.model.MediaTransaction.TransactionStatus;
 
 import java.util.Collection;
 import java.util.Date;
+import java.util.Optional;
 
 import org.springframework.data.jpa.repository.Query;
 import org.springframework.data.repository.CrudRepository;
@@ -19,7 +20,7 @@ import org.springframework.transaction.annotation.Transactional;
 public interface MediaTransactionRepository extends CrudRepository<MediaTransaction, Long> {
 
 	@Transactional(timeout = 10)
-	MediaTransaction findById(long id);
+	Optional<MediaTransaction> findById(long id);
 
 	@Transactional(timeout = 10)
 	Collection<MediaTransaction> findByEditions(Edition edition);

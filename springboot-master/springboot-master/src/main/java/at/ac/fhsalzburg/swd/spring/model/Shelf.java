@@ -1,7 +1,6 @@
 package at.ac.fhsalzburg.swd.spring.model;
 
 import java.util.Collection;
-import java.util.List;
 
 import javax.persistence.*;
 

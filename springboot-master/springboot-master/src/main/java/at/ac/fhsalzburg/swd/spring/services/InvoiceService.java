@@ -1,23 +1,49 @@
 package at.ac.fhsalzburg.swd.spring.services;
 
+import java.util.List;
+import java.util.Arrays;
+
+
+import java.util.Date;
+
+import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
 import at.ac.fhsalzburg.swd.spring.model.Customer;
-import at.ac.fhsalzburg.swd.spring.model.Media;
+import at.ac.fhsalzburg.swd.spring.model.Invoice;
+import at.ac.fhsalzburg.swd.spring.model.MediaTransaction;
+import at.ac.fhsalzburg.swd.spring.repository.InvoiceRepository;
 
 @Service
 public class InvoiceService implements InvoiceServiceInterface{
+	
+	@Autowired
+    private InvoiceRepository invoiceRepository;
+
 
 	@Override
-	public void deductAmount(Customer customer, Media media) {
-		// TODO Auto-generated method stub
-		
+	public void deductAmount(Customer customer, MediaTransaction transaction) {
+	    double penaltyAmount = calculatePenalty(transaction);
+	    if (penaltyAmount > 0) {
+	        // Manuelle Erstellung der Liste
+	        List<MediaTransaction> transactions = Arrays.asList(transaction);
+
+	        Invoice invoice = new Invoice(new Date(), false, transactions, customer);
+	        invoice.setTotalAmount(penaltyAmount);
+	        invoiceRepository.save(invoice);
+	    }
 	}
 
-	@Override
-	public double getOutstandingBalance(Customer customer) {
-		// TODO Auto-generated method stub
-		return 0;
-	}
+	private double calculatePenalty(MediaTransaction transaction) {
+        //Berechnung von Mahngebühren: 1 Euro pro verspäteten Tag
+        long overdueDays = (transaction.getReturnDate().getTime() - transaction.getExpirationDate().getTime()) / (1000 * 60 * 60 * 24);
+        return overdueDays > 0 ? overdueDays * 1.0 : 0.0;
+    }
+
+    @Override
+    public double getOutstandingBalance(Customer customer) {
+        Double outstandingBalance = invoiceRepository.calculateOutstandingBalance(customer);
+        return outstandingBalance != null ? outstandingBalance : 0.0;
+    }
 
 }

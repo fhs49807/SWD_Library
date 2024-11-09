@@ -1,10 +1,9 @@
 package at.ac.fhsalzburg.swd.spring.startup;
 
 import java.util.Arrays;
+import java.util.Collection;
 import java.util.Date;
-import java.util.HashMap;
 import java.util.List;
-import java.util.Map;
 
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.CommandLineRunner;
@@ -12,14 +11,11 @@ import org.springframework.context.annotation.Profile;
 import org.springframework.stereotype.Component;
 import org.springframework.transaction.annotation.Transactional;
 
-import at.ac.fhsalzburg.swd.spring.model.Book;
 import at.ac.fhsalzburg.swd.spring.model.Customer;
-import at.ac.fhsalzburg.swd.spring.model.Edition;
 import at.ac.fhsalzburg.swd.spring.model.Genre;
 import at.ac.fhsalzburg.swd.spring.model.Library;
 import at.ac.fhsalzburg.swd.spring.model.Media;
 import at.ac.fhsalzburg.swd.spring.model.MediaTransaction;
-import at.ac.fhsalzburg.swd.spring.model.MediaTransaction.TransactionStatus;
 import at.ac.fhsalzburg.swd.spring.model.MediaType;
 import at.ac.fhsalzburg.swd.spring.model.Section;
 import at.ac.fhsalzburg.swd.spring.model.Shelf;
@@ -29,7 +25,7 @@ import at.ac.fhsalzburg.swd.spring.repository.MediaTypeRepository;
 import at.ac.fhsalzburg.swd.spring.services.CustomerService;
 import at.ac.fhsalzburg.swd.spring.services.LibraryService;
 import at.ac.fhsalzburg.swd.spring.services.MediaService;
-import at.ac.fhsalzburg.swd.spring.services.MediaTransactionService;
+import at.ac.fhsalzburg.swd.spring.services.MediaTransactionServiceInterface;
 import at.ac.fhsalzburg.swd.spring.services.OrderServiceInterface;
 import at.ac.fhsalzburg.swd.spring.services.ProductServiceInterface;
 import at.ac.fhsalzburg.swd.spring.services.UserServiceInterface;
@@ -62,6 +58,9 @@ public class CommandLineAppStartupRunner implements CommandLineRunner {
 
 	@Autowired
 	private MediaService mediaService;
+	
+	@Autowired
+	private MediaTransactionServiceInterface mediaTransactionService;
 
 	// Initialize System with preset accounts and stocks
 	@Override
@@ -90,6 +89,15 @@ public class CommandLineAppStartupRunner implements CommandLineRunner {
 
 		performCustomerCRUD();
 		createLibraryWithMedia();
+		
+		// Rückgabe eines ausgeliehenen Mediums simulieren
+	    Customer existingCustomer = customerService.findByName("John Doe").iterator().next();
+	    Collection<MediaTransaction> loans = mediaTransactionService.findLoansByUser(existingCustomer );
+	    if (!loans.isEmpty()) {
+	        MediaTransaction transaction = loans.iterator().next();
+	        mediaTransactionService.returnMedia(transaction.getId());
+	        System.out.println("Media returned for transaction ID: " + transaction.getId());
+	    }
 	}
 
 	private void performCustomerCRUD() {

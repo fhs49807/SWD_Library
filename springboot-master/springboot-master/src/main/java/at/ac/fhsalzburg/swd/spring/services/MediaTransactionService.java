@@ -21,7 +21,10 @@ public class MediaTransactionService implements MediaTransactionServiceInterface
 
 	@Autowired
 	private EditionRepository editionRepository;
-
+	
+	@Autowired
+    private InvoiceServiceInterface invoiceService;
+	
 	// creates loan record for a customer
 	// marks each loaned item as unavailable
 	// saves transaction to repository
@@ -48,4 +51,27 @@ public class MediaTransactionService implements MediaTransactionServiceInterface
 		return (Collection<MediaTransaction>) mediaTransactionRepository.findAll();
 	}
 
+    @Override
+    public void returnMedia(Long transactionId) {
+        MediaTransaction transaction = mediaTransactionRepository.findById(transactionId)
+                .orElseThrow(() -> new IllegalArgumentException("Transaction not found"));
+
+        // Rückgabedatum aktualisieren
+        transaction.setReturnDate(new Date());
+        transaction.setStatus(MediaTransaction.TransactionStatus.COMPLETED);
+
+        // Editionen als verfügbar markieren
+        for (Edition edition : transaction.getEditions()) {
+            edition.setAvailable(true);
+            editionRepository.save(edition);
+        }
+
+        // Gebühren berechnen und eventuell eine Rechnung erstellen
+        if (transaction.getReturnDate().after(transaction.getExpirationDate())) {
+            invoiceService.deductAmount(transaction.getCustomer(), transaction);
+        }
+
+        // Transaktion aktualisieren
+        mediaTransactionRepository.save(transaction);
+    }
 }

@@ -5,9 +5,7 @@ import java.util.Date;
 
 import at.ac.fhsalzburg.swd.spring.model.Customer;
 import at.ac.fhsalzburg.swd.spring.model.Edition;
-import at.ac.fhsalzburg.swd.spring.model.Media;
 import at.ac.fhsalzburg.swd.spring.model.MediaTransaction;
-import at.ac.fhsalzburg.swd.spring.model.Shelf;
 
 public interface MediaTransactionServiceInterface {
 
@@ -20,4 +18,5 @@ public interface MediaTransactionServiceInterface {
 	// retrieve all current loans
 	public abstract Collection<MediaTransaction> getAllLoans();
 
+	public abstract void returnMedia(Long transactionId);
 }

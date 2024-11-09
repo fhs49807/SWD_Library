@@ -4,8 +4,6 @@ import java.util.Collection;
 
 import java.util.Date;
 
-import org.springframework.stereotype.Repository;
-
 import at.ac.fhsalzburg.swd.spring.model.User;
 
 public interface UserServiceInterface {
