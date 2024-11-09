@@ -39,28 +39,27 @@ public class MediaTransactionServiceTest {
         // Mock-Transaktion erstellen
         MediaTransaction transaction = new MediaTransaction(
                 new Date(),                     // transactionDate
-                new Date(),                     // expirationDate (als Beispiel)
-                Collections.emptyList(),        // media (leere Liste als Beispiel)
-                Collections.emptyList(),        // editions (leere Liste als Beispiel)
+                new Date(),                     // expirationDate 
+                Collections.emptyList(),        // media 
+                Collections.emptyList(),        // editions 
                 null                            // customer
         );
 
-        // Setze den Status der Transaktion
         transaction.setStatus(MediaTransaction.TransactionStatus.ACTIVE);
 
-        // Mock das Verhalten des Repositories
+        // mock repository verhalten
         Mockito.<Optional<MediaTransaction>>when(mediaTransactionRepository.findById(1L))
                 .thenReturn(Optional.of(transaction));
 
-        // Rückgabe durchführen
+        // zurückgeben 
         mediaTransactionService.returnMedia(1L);
 
-        // Sicherstellen, dass die Editionen als verfügbar markiert wurden
+        // sicherstellen, dass editionen als verfügbar markiert 
         for (Edition edition : transaction.getEditions()) {
             assertTrue(edition.isAvailable());
         }
 
-        // Sicherstellen, dass die Transaktion aktualisiert wurde
+        // sicherstellen, dass transaktion aktualisiert
         assertEquals(MediaTransaction.TransactionStatus.COMPLETED, transaction.getStatus());
     }
 }

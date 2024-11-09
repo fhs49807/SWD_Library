@@ -50,10 +50,6 @@ public class MediaTransaction {
 	@ManyToOne
 	private Customer customer;
 	
-	// Standard-Konstruktor für Tests
-    public MediaTransaction() {
-    }
-	
 	public MediaTransaction(Date transactionDate, Date expirationDate, Collection<Media> media, Collection<Edition> editions, Customer customer) {
 	    this.transactionDate = transactionDate;
 	    this.expirationDate = expirationDate;

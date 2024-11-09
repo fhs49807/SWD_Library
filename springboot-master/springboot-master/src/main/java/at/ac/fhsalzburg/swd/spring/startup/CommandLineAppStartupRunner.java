@@ -90,7 +90,7 @@ public class CommandLineAppStartupRunner implements CommandLineRunner {
 		performCustomerCRUD();
 		createLibraryWithMedia();
 		
-		// Rückgabe eines ausgeliehenen Mediums simulieren
+		// simuliert zurückgebn von ausleihe 
 	    Customer existingCustomer = customerService.findByName("John Doe").iterator().next();
 	    Collection<MediaTransaction> loans = mediaTransactionService.findLoansByUser(existingCustomer );
 	    if (!loans.isEmpty()) {

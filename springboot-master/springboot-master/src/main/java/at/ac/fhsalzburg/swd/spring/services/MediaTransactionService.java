@@ -56,22 +56,22 @@ public class MediaTransactionService implements MediaTransactionServiceInterface
         MediaTransaction transaction = mediaTransactionRepository.findById(transactionId)
                 .orElseThrow(() -> new IllegalArgumentException("Transaction not found"));
 
-        // Rückgabedatum aktualisieren
+        // rückgabe date aktualisieren
         transaction.setReturnDate(new Date());
         transaction.setStatus(MediaTransaction.TransactionStatus.COMPLETED);
 
-        // Editionen als verfügbar markieren
+        // editionen als verfügbar markieren
         for (Edition edition : transaction.getEditions()) {
             edition.setAvailable(true);
             editionRepository.save(edition);
         }
 
-        // Gebühren berechnen und eventuell eine Rechnung erstellen
+        // gebühren calc & evt Rg erstellen
         if (transaction.getReturnDate().after(transaction.getExpirationDate())) {
             invoiceService.deductAmount(transaction.getCustomer(), transaction);
         }
 
-        // Transaktion aktualisieren
+        // transaktion aktualisieren
         mediaTransactionRepository.save(transaction);
     }
 }
