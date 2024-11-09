@@ -25,7 +25,7 @@ public class InvoiceService implements InvoiceServiceInterface{
 	public void deductAmount(Customer customer, MediaTransaction transaction) {
 	    double penaltyAmount = calculatePenalty(transaction);
 	    if (penaltyAmount > 0) {
-	        // Manuelle Erstellung der Liste
+	        // liste man. erstelln
 	        List<MediaTransaction> transactions = Arrays.asList(transaction);
 
 	        Invoice invoice = new Invoice(new Date(), false, transactions, customer);
@@ -35,7 +35,7 @@ public class InvoiceService implements InvoiceServiceInterface{
 	}
 
 	private double calculatePenalty(MediaTransaction transaction) {
-        //Berechnung von Mahngebühren: 1 Euro pro verspäteten Tag
+        // mahngebühren calc: 1€ pro tag verspätung
         long overdueDays = (transaction.getReturnDate().getTime() - transaction.getExpirationDate().getTime()) / (1000 * 60 * 60 * 24);
         return overdueDays > 0 ? overdueDays * 1.0 : 0.0;
     }
