@@ -18,5 +18,9 @@ public interface MediaTransactionServiceInterface {
 	// retrieve all current loans
 	public abstract Collection<MediaTransaction> getAllLoans();
 
+	// Mario Neubacher
 	public abstract void returnMedia(Long transactionId);
+
+	// Thomas Clermont
+	public abstract MediaTransaction loanMedia(Long customerId, Collection<Long> editionIds, Date dueDate);
 }

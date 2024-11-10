@@ -3,6 +3,8 @@ package at.ac.fhsalzburg.swd.spring.services;
 import java.util.Collection;
 import java.util.Collections;
 import java.util.Date;
+import java.util.stream.Collectors;
+import java.util.stream.StreamSupport;
 
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
@@ -10,6 +12,7 @@ import org.springframework.stereotype.Service;
 import at.ac.fhsalzburg.swd.spring.model.Customer;
 import at.ac.fhsalzburg.swd.spring.model.Edition;
 import at.ac.fhsalzburg.swd.spring.model.MediaTransaction;
+import at.ac.fhsalzburg.swd.spring.repository.CustomerRepository;
 import at.ac.fhsalzburg.swd.spring.repository.EditionRepository;
 import at.ac.fhsalzburg.swd.spring.repository.MediaTransactionRepository;
 
@@ -21,10 +24,13 @@ public class MediaTransactionService implements MediaTransactionServiceInterface
 
 	@Autowired
 	private EditionRepository editionRepository;
-	
+
 	@Autowired
-    private InvoiceServiceInterface invoiceService;
-	
+	private InvoiceServiceInterface invoiceService;
+
+	@Autowired
+	private CustomerRepository customerRepository;
+
 	// creates loan record for a customer
 	// marks each loaned item as unavailable
 	// saves transaction to repository
@@ -51,27 +57,63 @@ public class MediaTransactionService implements MediaTransactionServiceInterface
 		return (Collection<MediaTransaction>) mediaTransactionRepository.findAll();
 	}
 
-    @Override
-    public void returnMedia(Long transactionId) {
-        MediaTransaction transaction = mediaTransactionRepository.findById(transactionId)
-                .orElseThrow(() -> new IllegalArgumentException("Transaction not found"));
+	@Override
+	public MediaTransaction loanMedia(Long customerId, Collection<Long> editionIds, Date dueDate) {
+		// find customer by ID
+		Customer customer = customerRepository.findById(customerId)
+				.orElseThrow(() -> new IllegalArgumentException("Customer not found"));
 
-        // rückgabe date aktualisieren
-        transaction.setReturnDate(new Date());
-        transaction.setStatus(MediaTransaction.TransactionStatus.COMPLETED);
+		// find all editions by ID
+		Collection<Edition> editions = StreamSupport
+				.stream(editionRepository.findAllById(editionIds).spliterator(), false).collect(Collectors.toList());
 
-        // editionen als verfügbar markieren
-        for (Edition edition : transaction.getEditions()) {
-            edition.setAvailable(true);
-            editionRepository.save(edition);
-        }
+		// check if editions are available for loan
+		for (Edition edition : editions) {
+			if (!edition.isAvailable()) {
+				throw new IllegalStateException("Edition with ID " + edition.getId() + " is not available for loan!");
+			}
+		}
 
-        // gebühren calc & evt Rg erstellen
-        if (transaction.getReturnDate().after(transaction.getExpirationDate())) {
-            invoiceService.deductAmount(transaction.getCustomer(), transaction);
-        }
+		// create new MediaTransaction
+		MediaTransaction transaction = new MediaTransaction();
+		transaction.setCustomer(customer);
+		transaction.setEditions(editions);
+		transaction.setTransactionDate(new Date());
+		transaction.setExpirationDate(dueDate);
+		transaction.setStatus(MediaTransaction.TransactionStatus.ACTIVE);
 
-        // transaktion aktualisieren
-        mediaTransactionRepository.save(transaction);
-    }
+		// mark edition as unavailable
+		for (Edition edition : editions) {
+			edition.setAvailable(false);
+			editionRepository.save(edition); // update edition availability in repository
+		}
+
+		// save transaction in repository
+		return mediaTransactionRepository.save(transaction);
+	}
+
+	@Override
+	public void returnMedia(Long transactionId) {
+		MediaTransaction transaction = mediaTransactionRepository.findById(transactionId)
+				.orElseThrow(() -> new IllegalArgumentException("Transaction not found"));
+
+		// rückgabe date aktualisieren
+		transaction.setReturnDate(new Date());
+		transaction.setStatus(MediaTransaction.TransactionStatus.COMPLETED);
+
+		// editionen als verfügbar markieren
+		for (Edition edition : transaction.getEditions()) {
+			edition.setAvailable(true);
+			editionRepository.save(edition);
+		}
+
+		// gebühren calc & evt Rg erstellen
+		if (transaction.getReturnDate().after(transaction.getExpirationDate())) {
+			invoiceService.deductAmount(transaction.getCustomer(), transaction);
+		}
+
+		// transaktion aktualisieren
+		mediaTransactionRepository.save(transaction);
+	}
+
 }

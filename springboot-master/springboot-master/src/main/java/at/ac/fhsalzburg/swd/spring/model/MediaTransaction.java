@@ -16,7 +16,6 @@ import org.springframework.format.annotation.DateTimeFormat;
 import lombok.NoArgsConstructor;
 
 @Entity
-@NoArgsConstructor
 @Table(name = "TRANSACTIONS")
 public class MediaTransaction {
 
@@ -49,6 +48,11 @@ public class MediaTransaction {
 
 	@ManyToOne
 	private Customer customer;
+	
+	public MediaTransaction() {
+		
+	}
+
 	
 	public MediaTransaction(Date transactionDate, Date expirationDate, Collection<Media> media, Collection<Edition> editions, Customer customer) {
 	    this.transactionDate = transactionDate;

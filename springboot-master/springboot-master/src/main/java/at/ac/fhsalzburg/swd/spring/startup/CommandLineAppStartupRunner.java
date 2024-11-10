@@ -4,6 +4,7 @@ import java.util.Arrays;
 import java.util.Collection;
 import java.util.Date;
 import java.util.List;
+import java.util.stream.Collectors;
 
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.CommandLineRunner;
@@ -12,6 +13,7 @@ import org.springframework.stereotype.Component;
 import org.springframework.transaction.annotation.Transactional;
 
 import at.ac.fhsalzburg.swd.spring.model.Customer;
+import at.ac.fhsalzburg.swd.spring.model.Edition;
 import at.ac.fhsalzburg.swd.spring.model.Genre;
 import at.ac.fhsalzburg.swd.spring.model.Library;
 import at.ac.fhsalzburg.swd.spring.model.Media;
@@ -20,6 +22,7 @@ import at.ac.fhsalzburg.swd.spring.model.MediaType;
 import at.ac.fhsalzburg.swd.spring.model.Section;
 import at.ac.fhsalzburg.swd.spring.model.Shelf;
 import at.ac.fhsalzburg.swd.spring.model.User;
+import at.ac.fhsalzburg.swd.spring.repository.EditionRepository;
 import at.ac.fhsalzburg.swd.spring.repository.GenreRepository;
 import at.ac.fhsalzburg.swd.spring.repository.MediaTypeRepository;
 import at.ac.fhsalzburg.swd.spring.services.CustomerService;
@@ -49,6 +52,9 @@ public class CommandLineAppStartupRunner implements CommandLineRunner {
 
 	@Autowired
 	private MediaTypeRepository mediaTypeRepository;
+	
+	@Autowired
+	private EditionRepository editionRepository;
 
 	@Autowired
 	private CustomerService customerService;
@@ -58,7 +64,7 @@ public class CommandLineAppStartupRunner implements CommandLineRunner {
 
 	@Autowired
 	private MediaService mediaService;
-	
+
 	@Autowired
 	private MediaTransactionServiceInterface mediaTransactionService;
 
@@ -89,15 +95,54 @@ public class CommandLineAppStartupRunner implements CommandLineRunner {
 
 		performCustomerCRUD();
 		createLibraryWithMedia();
+
+		returnMediaSimulation();
+		loanMediaSimulation();
+
+	}
+
+	private void loanMediaSimulation() {
 		
-		// simuliert zurückgebn von ausleihe 
-	    Customer existingCustomer = customerService.findByName("John Doe").iterator().next();
-	    Collection<MediaTransaction> loans = mediaTransactionService.findLoansByUser(existingCustomer );
-	    if (!loans.isEmpty()) {
-	        MediaTransaction transaction = loans.iterator().next();
-	        mediaTransactionService.returnMedia(transaction.getId());
-	        System.out.println("Media returned for transaction ID: " + transaction.getId());
-	    }
+		Customer existingCustomer = customerService.findByName("John Doe").iterator().next();
+
+		// find available editions for loan
+		Collection<Media> mediaItems = libraryService.validateMedia("10"); // "Harry Potter"
+		if (!mediaItems.isEmpty()) {
+			Media media = mediaItems.iterator().next();
+			Collection<Edition> availableEditions = libraryService.checkForAvailableEditions(media);
+
+			// if there are available editions
+			if (!availableEditions.isEmpty()) {
+				// get the edition ids
+				Collection<Long> editionIds = availableEditions.stream()
+						.map(Edition::getId)
+						.limit(1) 
+						.collect(Collectors.toList());
+
+				// set due date (14 days from today)
+				Date dueDate = new Date(System.currentTimeMillis() + (14L * 24 * 60 * 60 * 1000));
+
+				// run loanMedia method
+				MediaTransaction transaction = mediaTransactionService.loanMedia(existingCustomer.getId(), editionIds,
+						dueDate);
+				System.out.println("Media loaned with ID: " + transaction.getId());
+			} else {
+				System.out.println("No available editions!");
+			}
+		} else {
+			System.out.println("No media found to loan!");
+		}
+	}
+
+	private void returnMediaSimulation() {
+		// simuliert zurückgebn von ausleihe
+		Customer existingCustomer = customerService.findByName("John Doe").iterator().next();
+		Collection<MediaTransaction> loans = mediaTransactionService.findLoansByUser(existingCustomer);
+		if (!loans.isEmpty()) {
+			MediaTransaction transaction = loans.iterator().next();
+			mediaTransactionService.returnMedia(transaction.getId());
+			System.out.println("Media returned for transaction ID: " + transaction.getId());
+		}
 	}
 
 	private void performCustomerCRUD() {
@@ -155,13 +200,12 @@ public class CommandLineAppStartupRunner implements CommandLineRunner {
 		scienceFictionGenre.setName("Science Fiction");
 		scienceFictionGenre.setPrice(10.0);
 		scienceFictionGenre = genreRepository.save(scienceFictionGenre);
-		
+
 		Genre FantasyGenre = new Genre();
 		FantasyGenre.setName("Fantasy Genre");
 		FantasyGenre.setPrice(10.0);
 		FantasyGenre = genreRepository.save(FantasyGenre);
-		
-		
+
 		;
 
 		MediaType mediaType = new MediaType();
@@ -171,19 +215,28 @@ public class CommandLineAppStartupRunner implements CommandLineRunner {
 
 		// Create media items and assign genre, type, and shelf
 		Media book1 = new Media();
-		book1.setName("The Time Machine");
+		book1.setName("Dune");
 		book1.setGenre(scienceFictionGenre);
 		book1.setMediaType(mediaType);
 		book1.setShelf(shelfA1);
 		mediaService.save(book1);
 
 		Media book2 = new Media();
-		book2.setName("Dune");
+		book2.setName("Harry Potter");
 		book2.setGenre(FantasyGenre);
 		book2.setMediaType(mediaType);
 		book2.setShelf(shelfB1);
 		mediaService.save(book2);
 
 		System.out.println("Media items created and added to library shelves.");
+		
+		// Create editions for each book
+	    for (int i = 0; i < 3; i++) {
+	        Edition edition1 = new Edition(book1, true, null); // available edition
+	        Edition edition2 = new Edition(book2, true, null); // available edition
+	        editionRepository.save(edition1);
+	        editionRepository.save(edition2);
+	    }
+	    System.out.println("Editions created for media items.");
 	}
 }

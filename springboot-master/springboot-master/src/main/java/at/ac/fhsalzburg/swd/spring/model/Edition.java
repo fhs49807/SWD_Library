@@ -26,15 +26,20 @@ public class Edition {
 
 	@DateTimeFormat(pattern = "yyyy-MM-dd")
 	private Date dueDate;// due date (return date) for specific edition of medium
-	
-	//TODO: add to class diagram
-	private boolean available;//availability status
-	
-	
+
+	// TODO: add to class diagram
+	private boolean available;// availability status
+
 	// one media can have multiple editions
 	// Each Edition is linked to one Media item
 	@ManyToOne
 	private Media media;
+
+	public Edition(Media media, boolean available, Date dueDate) {
+		this.media = media;
+		this.available = available;
+		this.dueDate = dueDate;
+	}
 
 	public Edition(Long id, Date dueDate, Media media) {
 		super();
@@ -62,13 +67,13 @@ public class Edition {
 	public Long getId() {
 		return id;
 	}
-	
-	public boolean isAvailable() {
-        return available;
-    }
 
-    public void setAvailable(boolean available) {
-        this.available = available;
-    }
+	public boolean isAvailable() {
+		return available;
+	}
+
+	public void setAvailable(boolean available) {
+		this.available = available;
+	}
 
 }
