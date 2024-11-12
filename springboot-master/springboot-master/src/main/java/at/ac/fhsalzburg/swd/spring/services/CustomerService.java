@@ -35,7 +35,7 @@ public class CustomerService implements CustomerServiceInterface {
 
 	// find customer by name
 	@Override
-	public Collection<Customer> findByName(String name) {
+	public Customer findByName(String name) {
 		return customerRepository.findByName(name);
 	}
 

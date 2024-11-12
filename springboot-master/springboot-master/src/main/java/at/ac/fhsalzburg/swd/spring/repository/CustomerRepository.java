@@ -16,7 +16,7 @@ public interface CustomerRepository extends CrudRepository<Customer, Long> {
 
 	// finds all customers with specific name
 	@Transactional(timeout = 10)
-	Collection<Customer> findByName(String name);
+	Customer findByName(String name);
 
 	// finds all customers with specific type
 	@Transactional(timeout = 10)

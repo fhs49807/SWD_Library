@@ -13,7 +13,7 @@ public interface CustomerServiceInterface {
 	public abstract Customer findById(Long id);
 
 	// search for customer by name
-	public abstract Collection<Customer> findByName(String name);
+	Customer findByName(String name);
 
 	// delete customer by id
 	public abstract void deleteById(Long id);

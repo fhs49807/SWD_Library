@@ -3,13 +3,7 @@ package at.ac.fhsalzburg.swd.spring.model;
 import lombok.AllArgsConstructor;
 import lombok.NoArgsConstructor;
 
-import javax.persistence.Entity;
-import javax.persistence.EnumType;
-import javax.persistence.Enumerated;
-import javax.persistence.GeneratedValue;
-import javax.persistence.GenerationType;
-import javax.persistence.Id;
-import javax.persistence.Table;
+import javax.persistence.*;
 
 import org.springframework.format.annotation.DateTimeFormat;
 
@@ -22,7 +16,7 @@ import java.util.Date;
 public class Customer {
 
 	@Id
-	@GeneratedValue(strategy = GenerationType.AUTO)
+	@GeneratedValue(strategy = GenerationType.IDENTITY)
 	private Long id;
 
 	@DateTimeFormat(pattern = "yyyy-MM-dd")
@@ -33,6 +27,8 @@ public class Customer {
 	private CustomerType customerType;
 
 	private int loanLimit;// based on customerType enum
+
+    @Column(unique = true)
 	private String name;// username
 
 	public Long getId() {
