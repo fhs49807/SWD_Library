@@ -24,5 +24,5 @@ public interface EditionRepository extends CrudRepository<Edition, Long> {
 
 	// finds all available editions associated with specific media item
 	@Query("SELECT e FROM Edition e WHERE e.media = :media AND e.available = true")
-	Collection<Edition> findByMediaAndAvailable(@Param("media") Media media);
+	List<Edition> findByMediaAndAvailable(@Param("media") Media media);
 }

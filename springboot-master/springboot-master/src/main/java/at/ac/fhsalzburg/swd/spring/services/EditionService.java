@@ -7,6 +7,7 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
 import java.util.Collection;
+import java.util.List;
 
 @Service
 public class EditionService implements EditionServiceInterface {
@@ -14,7 +15,7 @@ public class EditionService implements EditionServiceInterface {
     @Autowired
     private EditionRepository editionRepository;
 
-    public Collection<Edition> findByMediaAndAvailable(Media media) {
+    public List<Edition> findByMediaAndAvailable(Media media) {
         return editionRepository.findByMediaAndAvailable(media);
     }
 }
