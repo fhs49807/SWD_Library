@@ -7,6 +7,7 @@ import javax.persistence.Entity;
 import javax.persistence.GeneratedValue;
 import javax.persistence.GenerationType;
 import javax.persistence.Id;
+import javax.persistence.JoinColumn;
 import javax.persistence.ManyToMany;
 import javax.persistence.ManyToOne;
 import javax.persistence.Table;
@@ -47,19 +48,19 @@ public class MediaTransaction {
 	private Collection<Edition> editions;// one transaction can loan multiple edition items
 
 	@ManyToOne
-	private Customer customer;
+	private User user;
 	
 	public MediaTransaction() {
 		
 	}
 
 	
-	public MediaTransaction(Date transactionDate, Date expirationDate, Collection<Media> media, Collection<Edition> editions, Customer customer) {
+	public MediaTransaction(Date transactionDate, Date expirationDate, Collection<Media> media, Collection<Edition> editions, User user) {
 	    this.transactionDate = transactionDate;
 	    this.expirationDate = expirationDate;
 	    this.media = media;
 	    this.editions = editions;
-	    this.customer = customer;
+	    this.user = user;
 	    this.status = TransactionStatus.ACTIVE; // default status: ACTIVE
 	}
 
@@ -121,12 +122,12 @@ public class MediaTransaction {
 		this.editions = editions;
 	}
 
-	public Customer getCustomer() {
-		return customer;
+	public User getUser() {
+	    return user;
 	}
 
-	public void setCustomer(Customer customer) {
-		this.customer = customer;
+	public void setUser(User user) {
+	    this.user = user;
 	}
 
 	public Long getId() {

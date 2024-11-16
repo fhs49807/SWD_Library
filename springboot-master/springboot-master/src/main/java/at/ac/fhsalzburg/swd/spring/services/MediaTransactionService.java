@@ -9,12 +9,12 @@ import java.util.stream.StreamSupport;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
-import at.ac.fhsalzburg.swd.spring.model.Customer;
 import at.ac.fhsalzburg.swd.spring.model.Edition;
 import at.ac.fhsalzburg.swd.spring.model.MediaTransaction;
-import at.ac.fhsalzburg.swd.spring.repository.CustomerRepository;
+import at.ac.fhsalzburg.swd.spring.model.User;
 import at.ac.fhsalzburg.swd.spring.repository.EditionRepository;
 import at.ac.fhsalzburg.swd.spring.repository.MediaTransactionRepository;
+import at.ac.fhsalzburg.swd.spring.repository.UserRepository;
 
 @Service
 public class MediaTransactionService implements MediaTransactionServiceInterface {
@@ -29,14 +29,16 @@ public class MediaTransactionService implements MediaTransactionServiceInterface
 	private InvoiceServiceInterface invoiceService;
 
 	@Autowired
-	private CustomerRepository customerRepository;
+	private UserRepository userRepository;
+	
+	
 
 	// creates loan record for a customer
 	// marks each loaned item as unavailable
 	// saves transaction to repository
 	@Override
-	public MediaTransaction createLoanRecord(Customer customer, Date dueDate, Collection<Edition> editions) {
-		MediaTransaction loan = new MediaTransaction(new Date(), dueDate, Collections.emptyList(), editions, customer);
+	public MediaTransaction createLoanRecord(User user, Date dueDate, Collection<Edition> editions) {
+		MediaTransaction loan = new MediaTransaction(new Date(), dueDate, Collections.emptyList(), editions, user);
 
 		for (Edition edition : editions) {
 			edition.setAvailable(false); // Mark each edition as unavailable
@@ -47,8 +49,8 @@ public class MediaTransactionService implements MediaTransactionServiceInterface
 
 	// finds all loan transactions for specific customer
 	@Override
-	public Collection<MediaTransaction> findLoansByUser(Customer customer) {
-		return mediaTransactionRepository.findByCustomer(customer);
+	public Collection<MediaTransaction> findLoansByUser(User user) {
+		return mediaTransactionRepository.findByUser(user);
 	}
 
 	// get all loans currently entered in the system
@@ -58,10 +60,13 @@ public class MediaTransactionService implements MediaTransactionServiceInterface
 	}
 
 	@Override
-	public MediaTransaction loanMedia(Long customerId, Collection<Long> editionIds, Date dueDate) {
-		// find customer by ID
-		Customer customer = customerRepository.findById(customerId)
-				.orElseThrow(() -> new IllegalArgumentException("Customer not found"));
+	public MediaTransaction loanMedia(String username, Collection<Long> editionIds, Date dueDate) {
+		
+		// find customer by ID --> by username
+		User user = userRepository.findByUsername(username);
+	    if (user == null) {
+	        throw new IllegalArgumentException("User not found");
+	    }
 
 		// find all editions by ID
 		Collection<Edition> editions = StreamSupport
@@ -76,7 +81,7 @@ public class MediaTransactionService implements MediaTransactionServiceInterface
 
 		// create new MediaTransaction
 		MediaTransaction transaction = new MediaTransaction();
-		transaction.setCustomer(customer);
+		transaction.setUser(user);
 		transaction.setEditions(editions);
 		transaction.setTransactionDate(new Date());
 		transaction.setExpirationDate(dueDate);
@@ -109,7 +114,7 @@ public class MediaTransactionService implements MediaTransactionServiceInterface
 
 		// gebühren calc & evt Rg erstellen
 		if (transaction.getReturnDate().after(transaction.getExpirationDate())) {
-			invoiceService.deductAmount(transaction.getCustomer(), transaction);
+			invoiceService.deductAmount(transaction.getUser(), transaction);
 		}
 
 		// transaktion aktualisieren

@@ -20,7 +20,7 @@ public class ReserveMediaTransaction {
     private Long id;
 
     @ManyToOne
-    private Customer customer;
+    private User user;
 
     @ManyToOne
     private Media media;
@@ -28,8 +28,8 @@ public class ReserveMediaTransaction {
     @DateTimeFormat(pattern = "yyyy-MM-dd")
     private Date reserveDate; // date when media was reserved
 
-    public ReserveMediaTransaction(Customer customer, Media media) {
-        this.customer = customer;
+    public ReserveMediaTransaction(User user, Media media) {
+        this.user = user;
         this.media = media;
 
         reserveDate = new Date();

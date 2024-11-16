@@ -1,8 +1,8 @@
 package at.ac.fhsalzburg.swd.spring.test;
 
-import at.ac.fhsalzburg.swd.spring.model.Customer;
 import at.ac.fhsalzburg.swd.spring.model.Edition;
 import at.ac.fhsalzburg.swd.spring.model.Media;
+import at.ac.fhsalzburg.swd.spring.model.User;
 import at.ac.fhsalzburg.swd.spring.repository.ReserveMediaTransactionRepository;
 import at.ac.fhsalzburg.swd.spring.services.EditionService;
 import at.ac.fhsalzburg.swd.spring.services.EditionServiceInterface;
@@ -47,14 +47,14 @@ class ReserveMediaTransactionServiceTest {
 
     @Test
     void reserveMediaForCustomer() {
-        Customer customer = new Customer();
-        customer.setName("John Doe");
+        User user = new User();
+        user.setUsername("John Doe");
 
         Media media = new Media();
         media.setName("Dune");
 
 
         // customer must reserve the media
-        reserveMediaTransactionService.reserveMediaForCustomer(customer, media);
+        reserveMediaTransactionService.reserveMediaForCustomer(user, media);
     }
 }

@@ -1,10 +1,10 @@
 package at.ac.fhsalzburg.swd.spring.repository;
 
-import at.ac.fhsalzburg.swd.spring.model.Customer;
 import at.ac.fhsalzburg.swd.spring.model.Edition;
 import at.ac.fhsalzburg.swd.spring.model.Media;
 import at.ac.fhsalzburg.swd.spring.model.MediaTransaction;
 import at.ac.fhsalzburg.swd.spring.model.MediaTransaction.TransactionStatus;
+import at.ac.fhsalzburg.swd.spring.model.User;
 
 import java.util.Collection;
 import java.util.Date;
@@ -26,13 +26,14 @@ public interface MediaTransactionRepository extends CrudRepository<MediaTransact
 	Collection<MediaTransaction> findByEditions(Edition edition);
 
 	@Transactional(timeout = 10)
-	Collection<MediaTransaction> findByCustomer(Customer customer);
+	Collection<MediaTransaction> findByUser(User user);
 
 	@Transactional(timeout = 10)
 	Collection<MediaTransaction> findByStatus(TransactionStatus status);
 
 	// get all reservations between startDate and endDate
-	// used in handleReservations in LibraryService to determine availability of edition for loan period
+	// used in handleReservations in LibraryService to determine availability of
+	// edition for loan period
 	@Query("SELECT m FROM MediaTransaction m WHERE :media MEMBER OF m.media AND m.expirationDate BETWEEN :startDate AND :endDate")
 	Collection<MediaTransaction> findReservationsByDateRange(@Param("media") Media media,
 			@Param("startDate") Date startDate, @Param("endDate") Date endDate);

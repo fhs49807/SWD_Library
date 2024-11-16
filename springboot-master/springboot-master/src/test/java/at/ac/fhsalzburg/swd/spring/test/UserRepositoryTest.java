@@ -27,7 +27,7 @@ public class UserRepositoryTest {
     @Test
     public void whenFindByUsername_thenReturnCustomer() {
         // given
-        User givenUser = new User("Max", "Max Mustermann", "max@muster.com", "123", new Date(),"","USER",null);
+        User givenUser = new User("Max", "Max Mustermann", "max@muster.com", "123", new Date(),"","USER",null, null, 0);
         entityManager.persist(givenUser);
         entityManager.flush();
 

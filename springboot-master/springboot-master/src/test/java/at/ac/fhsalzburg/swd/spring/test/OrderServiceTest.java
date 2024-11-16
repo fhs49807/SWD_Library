@@ -46,7 +46,7 @@ public class OrderServiceTest {
     public void whenNewOrderWithCredit_thenReturnOrder() {
         // given    	
     	Date now = new Date();
-    	User customer = new User("test","junittest","test@test.tst", "123456", now, "none", "USER", null);    	
+    	User customer = new User("test","junittest","test@test.tst", "123456", now, "none", "USER", null, null, 0);    	
     	Product product = new Product("product 1",120);
     	ArrayList<Product> products = new ArrayList<Product>();
     	products.add(product);    	
@@ -70,7 +70,7 @@ public class OrderServiceTest {
     public void whenNewOrderNoCredit_thenReturnNull() {
     	// given
     	Date now = new Date();
-    	User customer = new User("test","junittest","test@test.tst", "123456", now, "none", "USER", null);
+    	User customer = new User("test","junittest","test@test.tst", "123456", now, "none", "USER", null, null, 0);
     	customer.setCredit(119l);
     	Product product = new Product("product 1",120);
     	ArrayList<Product> products = new ArrayList<Product>();

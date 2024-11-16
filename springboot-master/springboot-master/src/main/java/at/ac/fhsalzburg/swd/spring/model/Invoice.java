@@ -36,17 +36,17 @@ public class Invoice {
 	//TODO: add to class diagram
 	// one customer can have several invoices
 	@ManyToOne
-	private Customer customer;
+	private User user;
 
 	// one invoice can have multiple transactions
 	@OneToMany
 	private List<MediaTransaction> transactions;
 
-	public Invoice(Date dueDate, boolean paymentStatus, List<MediaTransaction> transactions, Customer customer) {
+	public Invoice(Date dueDate, boolean paymentStatus, List<MediaTransaction> transactions, User user) {
 		this.dueDate = dueDate;
 		this.paymentStatus = paymentStatus;
 		this.transactions = transactions;
-		this.customer = customer;
+		this.user = user;
 		this.totalAmount = calculateTotalAmount();
 	}
 
@@ -85,11 +85,11 @@ public class Invoice {
 		this.totalAmount = totalAmount;
 	}
 
-	public Customer getCustomer() {
-		return customer;
+	public User getCustomer() {
+		return user;
 	}
 
-	public void setCustomer(Customer customer) {
-		this.customer = customer;
+	public void setCustomer(User user) {
+		this.user = user;
 	}
 }

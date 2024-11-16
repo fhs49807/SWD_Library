@@ -9,9 +9,9 @@ import java.util.Date;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
-import at.ac.fhsalzburg.swd.spring.model.Customer;
 import at.ac.fhsalzburg.swd.spring.model.Invoice;
 import at.ac.fhsalzburg.swd.spring.model.MediaTransaction;
+import at.ac.fhsalzburg.swd.spring.model.User;
 import at.ac.fhsalzburg.swd.spring.repository.InvoiceRepository;
 
 @Service
@@ -22,13 +22,13 @@ public class InvoiceService implements InvoiceServiceInterface{
 
 
 	@Override
-	public void deductAmount(Customer customer, MediaTransaction transaction) {
+	public void deductAmount(User user, MediaTransaction transaction) {
 	    double penaltyAmount = calculatePenalty(transaction);
 	    if (penaltyAmount > 0) {
 	        // liste man. erstelln
 	        List<MediaTransaction> transactions = Arrays.asList(transaction);
 
-	        Invoice invoice = new Invoice(new Date(), false, transactions, customer);
+	        Invoice invoice = new Invoice(new Date(), false, transactions, user);
 	        invoice.setTotalAmount(penaltyAmount);
 	        invoiceRepository.save(invoice);
 	    }
@@ -41,8 +41,8 @@ public class InvoiceService implements InvoiceServiceInterface{
     }
 
     @Override
-    public double getOutstandingBalance(Customer customer) {
-        Double outstandingBalance = invoiceRepository.calculateOutstandingBalance(customer);
+    public double getOutstandingBalance(User user) {
+        Double outstandingBalance = invoiceRepository.calculateOutstandingBalance(user);
         return outstandingBalance != null ? outstandingBalance : 0.0;
     }
 

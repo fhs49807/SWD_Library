@@ -3,17 +3,17 @@ package at.ac.fhsalzburg.swd.spring.services;
 import java.util.Collection;
 import java.util.Date;
 
-import at.ac.fhsalzburg.swd.spring.model.Customer;
 import at.ac.fhsalzburg.swd.spring.model.Edition;
 import at.ac.fhsalzburg.swd.spring.model.MediaTransaction;
+import at.ac.fhsalzburg.swd.spring.model.User;
 
 public interface MediaTransactionServiceInterface {
 
 	// create loan record
-	public abstract MediaTransaction createLoanRecord(Customer customer, Date dueDate, Collection<Edition> editions);
+	public abstract MediaTransaction createLoanRecord(User user, Date dueDate, Collection<Edition> editions);
 
 	// retrieve all loans associated to custmer
-	public abstract Collection<MediaTransaction> findLoansByUser(Customer customer);
+	public abstract Collection<MediaTransaction> findLoansByUser(User user);
 
 	// retrieve all current loans
 	public abstract Collection<MediaTransaction> getAllLoans();
@@ -22,5 +22,5 @@ public interface MediaTransactionServiceInterface {
 	public abstract void returnMedia(Long transactionId);
 
 	// Thomas Clermont
-	public abstract MediaTransaction loanMedia(Long customerId, Collection<Long> editionIds, Date dueDate);
+	public abstract MediaTransaction loanMedia(String username, Collection<Long> editionIds, Date dueDate);
 }
