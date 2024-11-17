@@ -1,0 +1,87 @@
+<!DOCTYPE html>
+<html xmlns:layout="http://www.ultraq.net.nz/thymeleaf/layout"
+      xmlns:th="http://www.thymeleaf.org"
+      layout:decorate="~{layouts/main-layout}"
+      xmlns:sec="https://www.thymeleaf.org/thymeleaf-extras-springsecurity5">
+
+<head>
+    <title>Loan Media</title>
+</head>
+
+<body>
+    <main layout:fragment="content" th:remove="tag">
+
+        <h2>Loan Media</h2>
+
+        <!-- Alert if the user is not logged in -->
+        <div sec:authorize="!isAuthenticated()">
+            <div class="alert alert-danger">
+                <span>You must log in to loan media!</span>
+            </div>
+        </div>
+
+        <!-- Loan functionality for authenticated users -->
+        <div sec:authorize="isAuthenticated()">
+            <h3>Select Media to Loan</h3>
+            
+            <!-- Dropdowns for filtering media -->
+            <form id="searchForm" th:action="@{/searchMedia}" method="get">
+                <div>
+                    <label for="genre">Genre:</label>
+                    <select id="genre" name="genre" class="form-control">
+                        <option th:each="genre : ${genres}" th:value="${genre}" th:text="${genre}"></option>
+                    </select>
+                </div>
+                <div>
+                    <label for="type">Media Type:</label>
+                    <select id="type" name="type" class="form-control">
+                        <option th:each="type : ${mediaTypes}" th:value="${type}" th:text="${type}"></option>
+                    </select>
+                </div>
+                <button type="submit" class="btn btn-primary mt-3">Search Media</button>
+            </form>
+
+            <!-- Media table -->
+            <table class="table table-hover mt-4">
+                <thead>
+                    <tr>
+                        <th>Select</th>
+                        <th>Media ID</th>
+                        <th>Title</th>
+                        <th>Genre</th>
+                        <th>Type</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    <tr th:each="media : ${mediaList}">
+                        <td><input type="radio" name="selectedMedia" th:value="${media.id}"></td>
+                        <td th:text="${media.id}"></td>
+                        <td th:text="${media.name}"></td>
+                        <td th:text="${media.genre.name}"></td>
+                        <td th:text="${media.mediaType.type}"></td>
+                    </tr>
+                </tbody>
+            </table>
+
+            <!-- Loan date and submit -->
+            <form id="loanForm" th:action="@{/loanMedia}" method="post">
+    <div>
+        <label for="loanDate">Select Loan Date:</label>
+        <input type="datetime-local" id="loanDate" name="loanDate" class="form-control" required>
+    </div>
+    <input type="hidden" id="selectedMedia" name="mediaId" value="">
+    <button type="submit" class="btn btn-success mt-3">Submit Loan</button>
+</form>
+
+<script>
+    // JavaScript to update hidden media ID field
+    document.querySelectorAll('input[name="selectedMedia"]').forEach(input => {
+        input.addEventListener('change', () => {
+            document.getElementById('selectedMedia').value = input.value;
+        });
+    });
+</script>
+
+    </main>
+</body>
+</html>

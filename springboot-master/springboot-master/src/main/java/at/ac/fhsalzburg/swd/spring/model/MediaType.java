@@ -28,7 +28,7 @@ public class MediaType {
 		return typeName;
 	}
 
-	public void setTypeName(String typeName) {
+	public void setType(String typeName) {
 		this.typeName = typeName;
 	}
 

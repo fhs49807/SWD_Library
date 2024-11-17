@@ -13,7 +13,7 @@ public class Media {
 	private int FSK;
 	private double price;// set price automatically based on genre ('setGenre')
 
-	// Each Media item belongs to a single Genre
+	// Each Media item belongs to a single Genre (fantasy, sci fi, etc.)
 	// One Genre can have multiple Media items
 	@ManyToOne
 	private Genre genre;

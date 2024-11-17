@@ -24,6 +24,7 @@ public class MediaTransaction {
 	@GeneratedValue(strategy = GenerationType.AUTO)
 	private Long id;
 
+	
 	private TransactionStatus status;
 	private ReturnCondition condition;
 

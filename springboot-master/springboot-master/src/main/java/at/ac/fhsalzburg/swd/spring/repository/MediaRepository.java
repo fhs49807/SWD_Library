@@ -1,6 +1,10 @@
 package at.ac.fhsalzburg.swd.spring.repository;
 
+import java.util.List;
+
+import org.springframework.data.jpa.repository.Query;
 import org.springframework.data.repository.CrudRepository;
+import org.springframework.data.repository.query.Param;
 import org.springframework.stereotype.Repository;
 import org.springframework.transaction.annotation.Transactional;
 
@@ -13,6 +17,7 @@ public interface MediaRepository extends CrudRepository<Media, Long> {
 	@Transactional(timeout = 10)
 	Media findByName(String name);
 
-	@Transactional(timeout = 10)
-	Iterable<Media> findByMediaType(MediaType mediaType);
+	@Query("SELECT m FROM Media m WHERE m.genre.name = :genre AND m.mediaType.typeName = :typeName")
+	List<Media> findByGenreAndType(@Param("genre") String genre, @Param("typeName") String typeName);
+
 }

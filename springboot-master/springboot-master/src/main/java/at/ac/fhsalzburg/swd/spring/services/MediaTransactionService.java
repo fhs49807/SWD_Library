@@ -1,5 +1,6 @@
 package at.ac.fhsalzburg.swd.spring.services;
 
+import java.util.Calendar;
 import java.util.Collection;
 import java.util.Collections;
 import java.util.Date;
@@ -30,8 +31,6 @@ public class MediaTransactionService implements MediaTransactionServiceInterface
 
 	@Autowired
 	private UserRepository userRepository;
-	
-	
 
 	// creates loan record for a customer
 	// marks each loaned item as unavailable
@@ -61,12 +60,12 @@ public class MediaTransactionService implements MediaTransactionServiceInterface
 
 	@Override
 	public MediaTransaction loanMedia(String username, Collection<Long> editionIds, Date dueDate) {
-		
+
 		// find customer by ID --> by username
 		User user = userRepository.findByUsername(username);
-	    if (user == null) {
-	        throw new IllegalArgumentException("User not found");
-	    }
+		if (user == null) {
+			throw new IllegalArgumentException("User not found");
+		}
 
 		// find all editions by ID
 		Collection<Edition> editions = StreamSupport
@@ -79,12 +78,21 @@ public class MediaTransactionService implements MediaTransactionServiceInterface
 			}
 		}
 
-		// create new MediaTransaction
+		// Calculate dates
+		Date transactionDate = new Date(); // Current date for transactionDate
+		Calendar calendar = Calendar.getInstance();
+		calendar.setTime(transactionDate);
+		int loanPeriodDays = 14; // Default loan period
+		calendar.add(Calendar.DAY_OF_YEAR, loanPeriodDays);
+		Date expectedReturnDate = calendar.getTime();
+
+		// Create new MediaTransaction
 		MediaTransaction transaction = new MediaTransaction();
 		transaction.setUser(user);
 		transaction.setEditions(editions);
-		transaction.setTransactionDate(new Date());
-		transaction.setExpirationDate(dueDate);
+		transaction.setTransactionDate(transactionDate);
+		transaction.setExpectedReturnDate(expectedReturnDate);
+		transaction.setExpirationDate(dueDate); // Date provided by the user
 		transaction.setStatus(MediaTransaction.TransactionStatus.ACTIVE);
 
 		// mark edition as unavailable

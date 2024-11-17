@@ -26,6 +26,9 @@ public class Section {
 		this.name = name;
 	}
 
+	public Section() {
+	}
+
 	public Section(String name, List<Shelf> shelves) {
 		this.name = name;
 		this.shelves = shelves;

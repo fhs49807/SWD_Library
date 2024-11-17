@@ -17,12 +17,15 @@ public class Shelf {
 	private Integer number;
 
 	@ManyToOne
-	@JoinColumn(name = "SECTION_ID") 
+	@JoinColumn(name = "SECTION_ID")
 	private Section section; // Each Shelf belongs to one Section
 
 	@OneToMany(mappedBy = "shelf", cascade = CascadeType.ALL, fetch = FetchType.LAZY)
-    private Collection<Media> mediaItems;//one self can hold multiple media items
-	
+	private Collection<Media> mediaItems;// one self can hold multiple media items
+
+	public Shelf() {
+	}
+
 	public Shelf(Integer number, Section section) {
 		this.number = number;
 		this.section = section;

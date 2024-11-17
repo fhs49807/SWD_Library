@@ -71,8 +71,8 @@ public class CommandLineAppStartupRunner implements CommandLineRunner {
 		orderService.addOrder(new Date(), user, productService.getAll());
 
 		// Create sample customer
-		boolean newCustomer = userService.addUser("john.doe", "John Doe", "john.doe@example.com", "123456789",
-				new Date(), "securepassword", "Customer", User.CustomerType.REGULAR, 5);
+		boolean newCustomer = userService.addUser("john", "John Doe", "john.doe@example.com", "123456789",
+				new Date(), "pw", "Customer", User.CustomerType.REGULAR, 5);
 		if (newCustomer) {
 			System.out.println("User created successfully.");
 		} else {
@@ -215,23 +215,33 @@ public class CommandLineAppStartupRunner implements CommandLineRunner {
 		FantasyGenre.setPrice(10.0);
 		FantasyGenre = genreRepository.save(FantasyGenre);
 
-		MediaType mediaType = new MediaType();
-		mediaType.setTypeName("Book");
+		MediaType mediaTypeBook = new MediaType();
+		mediaTypeBook.setType("Book");
 		// Save the MediaType entity before using it
-		mediaType = mediaTypeRepository.save(mediaType);
+		mediaTypeBook = mediaTypeRepository.save(mediaTypeBook);
+		
+		MediaType mediaTypeMovie = new MediaType();
+		mediaTypeMovie.setType("Movie");
+		// Save the MediaType entity before using it
+		mediaTypeMovie = mediaTypeRepository.save(mediaTypeMovie);
+		
+		MediaType mediaTypeAudio = new MediaType();
+		mediaTypeAudio.setType("Audio");
+		// Save the MediaType entity before using it
+		mediaTypeAudio = mediaTypeRepository.save(mediaTypeAudio);
 
 		// Create media items and assign genre, type, and shelf
 		Media book1 = new Media();
 		book1.setName("Dune");
 		book1.setGenre(scienceFictionGenre);
-		book1.setMediaType(mediaType);
+		book1.setMediaType(mediaTypeBook);
 		book1.setShelf(shelfA1);
 		mediaService.save(book1);
 
 		Media book2 = new Media();
 		book2.setName("Harry Potter");
 		book2.setGenre(FantasyGenre);
-		book2.setMediaType(mediaType);
+		book2.setMediaType(mediaTypeBook);
 		book2.setShelf(shelfB1);
 		mediaService.save(book2);
 

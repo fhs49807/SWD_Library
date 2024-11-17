@@ -1,5 +1,8 @@
 package at.ac.fhsalzburg.swd.spring.controller;
 
+import java.text.SimpleDateFormat;
+import java.util.Collections;
+import java.util.Date;
 import java.util.List;
 
 import javax.annotation.Resource;
@@ -16,6 +19,7 @@ import org.springframework.security.core.annotation.CurrentSecurityContext;
 import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.stereotype.Controller;
 import org.springframework.ui.Model;
+import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.ModelAttribute;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestMethod;
@@ -23,7 +27,12 @@ import org.springframework.web.bind.annotation.RequestParam;
 
 import at.ac.fhsalzburg.swd.spring.TestBean;
 import at.ac.fhsalzburg.swd.spring.dto.UserDTO;
+import at.ac.fhsalzburg.swd.spring.model.Genre;
+import at.ac.fhsalzburg.swd.spring.model.Media;
+import at.ac.fhsalzburg.swd.spring.model.MediaType;
 import at.ac.fhsalzburg.swd.spring.model.User;
+import at.ac.fhsalzburg.swd.spring.services.MediaService;
+import at.ac.fhsalzburg.swd.spring.services.MediaTransactionService;
 import at.ac.fhsalzburg.swd.spring.services.UserServiceInterface;
 import at.ac.fhsalzburg.swd.spring.util.ObjectMapperUtils;
 
@@ -50,6 +59,12 @@ public class TemplateController {
 
 	@Autowired
 	UserServiceInterface userService;
+
+	@Autowired
+	MediaService mediaService;
+
+	@Autowired
+	MediaTransactionService mediaTransactionService;
 
 	@Resource(name = "sessionBean") // The @Resource annotation is part of the JSR-250 annotation
 									// collection and is packaged with Jakarta EE. This annotation
@@ -121,22 +136,58 @@ public class TemplateController {
 		logger.info("login called");
 		return "login";
 	}
-	
-	
 
 	// TODO: add "/media" to view all mediums in library
 	// TODO: add "/editions" to show editions for specific medium
 	// TODO: add "/media/add,update,delete"??
-	
+
 	// TODO: add "/loan" to loan exemplar to customer
 	// TODO: add "/return" to return medium back
 	// TODO: add "/reserve" to reserve medium
-	
+
 	// TODO: add "/invoices" to get all unpaid invoices for customer
 	// TODO: add "/pay" to pay outstanding balances
 
-	
-	
+	@RequestMapping(value = "/loan", method = RequestMethod.GET)
+	public String showLoanPage(Model model) {
+		model.addAttribute("genres", mediaService.getAllGenres());
+		model.addAttribute("mediaTypes", mediaService.getAllMediaTypes());
+		model.addAttribute("mediaList", mediaService.searchMediaByGenreAndType("defaultGenre", "defaultType"));
+		return "loan";
+	}
+
+	@GetMapping("/searchMedia")
+	public String searchMedia(@RequestParam String genre, @RequestParam String type, Model model) {
+
+		model.addAttribute("genres", mediaService.getAllGenres());
+		model.addAttribute("mediaTypes", mediaService.getAllMediaTypes());
+
+		Iterable<Media> mediaList = mediaService.searchMediaByGenreAndType(genre, type);
+		model.addAttribute("mediaList", mediaList);
+		return "loan";
+	}
+
+	@RequestMapping(value = "/loanMedia", method = RequestMethod.POST)
+	public String loanMedia(@RequestParam Long mediaId, @RequestParam String loanDate,
+			@CurrentSecurityContext(expression = "authentication") Authentication authentication, Model model) {
+		if (!(authentication instanceof AnonymousAuthenticationToken)) {
+			String username = authentication.getName();
+			try {
+				Date parsedLoanDate = new SimpleDateFormat("yyyy-MM-dd'T'HH:mm").parse(loanDate);
+
+				// Call the loanMedia method from MediaTransactionService
+				mediaTransactionService.loanMedia(username, Collections.singletonList(mediaId), parsedLoanDate);
+
+				model.addAttribute("message", "Loan created successfully!");
+			} catch (Exception e) {
+				model.addAttribute("message", "Error creating loan: " + e.getMessage());
+			}
+		} else {
+			model.addAttribute("message", "You must log in to loan media.");
+		}
+		return "loan"; // Return to loan page with status message
+	}
+
 	@RequestMapping(value = { "/login-error" })
 	public String loginError(Model model) {
 		logger.info("loginError called");
