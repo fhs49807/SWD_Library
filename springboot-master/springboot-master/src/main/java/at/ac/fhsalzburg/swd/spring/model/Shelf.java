@@ -7,7 +7,6 @@ import javax.persistence.*;
 import lombok.NoArgsConstructor;
 
 @Entity
-@NoArgsConstructor
 @Table(name = "SHELVES")
 public class Shelf {
 
