@@ -1,5 +1,7 @@
 package at.ac.fhsalzburg.swd.spring.model;
 
+import java.util.List;
+
 import javax.persistence.*;
 
 @Entity
@@ -27,6 +29,10 @@ public class Media {
     @JoinColumn(name = "shelf_id")
     private Shelf shelf;
 
+	// One Media can have multiple Editions
+    @OneToMany(mappedBy = "media", cascade = CascadeType.ALL, orphanRemoval = true)
+    private List<Edition> editions;
+	
 	public Media() {
     }
 	

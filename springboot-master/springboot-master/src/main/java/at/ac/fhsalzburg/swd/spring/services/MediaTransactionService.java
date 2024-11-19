@@ -36,14 +36,14 @@ public class MediaTransactionService implements MediaTransactionServiceInterface
 	// marks each loaned item as unavailable
 	// saves transaction to repository
 	@Override
-	public MediaTransaction createLoanRecord(User user, Date dueDate, Collection<Edition> editions) {
-		MediaTransaction loan = new MediaTransaction(new Date(), dueDate, Collections.emptyList(), editions, user);
-
-		for (Edition edition : editions) {
-			edition.setAvailable(false); // Mark each edition as unavailable
-		}
-		editionRepository.saveAll(editions); // Update availability of all editions
-		return mediaTransactionRepository.save(loan);
+	public Collection<MediaTransaction> createLoanRecord(User user, Date dueDate, Collection<Edition> editions) {
+	    Collection<MediaTransaction> transactions = editions.stream().map(edition -> {
+	        MediaTransaction loan = new MediaTransaction(new Date(), dueDate, Collections.emptyList(), edition, user);
+	        edition.setAvailable(false); // Mark the edition as unavailable
+	        editionRepository.save(edition); // Persist availability change
+	        return mediaTransactionRepository.save(loan);
+	    }).collect(Collectors.toList());
+	    return transactions;
 	}
 
 	// finds all loan transactions for specific customer
@@ -60,90 +60,91 @@ public class MediaTransactionService implements MediaTransactionServiceInterface
 
 	@Override
 	public MediaTransaction loanMedia(String username, Collection<Long> editionIds, Date dueDate) {
-
-		// Validate dueDate
+	    // Validate dueDate
 	    Date today = new Date();
 	    if (dueDate.before(today)) {
 	        throw new IllegalArgumentException("Loan date cannot be in the past.");
 	    }
-		
-		// find customer by ID --> by username
-		User user = userRepository.findByUsername(username);
-		if (user == null) {
-			throw new IllegalArgumentException("User not found");
-		}
 
-		// Check if the user already has any of the requested media on loan
-	    for (Long mediaId : editionIds) {
-	        boolean isAlreadyLoaned = mediaTransactionRepository.existsByUserAndMediaIdAndStatus(
-	                user, mediaId, MediaTransaction.TransactionStatus.ACTIVE);
-	        if (isAlreadyLoaned) {
-	            throw new IllegalStateException("You already have this media on loan.");
-	        }
+	    // Find user by username
+	    User user = userRepository.findByUsername(username);
+	    if (user == null) {
+	        throw new IllegalArgumentException("User not found");
 	    }
-		
-		// find all editions by ID
-		Collection<Edition> editions = StreamSupport
-				.stream(editionRepository.findAllById(editionIds).spliterator(), false).collect(Collectors.toList());
 
-		// check if editions are available for loan
-		for (Edition edition : editions) {
-			if (!edition.isAvailable()) {
-				throw new IllegalStateException("Edition with ID " + edition.getId() + " is not available for loan!");
-			}
-		}
+	    // Find all editions by their IDs
+	    Collection<Edition> editions = StreamSupport
+	            .stream(editionRepository.findAllById(editionIds).spliterator(), false)
+	            .collect(Collectors.toList());
 
-		// Calculate dates
-		Date transactionDate = new Date(); // Current date for transactionDate
-		Calendar calendar = Calendar.getInstance();
-		calendar.setTime(transactionDate);
-		int loanPeriodDays = 14; // Default loan period
-		calendar.add(Calendar.DAY_OF_YEAR, loanPeriodDays);
-		Date expectedReturnDate = calendar.getTime();
+	    if (editions.isEmpty()) {
+	        throw new IllegalArgumentException("No editions found for the provided IDs.");
+	    }
 
-		// Create new MediaTransaction
-		MediaTransaction transaction = new MediaTransaction();
-		transaction.setUser(user);
-		transaction.setEditions(editions);
-		transaction.setTransactionDate(transactionDate);
-		transaction.setExpectedReturnDate(expectedReturnDate);
-		transaction.setExpirationDate(dueDate); // Date provided by the user
-		transaction.setStatus(MediaTransaction.TransactionStatus.ACTIVE);
+	    // Process each edition separately
+	    MediaTransaction transaction = null;
+	    for (Edition edition : editions) {
+	        if (!edition.isAvailable()) {
+	            throw new IllegalStateException("Edition with ID " + edition.getId() + " is not available for loan!");
+	        }
 
-		// mark edition as unavailable
-		for (Edition edition : editions) {
-			edition.setAvailable(false);
-			editionRepository.save(edition); // update edition availability in repository
-		}
+	        // Check if the user already has this edition on loan
+	        boolean isAlreadyLoaned = mediaTransactionRepository.existsByUserAndEditionAndStatus(
+	                user, edition, MediaTransaction.TransactionStatus.ACTIVE);
+	        if (isAlreadyLoaned) {
+	            throw new IllegalStateException("User already has this media on loan (Edition ID: " + edition.getId() + ").");
+	        }
 
-		// save transaction in repository
-		return mediaTransactionRepository.save(transaction);
+	        // Calculate transaction and expected return dates
+	        Date transactionDate = new Date();
+	        Calendar calendar = Calendar.getInstance();
+	        calendar.setTime(transactionDate);
+	        int loanPeriodDays = 14;
+	        calendar.add(Calendar.DAY_OF_YEAR, loanPeriodDays);
+	        Date expectedReturnDate = calendar.getTime();
+
+	        // Create and save the MediaTransaction
+	        transaction = new MediaTransaction(transactionDate, dueDate, edition, user);
+	        transaction.setExpectedReturnDate(expectedReturnDate);
+	        transaction.setStatus(MediaTransaction.TransactionStatus.ACTIVE);
+	        mediaTransactionRepository.save(transaction);
+
+	        // Update edition's availability
+	        edition.setAvailable(false);
+	        edition.setDueDate(expectedReturnDate);
+	        editionRepository.save(edition);
+	    }
+
+	    return transaction;
 	}
+
+
+
 
 	@Override
 	public void returnMedia(Long transactionId) {
-		MediaTransaction transaction = mediaTransactionRepository.findById(transactionId)
-				.orElseThrow(() -> new IllegalArgumentException("Transaction not found"));
+	    MediaTransaction transaction = mediaTransactionRepository.findById(transactionId)
+	            .orElseThrow(() -> new IllegalArgumentException("Transaction not found"));
 
-		// rückgabe date aktualisieren und status ändern
-		transaction.setReturnDate(new Date());
-		transaction.setStatus(MediaTransaction.TransactionStatus.COMPLETED);
+	    // Update the return date and status
+	    transaction.setReturnDate(new Date());
+	    transaction.setStatus(MediaTransaction.TransactionStatus.COMPLETED);
 
-		// editionen als verfügbar markieren
-		for (Edition edition : transaction.getEditions()) {
-			edition.setAvailable(true);
-			editionRepository.save(edition);
-		}
+	    // Mark the edition as available
+	    Edition edition = transaction.getEdition();
+	    edition.setAvailable(true);
+	    editionRepository.save(edition);
 
-		// gebühren calc & evt Rg erstellen
-		if (transaction.getReturnDate().after(transaction.getExpirationDate())) {
-			invoiceService.deductAmount(transaction.getUser(), transaction);
-		}
+	    // Calculate fees and generate invoice if return is overdue
+	    if (transaction.getReturnDate().after(transaction.getExpirationDate())) {
+	        invoiceService.deductAmount(transaction.getUser(), transaction);
+	    }
 
-		// transaktion aktualisieren in der DB
-		mediaTransactionRepository.save(transaction);
+	    // Save the updated transaction
+	    mediaTransactionRepository.save(transaction);
 	}
 	
 	
+
 
 }

@@ -52,10 +52,11 @@ public class Invoice {
 
 	// Calculate total amount based on the price of all editions in each transaction
 	public double calculateTotalAmount() {
-		return transactions.stream().flatMap(transaction -> transaction.getEditions().stream())
-				.mapToDouble(edition -> edition.getMedia().getPrice()) // .getGenre().getPrice() ???
-				.sum();
+	    return transactions.stream()
+	            .mapToDouble(transaction -> transaction.getEdition().getMedia().getPrice())
+	            .sum();
 	}
+
 
 	public Date getDueDate() {
 		return dueDate;

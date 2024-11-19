@@ -22,4 +22,6 @@ public interface MediaServiceInterface {
 	
 	Iterable<Media> searchMediaByGenreAndType(String genre, String type);
 
+    Boolean addMedia(Media media);
+
 }

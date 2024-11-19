@@ -28,18 +28,23 @@ public class EditionRepositoryTest {
     private EditionRepository editionRepository;
 
     @Test
-    public void whenFindByName_thenReturnGenre() {
+    public void whenFindByMedia_thenReturnEditions() {
         // given
-        Media media = new Book(null, 123, "available", null, "JAVA 101", null, null, "isbn123");
-        entityManager.persist(media);
+        Book book = new Book();
+        book.setName("JAVA 101");
+        book.setISBN("isbn123");
+        entityManager.persist(book);
         entityManager.flush();
 
-        Edition givenEdition = new Edition(null, null, media);
+        Edition givenEdition = new Edition(book);
         entityManager.persist(givenEdition);
         entityManager.flush();
 
-        List<Edition> foundEditions = editionRepository.findByMedia(media);
-        assertEquals(givenEdition, foundEditions.get(0));
+        List<Edition> foundEditions = editionRepository.findByMedia(book);
 
+        // Validate that the retrieved edition matches the given edition
+        assertEquals(1, foundEditions.size());
+        assertEquals(givenEdition, foundEditions.get(0));
     }
+
 }

@@ -6,6 +6,7 @@ import javax.persistence.Entity;
 import javax.persistence.GeneratedValue;
 import javax.persistence.GenerationType;
 import javax.persistence.Id;
+import javax.persistence.JoinColumn;
 import javax.persistence.ManyToOne;
 import javax.persistence.Table;
 
@@ -17,7 +18,6 @@ import lombok.NoArgsConstructor;
 
 @Entity
 @Table(name = "EDITIONS")
-@NoArgsConstructor
 public class Edition {
 
 	@Id
@@ -33,7 +33,9 @@ public class Edition {
 	// one media can have multiple editions
 	// Each Edition is linked to one Media item
 	@ManyToOne
+	@JoinColumn(name = "media_id", nullable = false)
 	private Media media;
+
 
 	public Edition(Media media, boolean available, Date dueDate) {
 		this.media = media;
@@ -41,11 +43,14 @@ public class Edition {
 		this.dueDate = dueDate;
 	}
 
-	public Edition(Long id, Date dueDate, Media media) {
-		super();
-		this.id = id;
-		this.dueDate = dueDate;
-		this.media = media;
+	public Edition() {
+		
+	}
+	
+
+	public Edition(Media media) {
+	    this.media = media;
+	    this.available = true;
 	}
 
 	public Date getDueDate() {
