@@ -125,7 +125,7 @@ public class MediaTransactionService implements MediaTransactionServiceInterface
 		MediaTransaction transaction = mediaTransactionRepository.findById(transactionId)
 				.orElseThrow(() -> new IllegalArgumentException("Transaction not found"));
 
-		// rückgabe date aktualisieren
+		// rückgabe date aktualisieren und status ändern
 		transaction.setReturnDate(new Date());
 		transaction.setStatus(MediaTransaction.TransactionStatus.COMPLETED);
 
@@ -140,8 +140,10 @@ public class MediaTransactionService implements MediaTransactionServiceInterface
 			invoiceService.deductAmount(transaction.getUser(), transaction);
 		}
 
-		// transaktion aktualisieren
+		// transaktion aktualisieren in der DB
 		mediaTransactionRepository.save(transaction);
 	}
+	
+	
 
 }

@@ -1,0 +1,43 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org">
+<head>
+    <meta charset="UTF-8">
+    <title>Return Media</title>
+    <link rel="stylesheet" th:href="@{/css/styles.css}"> 
+</head>
+<body>
+    <h1>Return Media</h1>
+
+    <div th:if="${successMessage}" class="success">
+        <p th:text="${successMessage}"></p>
+    </div>
+    <div th:if="${errorMessage}" class="error">
+        <p th:text="${errorMessage}"></p>
+    </div>
+
+    <h3>Your Current Loans</h3>
+    <table>
+        <thead>
+            <tr>
+                <th>Media Name</th>
+                <th>Due Date</th>
+                <th>Action</th>
+            </tr>
+        </thead>
+        <tbody>
+            <tr th:each="transaction : ${loans}">
+                <td th:text="${transaction.media.name}">Media Name</td>
+                <td th:text="${#dates.format(transaction.expirationDate, 'yyyy-MM-dd')}">Due Date</td>
+                <td>
+                    <form th:action="@{/returnMedia}" method="post">
+                        <input type="hidden" name="transactionId" th:value="${transaction.id}" />
+                        <button type="submit">Return</button>
+                    </form>
+                </td>
+            </tr>
+        </tbody>
+    </table>
+
+    <a th:href="@{/loan}">Back to Loan Page</a>
+</body>
+</html>
