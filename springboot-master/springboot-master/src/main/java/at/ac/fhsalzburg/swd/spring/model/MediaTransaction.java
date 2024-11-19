@@ -147,6 +147,11 @@ public class MediaTransaction {
 	public Long getId() {
 		return id;
 	}
+	
+	//  Setter nur für Testzwecke
+    public void setId(Long id) {
+        this.id = id;
+    }
 
 	public enum TransactionStatus {
 		ACTIVE, COMPLETED, OVERDUE
