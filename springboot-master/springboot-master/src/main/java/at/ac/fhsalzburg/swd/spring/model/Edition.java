@@ -6,6 +6,7 @@ import javax.persistence.Entity;
 import javax.persistence.GeneratedValue;
 import javax.persistence.GenerationType;
 import javax.persistence.Id;
+import javax.persistence.JoinColumn;
 import javax.persistence.ManyToOne;
 import javax.persistence.Table;
 
@@ -32,7 +33,9 @@ public class Edition {
 	// one media can have multiple editions
 	// Each Edition is linked to one Media item
 	@ManyToOne
+	@JoinColumn(name = "media_id", nullable = false)
 	private Media media;
+
 
 	public Edition(Media media, boolean available, Date dueDate) {
 		this.media = media;
