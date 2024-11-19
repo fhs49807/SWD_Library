@@ -7,15 +7,17 @@ import javax.persistence.Entity;
 import lombok.NoArgsConstructor;
 
 @Entity
-@NoArgsConstructor
 public class Book extends Media {
 
 	private String ISBN;
 
-	public Book(Long id, int barcode, String availabilityStatus, Date dueDate, String name, MediaType mediaType,
-			Library library, String ISBN) {
-		super();
-		this.ISBN = ISBN;
+	public Book(String ISBN, String name, Genre genre, MediaType mediaType, Shelf shelf) {
+        super(name, genre, mediaType, shelf); // Call Media's constructor
+        this.ISBN = ISBN; // Initialize Book-specific field
+    }
+
+	public Book() {
+		// TODO Auto-generated constructor stub
 	}
 
 	public String getISBN() {

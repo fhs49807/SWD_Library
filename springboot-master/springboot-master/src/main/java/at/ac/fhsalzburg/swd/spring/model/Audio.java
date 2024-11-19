@@ -7,16 +7,18 @@ import javax.persistence.Entity;
 import lombok.NoArgsConstructor;
 
 @Entity
-@NoArgsConstructor
 public class Audio extends Media {
 
 	private String codec;
 
-	public Audio(Long id, int barcode, String availabilityStatus, Date dueDate, String name, MediaType mediaType,
-			Library library, String codec) {
-		super();
-		this.codec = codec;
-	}
+	public Audio(String codec, String name, Genre genre, MediaType mediaType, Shelf shelf) {
+        super(name, genre, mediaType, shelf); // Call Media's constructor
+        this.codec = codec;
+    }
+	
+	public Audio() {
+        
+    }
 
 	public String getCodec() {
 		return codec;

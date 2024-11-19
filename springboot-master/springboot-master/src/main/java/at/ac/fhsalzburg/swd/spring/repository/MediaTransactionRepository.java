@@ -23,7 +23,7 @@ public interface MediaTransactionRepository extends CrudRepository<MediaTransact
 	Optional<MediaTransaction> findById(long id);
 
 	@Transactional(timeout = 10)
-	Collection<MediaTransaction> findByEditions(Edition edition);
+    Collection<MediaTransaction> findByEdition(Edition edition);
 
 	@Transactional(timeout = 10)
 	Collection<MediaTransaction> findByUser(User user);
@@ -38,6 +38,6 @@ public interface MediaTransactionRepository extends CrudRepository<MediaTransact
 	Collection<MediaTransaction> findReservationsByDateRange(@Param("media") Media media,
 			@Param("startDate") Date startDate, @Param("endDate") Date endDate);
 
-    boolean existsByUserAndMediaIdAndStatus(User user, Long mediaId, MediaTransaction.TransactionStatus status);
+    boolean existsByUserAndEditionAndStatus(User user, Edition edition, MediaTransaction.TransactionStatus status);
 
 }

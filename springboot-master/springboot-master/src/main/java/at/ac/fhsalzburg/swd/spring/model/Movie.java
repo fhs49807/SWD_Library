@@ -7,15 +7,17 @@ import javax.persistence.Entity;
 import lombok.NoArgsConstructor;
 
 @Entity
-@NoArgsConstructor
 public class Movie extends Media {
 
 	private String IMDb;
 
-	public Movie(Long id, int barcode, String availabilityStatus, Date dueDate, String name, MediaType mediaType,
-			Library library, String iMDb) {
-		super();
-		IMDb = iMDb;
+	public Movie(String imdb, String name, Genre genre, MediaType mediaType, Shelf shelf) {
+		super(name, genre, mediaType, shelf); // Call Media's constructor
+		this.IMDb = imdb;
+	}
+
+	public Movie() {
+
 	}
 
 	public String getIMDb() {

@@ -4,6 +4,8 @@ import java.util.Collection;
 import java.util.Date;
 
 import javax.persistence.Entity;
+import javax.persistence.EnumType;
+import javax.persistence.Enumerated;
 import javax.persistence.GeneratedValue;
 import javax.persistence.GenerationType;
 import javax.persistence.Id;
@@ -24,7 +26,7 @@ public class MediaTransaction {
 	@GeneratedValue(strategy = GenerationType.AUTO)
 	private Long id;
 
-	
+	@Enumerated(EnumType.STRING)
 	private TransactionStatus status;
 	private ReturnCondition condition;
 
@@ -45,8 +47,10 @@ public class MediaTransaction {
 	@ManyToMany
 	private Collection<Media> media;// one transaction can reserve multiple media items
 	
-	@ManyToMany
-	private Collection<Edition> editions;// one transaction can loan multiple edition items
+	@ManyToOne
+    @JoinColumn(name = "edition_id", nullable = false)
+    private Edition edition; // Link a single edition to the transaction
+
 
 	@ManyToOne
 	private User user;
@@ -56,15 +60,24 @@ public class MediaTransaction {
 	}
 
 	
-	public MediaTransaction(Date transactionDate, Date expirationDate, Collection<Media> media, Collection<Edition> editions, User user) {
+	public MediaTransaction(Date transactionDate, Date expirationDate, Collection<Media> media, Edition edition, User user) {
 	    this.transactionDate = transactionDate;
 	    this.expirationDate = expirationDate;
 	    this.media = media;
-	    this.editions = editions;
+	    this.edition = edition;
 	    this.user = user;
 	    this.status = TransactionStatus.ACTIVE; // default status: ACTIVE
 	}
 
+
+
+	public MediaTransaction(Date transactionDate, Date expirationDate, Edition edition, User user) {
+        this.transactionDate = transactionDate;
+        this.expirationDate = expirationDate;
+        this.edition = edition;
+        this.user = user;
+        this.status = TransactionStatus.ACTIVE; // Default status
+    }
 
 
 	public TransactionStatus getStatus() {
@@ -115,12 +128,12 @@ public class MediaTransaction {
 		this.returnDate = returnDate;
 	}
 
-	public Collection<Edition> getEditions() {
-		return editions;
+	public Edition getEdition() {
+		return edition;
 	}
 
-	public void setEditions(Collection<Edition> editions) {
-		this.editions = editions;
+	public void setEdition(Edition editions) {
+		this.edition = editions;
 	}
 
 	public User getUser() {

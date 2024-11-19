@@ -71,8 +71,8 @@ public class CommandLineAppStartupRunner implements CommandLineRunner {
 		orderService.addOrder(new Date(), user, productService.getAll());
 
 		// Create sample customer
-		boolean newCustomer = userService.addUser("john", "John Doe", "john.doe@example.com", "123456789",
-				new Date(), "pw", "Customer", User.CustomerType.REGULAR, 5);
+		boolean newCustomer = userService.addUser("john", "John Doe", "john.doe@example.com", "123456789", new Date(),
+				"pw", "Customer", User.CustomerType.REGULAR, 5);
 		if (newCustomer) {
 			System.out.println("User created successfully.");
 		} else {
@@ -84,7 +84,7 @@ public class CommandLineAppStartupRunner implements CommandLineRunner {
 //		returnMediaSimulation();
 //		loanMediaSimulation();
 
-		//TODO: ID from reserveMediaSimulation does not exist in database
+		// TODO: ID from reserveMediaSimulation does not exist in database
 //		reserveMediaSimulation();
 	}
 
@@ -153,8 +153,6 @@ public class CommandLineAppStartupRunner implements CommandLineRunner {
 
 //  ---------------------------------------------------
 
-	
-
 	private void createLibraryWithMedia() {
 		// Create sections and shelves for the library
 		Section sectionA = new Section("Section A");
@@ -178,51 +176,61 @@ public class CommandLineAppStartupRunner implements CommandLineRunner {
 		scienceFictionGenre.setPrice(10.0);
 		scienceFictionGenre = genreRepository.save(scienceFictionGenre);
 
-		Genre FantasyGenre = new Genre();
-		FantasyGenre.setName("Fantasy Genre");
-		FantasyGenre.setPrice(10.0);
-		FantasyGenre = genreRepository.save(FantasyGenre);
+		Genre fantasyGenre = new Genre();
+		fantasyGenre.setName("Fantasy Genre");
+		fantasyGenre.setPrice(12.0);
+		fantasyGenre = genreRepository.save(fantasyGenre);
 
+		Genre thrillerGenre = new Genre();
+		thrillerGenre.setName("Thriller");
+		thrillerGenre.setPrice(15.0);
+		thrillerGenre = genreRepository.save(thrillerGenre);
+
+		// Create media types
 		MediaType mediaTypeBook = new MediaType();
 		mediaTypeBook.setType("Book");
-		// Save the MediaType entity before using it
 		mediaTypeBook = mediaTypeRepository.save(mediaTypeBook);
-		
-		MediaType mediaTypeMovie = new MediaType();
-		mediaTypeMovie.setType("Movie");
-		// Save the MediaType entity before using it
-		mediaTypeMovie = mediaTypeRepository.save(mediaTypeMovie);
-		
+
 		MediaType mediaTypeAudio = new MediaType();
 		mediaTypeAudio.setType("Audio");
-		// Save the MediaType entity before using it
 		mediaTypeAudio = mediaTypeRepository.save(mediaTypeAudio);
 
-		// Create media items and assign genre, type, and shelf
-		Media book1 = new Media();
-		book1.setName("Dune");
-		book1.setGenre(scienceFictionGenre);
-		book1.setMediaType(mediaTypeBook);
-		book1.setShelf(shelfA1);
-		mediaService.save(book1);
+		MediaType mediaTypeMovie = new MediaType();
+		mediaTypeMovie.setType("Movie");
+		mediaTypeMovie = mediaTypeRepository.save(mediaTypeMovie);
 
-		Media book2 = new Media();
-		book2.setName("Harry Potter");
-		book2.setGenre(FantasyGenre);
-		book2.setMediaType(mediaTypeBook);
-		book2.setShelf(shelfB1);
-		mediaService.save(book2);
+		// Create and add books
+		Book dune = new Book("55231", "Dune", scienceFictionGenre, mediaTypeBook, shelfA1);
+		mediaService.addMedia(dune);
 
-		System.out.println("Media items created and added to library shelves.");
+		Book harryPotter = new Book("234234", "Harry Potter", fantasyGenre, mediaTypeBook, shelfB1);
+		mediaService.addMedia(harryPotter);
 
-		// Create editions for each book
-		for (int i = 0; i < 3; i++) {
-			Edition edition1 = new Edition(book1, true, null); // available edition
-			Edition edition2 = new Edition(book2, true, null); // available edition
-			editionRepository.save(edition1);
-			editionRepository.save(edition2);
-		}
-		System.out.println("Editions created for media items.");
+		Book goneGirl = new Book("9780307588371", "Gone Girl", thrillerGenre, mediaTypeBook, shelfA1);
+		mediaService.addMedia(goneGirl);
+
+		// Create and add audios
+		Audio duneAudio = new Audio("AAC", "Dune Audiobook", scienceFictionGenre, mediaTypeAudio, shelfA1);
+		mediaService.addMedia(duneAudio);
+
+		Audio harryPotterAudio = new Audio("MP3", "Harry Potter Audiobook", fantasyGenre, mediaTypeAudio, shelfB1);
+		mediaService.addMedia(harryPotterAudio);
+
+		Audio goneGirlAudio = new Audio("WAV", "Gone Girl Audiobook", thrillerGenre, mediaTypeAudio, shelfA1);
+		mediaService.addMedia(goneGirlAudio);
+
+		// Create and add movies
+		Movie duneMovie = new Movie("tt0816692", "Dune Movie", scienceFictionGenre, mediaTypeMovie, shelfA1);
+		mediaService.addMedia(duneMovie);
+
+		Movie harryPotterMovie = new Movie("tt0241527", "Harry Potter Movie", fantasyGenre, mediaTypeMovie, shelfB1);
+		mediaService.addMedia(harryPotterMovie);
+
+		Movie goneGirlMovie = new Movie("tt2267998", "Gone Girl Movie", thrillerGenre, mediaTypeMovie, shelfA1);
+		mediaService.addMedia(goneGirlMovie);
+
+		System.out.println("Library with media created successfully.");
+
 	}
 
 }

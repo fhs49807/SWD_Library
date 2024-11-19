@@ -17,7 +17,6 @@ import lombok.NoArgsConstructor;
 
 @Entity
 @Table(name = "EDITIONS")
-@NoArgsConstructor
 public class Edition {
 
 	@Id
@@ -41,11 +40,14 @@ public class Edition {
 		this.dueDate = dueDate;
 	}
 
-	public Edition(Long id, Date dueDate, Media media) {
-		super();
-		this.id = id;
-		this.dueDate = dueDate;
-		this.media = media;
+	public Edition() {
+		
+	}
+	
+
+	public Edition(Media media) {
+	    this.media = media;
+	    this.available = true;
 	}
 
 	public Date getDueDate() {
