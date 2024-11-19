@@ -169,24 +169,32 @@ public class TemplateController {
 
 	@RequestMapping(value = "/loanMedia", method = RequestMethod.POST)
 	public String loanMedia(@RequestParam Long mediaId, @RequestParam String loanDate,
-			@CurrentSecurityContext(expression = "authentication") Authentication authentication, Model model) {
-		if (!(authentication instanceof AnonymousAuthenticationToken)) {
-			String username = authentication.getName();
-			try {
-				Date parsedLoanDate = new SimpleDateFormat("yyyy-MM-dd'T'HH:mm").parse(loanDate);
+	        @CurrentSecurityContext(expression = "authentication") Authentication authentication, Model model) {
+	    if (!(authentication instanceof AnonymousAuthenticationToken)) {
+	        String username = authentication.getName();
+	        try {
+	            Date parsedLoanDate = new SimpleDateFormat("yyyy-MM-dd'T'HH:mm").parse(loanDate);
 
-				// Call the loanMedia method from MediaTransactionService
-				mediaTransactionService.loanMedia(username, Collections.singletonList(mediaId), parsedLoanDate);
+	            // Attempt to loan media
+	            mediaTransactionService.loanMedia(username, Collections.singletonList(mediaId), parsedLoanDate);
 
-				model.addAttribute("message", "Loan created successfully!");
-			} catch (Exception e) {
-				model.addAttribute("message", "Error creating loan: " + e.getMessage());
-			}
-		} else {
-			model.addAttribute("message", "You must log in to loan media.");
-		}
-		return "loan"; // Return to loan page with status message
+	            model.addAttribute("successMessage", "Loan created successfully!");
+	        } catch (IllegalStateException e) {
+	            model.addAttribute("errorMessage", e.getMessage()); // User already has the media on loan
+	        } catch (Exception e) {
+	            model.addAttribute("errorMessage", "Error creating loan: " + e.getMessage());
+	        }
+	    } else {
+	        model.addAttribute("errorMessage", "You must log in to loan media.");
+	    }
+	 // Populate genres and media types to re-render the loan page properly
+	    model.addAttribute("genres", mediaService.getAllGenres());
+	    model.addAttribute("mediaTypes", mediaService.getAllMediaTypes());
+	    model.addAttribute("mediaList", Collections.emptyList()); // Or keep mediaList populated if needed
+
+	    return "loan"; // Return to loan page with feedback
 	}
+
 
 	@RequestMapping(value = { "/login-error" })
 	public String loginError(Model model) {

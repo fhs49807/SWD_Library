@@ -61,12 +61,27 @@ public class MediaTransactionService implements MediaTransactionServiceInterface
 	@Override
 	public MediaTransaction loanMedia(String username, Collection<Long> editionIds, Date dueDate) {
 
+		// Validate dueDate
+	    Date today = new Date();
+	    if (dueDate.before(today)) {
+	        throw new IllegalArgumentException("Loan date cannot be in the past.");
+	    }
+		
 		// find customer by ID --> by username
 		User user = userRepository.findByUsername(username);
 		if (user == null) {
 			throw new IllegalArgumentException("User not found");
 		}
 
+		// Check if the user already has any of the requested media on loan
+	    for (Long mediaId : editionIds) {
+	        boolean isAlreadyLoaned = mediaTransactionRepository.existsByUserAndMediaIdAndStatus(
+	                user, mediaId, MediaTransaction.TransactionStatus.ACTIVE);
+	        if (isAlreadyLoaned) {
+	            throw new IllegalStateException("You already have this media on loan.");
+	        }
+	    }
+		
 		// find all editions by ID
 		Collection<Edition> editions = StreamSupport
 				.stream(editionRepository.findAllById(editionIds).spliterator(), false).collect(Collectors.toList());

@@ -38,4 +38,6 @@ public interface MediaTransactionRepository extends CrudRepository<MediaTransact
 	Collection<MediaTransaction> findReservationsByDateRange(@Param("media") Media media,
 			@Param("startDate") Date startDate, @Param("endDate") Date endDate);
 
+    boolean existsByUserAndMediaIdAndStatus(User user, Long mediaId, MediaTransaction.TransactionStatus status);
+
 }

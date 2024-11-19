@@ -79,11 +79,10 @@ public class CommandLineAppStartupRunner implements CommandLineRunner {
 			System.out.println("Failed to create user.");
 		}
 
-		performCustomerCRUD();
 		createLibraryWithMedia();
 
-		returnMediaSimulation();
-		loanMediaSimulation();
+//		returnMediaSimulation();
+//		loanMediaSimulation();
 
 		//TODO: ID from reserveMediaSimulation does not exist in database
 //		reserveMediaSimulation();
@@ -154,38 +153,7 @@ public class CommandLineAppStartupRunner implements CommandLineRunner {
 
 //  ---------------------------------------------------
 
-	private void performCustomerCRUD() {
-		// CREATE
-		boolean created = userService.addUser("jane.doe", "Jane Doe", "jane.doe@example.com", "987654321", new Date(),
-				"securepassword", "Customer", User.CustomerType.REGULAR, 5);
-		if (created) {
-			System.out.println("User created: Jane Doe");
-		}
-
-		// READ
-		User retrievedUser = userService.getByUsername("jane.doe");
-		if (retrievedUser != null) {
-			System.out.println("User retrieved: " + retrievedUser);
-		} else {
-			System.out.println("User not found.");
-		}
-
-		// UPDATE
-		if (retrievedUser != null) {
-			retrievedUser.setFullname("Updated Name");
-			retrievedUser.setLoanLimit(10);
-			userService.addUser(retrievedUser); // Reuse addUser method for updating
-			System.out.println("User updated: " + retrievedUser);
-		} else {
-			System.out.println("User not found for update.");
-		}
-
-		// DELETE
-		if (retrievedUser != null) {
-			userService.deleteUser(retrievedUser.getUsername()); // Ensure this method exists in userService
-			System.out.println("User deleted with username: " + retrievedUser.getUsername());
-		}
-	}
+	
 
 	private void createLibraryWithMedia() {
 		// Create sections and shelves for the library
