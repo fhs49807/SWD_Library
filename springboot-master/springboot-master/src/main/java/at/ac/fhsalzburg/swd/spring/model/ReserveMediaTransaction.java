@@ -23,15 +23,14 @@ public class ReserveMediaTransaction {
     private User user;
 
     @ManyToOne
-    private Media media;
+    private Edition edition;
 
     @DateTimeFormat(pattern = "yyyy-MM-dd")
-    private Date reserveDate; // date when media was reserved
+    private Date reserveStartDate;
 
-    public ReserveMediaTransaction(User user, Media media) {
+    public ReserveMediaTransaction(User user, Edition edition, Date reserveStartDate) {
         this.user = user;
-        this.media = media;
-
-        reserveDate = new Date();
+        this.edition = edition;
+        this.reserveStartDate = reserveStartDate;
     }
 }

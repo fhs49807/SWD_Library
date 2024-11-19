@@ -11,7 +11,9 @@ public class Media {
 	@Id
 	@GeneratedValue(strategy = GenerationType.AUTO)
 	private Long id;
-	private String name;
+
+    @Column(unique = true)
+    private String name;
 	private int FSK;
 	private double price;// set price automatically based on genre ('setGenre')
 
@@ -24,7 +26,7 @@ public class Media {
 	// One MediaType can have multiple Media items
 	@ManyToOne
 	private MediaType mediaType;
-	
+
 	@ManyToOne
     @JoinColumn(name = "shelf_id")
     private Shelf shelf;
@@ -32,11 +34,11 @@ public class Media {
 	// One Media can have multiple Editions
     @OneToMany(mappedBy = "media", cascade = CascadeType.ALL, orphanRemoval = true)
     private List<Edition> editions;
-	
+
 	public Media() {
     }
-	
-	
+
+
 	public Media(String name, Genre genre, MediaType mediaType, Shelf shelf) {
         this.name = name;
         this.genre = genre;

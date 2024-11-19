@@ -1,26 +1,12 @@
 package at.ac.fhsalzburg.swd.spring.services;
 
-import at.ac.fhsalzburg.swd.spring.model.Audio;
-import at.ac.fhsalzburg.swd.spring.model.Book;
-import at.ac.fhsalzburg.swd.spring.model.Edition;
-import at.ac.fhsalzburg.swd.spring.model.Genre;
-import at.ac.fhsalzburg.swd.spring.model.Media;
-import at.ac.fhsalzburg.swd.spring.model.MediaType;
-import at.ac.fhsalzburg.swd.spring.model.Movie;
-import at.ac.fhsalzburg.swd.spring.repository.AudioRepository;
-import at.ac.fhsalzburg.swd.spring.repository.BookRepository;
-import at.ac.fhsalzburg.swd.spring.repository.EditionRepository;
-import at.ac.fhsalzburg.swd.spring.repository.GenreRepository;
-import at.ac.fhsalzburg.swd.spring.repository.MediaRepository;
-import at.ac.fhsalzburg.swd.spring.repository.MediaTypeRepository;
-import at.ac.fhsalzburg.swd.spring.repository.MovieRepository;
-
-import java.util.List;
-import java.util.stream.Collectors;
-import java.util.stream.StreamSupport;
-
+import at.ac.fhsalzburg.swd.spring.model.*;
+import at.ac.fhsalzburg.swd.spring.repository.*;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
+
+import java.util.stream.Collectors;
+import java.util.stream.StreamSupport;
 
 @Service
 public class MediaService implements MediaServiceInterface {
@@ -33,7 +19,7 @@ public class MediaService implements MediaServiceInterface {
 
     @Autowired
     private MediaTypeRepository mediaTypeRepository;
-    
+
     @Autowired
     private BookRepository bookRepository;
 
@@ -42,10 +28,10 @@ public class MediaService implements MediaServiceInterface {
 
     @Autowired
     private MovieRepository movieRepository;
-    
-    @Autowired    
+
+    @Autowired
     private EditionRepository editionRepository;
-    
+
     // constructor for injection of GenreRepo instance
     public MediaService(GenreRepository genreRepo) {
         this.genreRepository = genreRepo;
@@ -53,7 +39,8 @@ public class MediaService implements MediaServiceInterface {
 
     @Override
     public Boolean addMedia(Media media) {
-        if ((media.getName() != null) && (media.getName().length() > 0) && (media.getFSK() >= 0) && (media.getFSK() <= 18)) {
+        if ((media.getName() != null) && (media.getName().length() > 0) && (media.getFSK() >= 0) &&
+            (media.getFSK() <= 18)) {
             // Save media in the main media repository
             mediaRepository.save(media);
 
@@ -63,7 +50,7 @@ public class MediaService implements MediaServiceInterface {
             } else if (media instanceof Audio) {
                 audioRepository.save((Audio) media);
             } else if (media instanceof Movie) {
-            	movieRepository.save((Movie) media);
+                movieRepository.save((Movie) media);
             }
 
             // Add 2 exemplare for each medium
@@ -77,7 +64,7 @@ public class MediaService implements MediaServiceInterface {
 
         return false; // Media validation failed
     }
-    
+
     // saves genre entry to repository
     public void saveGenre(Genre genre) {
         genreRepository.save(genre);
@@ -91,23 +78,28 @@ public class MediaService implements MediaServiceInterface {
     public Media findById(Long id) {
         return mediaRepository.findById(id).orElseThrow();
     }
-    
+
     @Override
     public Iterable<String> getAllGenres() {
         return StreamSupport.stream(genreRepository.findAll().spliterator(), false)
-                .map(Genre::getName)
-                .collect(Collectors.toList()); // Return as List but Iterable-compatible
+            .map(Genre::getName)
+            .collect(Collectors.toList()); // Return as List but Iterable-compatible
     }
 
     @Override
     public Iterable<String> getAllMediaTypes() {
         return StreamSupport.stream(mediaTypeRepository.findAll().spliterator(), false)
-                .map(MediaType::getType)
-                .collect(Collectors.toList());
+            .map(MediaType::getType)
+            .collect(Collectors.toList());
     }
 
     @Override
     public Iterable<Media> searchMediaByGenreAndType(String genre, String type) {
         return mediaRepository.findByGenreAndType(genre, type);
+    }
+
+    @Override
+    public Media findByName(String name) {
+        return mediaRepository.findByName(name);
     }
 }

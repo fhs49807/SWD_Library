@@ -5,16 +5,14 @@ import at.ac.fhsalzburg.swd.spring.repository.EditionRepository;
 import at.ac.fhsalzburg.swd.spring.repository.GenreRepository;
 import at.ac.fhsalzburg.swd.spring.repository.MediaTypeRepository;
 import at.ac.fhsalzburg.swd.spring.services.*;
+import at.ac.fhsalzburg.swd.spring.util.DateUtils;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.CommandLineRunner;
 import org.springframework.context.annotation.Profile;
 import org.springframework.stereotype.Component;
 import org.springframework.transaction.annotation.Transactional;
 
-import java.util.Arrays;
-import java.util.Collection;
-import java.util.Date;
-import java.util.List;
+import java.util.*;
 import java.util.stream.Collectors;
 
 @Profile("!test")
@@ -52,7 +50,9 @@ public class CommandLineAppStartupRunner implements CommandLineRunner {
 	@Autowired
 	private ReserveMediaTransactionServiceInterface reserveMediaTransactionService;
 
-	// Initialize System with preset accounts and stocks
+    private final Scanner scanner = new Scanner(System.in);
+
+    // Initialize System with preset accounts and stocks
 	@Override
 	@Transactional // this method runs within one database transaction; performing a commit at the
 	// end
@@ -84,8 +84,7 @@ public class CommandLineAppStartupRunner implements CommandLineRunner {
 //		returnMediaSimulation();
 //		loanMediaSimulation();
 
-		// TODO: ID from reserveMediaSimulation does not exist in database
-//		reserveMediaSimulation();
+		reserveMediaSimulation();
 	}
 
 // TODO: remove and move to unit tests
@@ -123,21 +122,15 @@ public class CommandLineAppStartupRunner implements CommandLineRunner {
 	}
 
 	private void reserveMediaSimulation() {
-		User user = userService.getByUsername("john.doe");
+        User user = userService.getByUsername("john");
 
-		Media media = mediaService.findById(1L); // Dune
+        System.out.println("What do you want to reserve?");
+        String mediaName = scanner.nextLine();
 
-		// customer must not reserve the media
-		reserveMediaTransactionService.reserveMediaForCustomer(user, media);
+        System.out.println("When do you want to reserve " + mediaName + "? (yyyy-MM-dd)");
+        Date reserveStartDate = DateUtils.getDateFromString(scanner.nextLine());
 
-		// make that no edition for media is available
-		for (Edition edition : editionRepository.findByMediaAndAvailable(media)) {
-			edition.setAvailable(false);
-			editionRepository.save(edition);
-		}
-
-		// customer must reserve the media
-		reserveMediaTransactionService.reserveMediaForCustomer(user, media);
+        reserveMediaTransactionService.reserveMediaForCustomer(user, mediaName, reserveStartDate);
 	}
 
 	private void returnMediaSimulation() {

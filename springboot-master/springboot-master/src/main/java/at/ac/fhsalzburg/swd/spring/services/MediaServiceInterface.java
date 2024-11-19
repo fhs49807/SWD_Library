@@ -19,9 +19,11 @@ public interface MediaServiceInterface {
 	// get all currently existing mediaTypes
 	Iterable<String> getAllMediaTypes();
 
-	
+
 	Iterable<Media> searchMediaByGenreAndType(String genre, String type);
 
     Boolean addMedia(Media media);
+
+	Media findByName(String name);
 
 }

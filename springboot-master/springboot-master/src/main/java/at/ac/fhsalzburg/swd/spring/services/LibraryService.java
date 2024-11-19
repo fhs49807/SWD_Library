@@ -23,7 +23,9 @@ public class LibraryService implements LibraryServiceInterface {
 	private LibraryRepository libraryRepository;
 
 	@Autowired
-	private MediaRepository mediaRepository;
+	private MediaRepository mediaRepository; //besser in MediaService
+
+    //add MediaService @Autowired
 
 	@Autowired
 	private EditionRepository editionRepository;
@@ -36,7 +38,7 @@ public class LibraryService implements LibraryServiceInterface {
 	public Library save(Library library) {
 		return libraryRepository.save(library);
 	}
-	
+
 	// find library by id
 	@Override
 	public Library findById(Long id) {
