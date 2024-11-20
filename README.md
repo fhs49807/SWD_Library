@@ -10,3 +10,4 @@
 - Create at least one unit test for each selected use-case --> remove use cases from clsr
 - Create unit test for UI
 - Isolate the unit tests by mocking
+- If date(today) > ExpirationDate ---> Status = overdue + invoice anpassen

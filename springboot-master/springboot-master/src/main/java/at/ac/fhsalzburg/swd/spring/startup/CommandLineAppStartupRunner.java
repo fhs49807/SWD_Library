@@ -84,7 +84,7 @@ public class CommandLineAppStartupRunner implements CommandLineRunner {
 //		returnMediaSimulation();
 //		loanMediaSimulation();
 
-		reserveMediaSimulation();
+//		reserveMediaSimulation();
 	}
 
 // TODO: remove and move to unit tests
