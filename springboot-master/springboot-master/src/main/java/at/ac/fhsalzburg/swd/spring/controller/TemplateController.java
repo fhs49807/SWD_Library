@@ -165,7 +165,7 @@ public class TemplateController {
 		model.addAttribute("genres", mediaService.getAllGenres());
 		model.addAttribute("mediaTypes", mediaService.getAllMediaTypes());
 
-		Iterable<Media> mediaList = mediaService.searchMediaByGenreAndType(genre, type);
+		Iterable<Media> mediaList = mediaService.searchMediaByGenreAndType(genre, type);//TODO: add fsk
 		model.addAttribute("mediaList", mediaList);
 		return "loan";
 	}

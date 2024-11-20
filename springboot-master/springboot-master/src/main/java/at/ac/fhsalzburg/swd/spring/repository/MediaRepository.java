@@ -20,4 +20,8 @@ public interface MediaRepository extends CrudRepository<Media, Long> {
 	@Query("SELECT m FROM Media m WHERE m.genre.name = :genre AND m.mediaType.typeName = :typeName")
 	List<Media> findByGenreAndType(@Param("genre") String genre, @Param("typeName") String typeName);
 
+	// find media based on fsk	
+//	@Query("SELECT m FROM Media m WHERE m.fsk <= :maxFsk")
+//	List<Media> findMediaByFsk(@Param("maxFsk") int maxFsk);
+
 }
