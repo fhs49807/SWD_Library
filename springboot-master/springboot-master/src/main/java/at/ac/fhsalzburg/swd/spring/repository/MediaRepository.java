@@ -9,7 +9,6 @@ import org.springframework.stereotype.Repository;
 import org.springframework.transaction.annotation.Transactional;
 
 import at.ac.fhsalzburg.swd.spring.model.Media;
-import at.ac.fhsalzburg.swd.spring.model.MediaType;
 
 @Repository
 public interface MediaRepository extends CrudRepository<Media, Long> {
@@ -20,5 +19,7 @@ public interface MediaRepository extends CrudRepository<Media, Long> {
 	@Query("SELECT m FROM Media m WHERE m.genre.name = :genre AND m.mediaType.typeName = :typeName")
 	List<Media> findByGenreAndType(@Param("genre") String genre, @Param("typeName") String typeName);
 
+	@Query("SELECT e.id FROM Media m JOIN m.editions e WHERE m.id = :mediaId")
+	List<Long> findEditionIdsByMediaId(@Param("mediaId") Long mediaId);
 
 }

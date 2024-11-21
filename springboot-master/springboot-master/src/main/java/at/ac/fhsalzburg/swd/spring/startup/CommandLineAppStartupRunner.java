@@ -193,10 +193,10 @@ public class CommandLineAppStartupRunner implements CommandLineRunner {
 		mediaTypeMovie = mediaTypeRepository.save(mediaTypeMovie);
 
 		// Create and add books
-		Book dune = new Book("55231", "Dune", scienceFictionGenre, mediaTypeBook, shelfA1, 16);
+		Book dune = new Book("55231", "Dune", scienceFictionGenre, mediaTypeBook, shelfA1, 0);
 		mediaService.addMedia(dune);
 
-		Book harryPotter = new Book("234234", "Harry Potter", fantasyGenre, mediaTypeBook, shelfB1, 12);
+		Book harryPotter = new Book("234234", "Harry Potter", fantasyGenre, mediaTypeBook, shelfB1, 0);
 		mediaService.addMedia(harryPotter);
 
 		Book goneGirl = new Book("9780307588371", "Gone Girl", thrillerGenre, mediaTypeBook, shelfA1, 18);
@@ -204,7 +204,7 @@ public class CommandLineAppStartupRunner implements CommandLineRunner {
 
 		
 		// Create and add audios
-		Audio duneAudio = new Audio("AAC", "Dune Audiobook", scienceFictionGenre, mediaTypeAudio, shelfA1, 16);
+		Audio duneAudio = new Audio("AAC", "Dune Audiobook", scienceFictionGenre, mediaTypeAudio, shelfA1, 0);
 		mediaService.addMedia(duneAudio);
 
 		Audio harryPotterAudio = new Audio("MP3", "Harry Potter Audiobook", fantasyGenre, mediaTypeAudio, shelfB1, 0);
@@ -215,7 +215,7 @@ public class CommandLineAppStartupRunner implements CommandLineRunner {
 
 		
 		// Create and add movies
-		Movie duneMovie = new Movie("tt0816692", "Dune Movie", scienceFictionGenre, mediaTypeMovie, shelfA1, 16);
+		Movie duneMovie = new Movie("tt0816692", "Dune Movie", scienceFictionGenre, mediaTypeMovie, shelfA1, 0);
 		mediaService.addMedia(duneMovie);
 
 		Movie harryPotterMovie = new Movie("tt0241527", "Harry Potter Movie", fantasyGenre, mediaTypeMovie, shelfB1, 0);

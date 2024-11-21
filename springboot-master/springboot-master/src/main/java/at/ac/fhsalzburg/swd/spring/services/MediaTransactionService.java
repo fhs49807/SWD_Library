@@ -4,6 +4,7 @@ import java.util.Calendar;
 import java.util.Collection;
 import java.util.Collections;
 import java.util.Date;
+import java.util.List;
 import java.util.stream.Collectors;
 import java.util.stream.StreamSupport;
 
@@ -72,6 +73,8 @@ public class MediaTransactionService implements MediaTransactionServiceInterface
 	        throw new IllegalArgumentException("User not found");
 	    }
 
+	    
+	    
 	    // Find all editions by their IDs
 	    Collection<Edition> editions = StreamSupport
 	            .stream(editionRepository.findAllById(editionIds).spliterator(), false)
@@ -80,6 +83,17 @@ public class MediaTransactionService implements MediaTransactionServiceInterface
 	    if (editions.isEmpty()) {
 	        throw new IllegalArgumentException("No editions found for the provided IDs.");
 	    }
+	    
+	    List<Edition> validEditions = editions.stream()
+	    	    .filter(Edition::isAvailable) // Check only available editions
+	    	    .collect(Collectors.toList());
+
+	    	if (validEditions.size() != editionIds.size()) {
+	    	    throw new IllegalArgumentException("Some editions are not available for loan.");
+	    	}
+	    	validEditions.forEach(edition -> 
+	        System.out.println("Loaning Edition ID: " + edition.getId() + " for Media ID: " + edition.getMedia().getId()));
+
 
 	    // Process each edition separately
 	    MediaTransaction transaction = null;

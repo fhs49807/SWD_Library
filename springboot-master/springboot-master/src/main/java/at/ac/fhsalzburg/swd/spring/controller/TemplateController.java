@@ -141,7 +141,6 @@ public class TemplateController {
 	}
 
 	// TODO: add "/media" to view all mediums in library
-	// TODO: add "/editions" to show editions for specific medium
 	// TODO: add "/media/add,update,delete"??
 
 	// TODO: add "/loan" to loan exemplar to customer
@@ -196,16 +195,28 @@ public class TemplateController {
 
 	@RequestMapping(value = "/loanMedia", method = RequestMethod.POST)
 	public String loanMedia(@RequestParam Long mediaId, @RequestParam String loanDate,
-	        @CurrentSecurityContext(expression = "authentication") Authentication authentication, Model model) {
+	                        @CurrentSecurityContext(expression = "authentication") Authentication authentication, Model model) {
 	    if (!(authentication instanceof AnonymousAuthenticationToken)) {
 	        String username = authentication.getName();
 	        try {
 	            Date parsedLoanDate = new SimpleDateFormat("yyyy-MM-dd'T'HH:mm").parse(loanDate);
 
-	            // Attempt to loan media
+	            // Retrieve edition IDs and convert to String for display
+	            List<Long> editionIds = mediaService.getEditionIdsByMediaId(mediaId);
+	            List<String> editionIdsAsString = editionIds.stream()
+	                                                        .map(String::valueOf)
+	                                                        .toList();
+
+	            // Log or display the edition IDs
+	            System.out.println("Edition IDs: " + editionIdsAsString);
+
+	            // Loan media
 	            mediaTransactionService.loanMedia(username, Collections.singletonList(mediaId), parsedLoanDate);
 
-	            model.addAttribute("successMessage", "Loan created successfully!");
+	            // Combine Edition IDs and Media ID in the success message
+	            String successMessage = "Loan created successfully! Edition IDs: " + editionIdsAsString 
+	                                    + ", Media ID: " + mediaId;
+	            model.addAttribute("successMessage", successMessage);
 	        } catch (IllegalStateException e) {
 	            model.addAttribute("errorMessage", e.getMessage()); // User already has the media on loan
 	        } catch (Exception e) {
@@ -214,13 +225,18 @@ public class TemplateController {
 	    } else {
 	        model.addAttribute("errorMessage", "You must log in to loan media.");
 	    }
-	 // Populate genres and media types to re-render the loan page properly
+
+	    // Populate genres and media types to re-render the loan page properly
 	    model.addAttribute("genres", mediaService.getAllGenres());
 	    model.addAttribute("mediaTypes", mediaService.getAllMediaTypes());
 	    model.addAttribute("mediaList", Collections.emptyList()); // Or keep mediaList populated if needed
 
 	    return "loan"; // Return to loan page with feedback
 	}
+
+
+
+
 
 
 	@RequestMapping(value = { "/login-error" })

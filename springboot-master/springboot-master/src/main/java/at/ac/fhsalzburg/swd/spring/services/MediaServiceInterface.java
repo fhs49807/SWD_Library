@@ -1,6 +1,7 @@
 package at.ac.fhsalzburg.swd.spring.services;
 
 import java.util.Date;
+import java.util.List;
 
 import at.ac.fhsalzburg.swd.spring.model.Genre;
 import at.ac.fhsalzburg.swd.spring.model.Media;
@@ -28,5 +29,7 @@ public interface MediaServiceInterface {
     Boolean addMedia(Media media);
 
 	Media findByName(String name);
+
+	List<Long> getEditionIdsByMediaId(Long mediaId);
 
 }

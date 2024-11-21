@@ -2,6 +2,7 @@ package at.ac.fhsalzburg.swd.spring.model;
 
 import java.util.Date;
 
+import javax.persistence.Column;
 import javax.persistence.Entity;
 import javax.persistence.GeneratedValue;
 import javax.persistence.GenerationType;
@@ -35,6 +36,9 @@ public class Edition {
 	@ManyToOne
 	@JoinColumn(name = "media_id", nullable = false)
 	private Media media;
+	
+	@Column(name = "media_name")
+    private String mediaName; // Add the media name as a separate column
 
 
 	public Edition(Media media, boolean available, Date dueDate) {
@@ -52,7 +56,13 @@ public class Edition {
 	    this.media = media;
 	    this.available = true;
 	}
+	 public String getMediaName() {
+	        return mediaName;
+	    }
 
+	    public void setMediaName(String mediaName) {
+	        this.mediaName = mediaName;
+	    }
 	public Date getDueDate() {
 		return dueDate;
 	}
