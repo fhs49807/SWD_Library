@@ -197,6 +197,7 @@ public class TemplateController {
 	public String loanMedia(@RequestParam Long mediaId, @RequestParam String loanDate,
 	                        @CurrentSecurityContext(expression = "authentication") Authentication authentication, Model model) {
 	    if (!(authentication instanceof AnonymousAuthenticationToken)) {
+	        System.out.println("Media ID from UI: " + mediaId);
 	        String username = authentication.getName();
 	        try {
 	            Date parsedLoanDate = new SimpleDateFormat("yyyy-MM-dd'T'HH:mm").parse(loanDate);
@@ -211,7 +212,7 @@ public class TemplateController {
 	            System.out.println("Edition IDs: " + editionIdsAsString);
 
 	            // Loan media
-	            mediaTransactionService.loanMedia(username, Collections.singletonList(mediaId), parsedLoanDate);
+	            mediaTransactionService.loanMedia(username, mediaId, parsedLoanDate);
 
 	            // Combine Edition IDs and Media ID in the success message
 	            String successMessage = "Loan created successfully! Edition IDs: " + editionIdsAsString 

@@ -88,8 +88,16 @@ public class MediaService implements MediaServiceInterface {
 	}
 
 	public List<Long> getEditionIdsByMediaId(Long mediaId) {
-	    return mediaRepository.findEditionIdsByMediaId(mediaId);
+	    List<Long> editionIds = editionRepository.findById(mediaId)
+	            .stream()
+	            .map(Edition::getId)
+	            .collect(Collectors.toList());
+	    System.out.println("Edition IDs for Media ID " + mediaId + ": " + editionIds);
+	    return editionIds;
 	}
+
+
+
 
 	
 	@Override

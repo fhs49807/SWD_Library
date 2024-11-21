@@ -12,9 +12,11 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
 import at.ac.fhsalzburg.swd.spring.model.Edition;
+import at.ac.fhsalzburg.swd.spring.model.Media;
 import at.ac.fhsalzburg.swd.spring.model.MediaTransaction;
 import at.ac.fhsalzburg.swd.spring.model.User;
 import at.ac.fhsalzburg.swd.spring.repository.EditionRepository;
+import at.ac.fhsalzburg.swd.spring.repository.MediaRepository;
 import at.ac.fhsalzburg.swd.spring.repository.MediaTransactionRepository;
 import at.ac.fhsalzburg.swd.spring.repository.UserRepository;
 
@@ -32,6 +34,9 @@ public class MediaTransactionService implements MediaTransactionServiceInterface
 
 	@Autowired
 	private UserRepository userRepository;
+	
+	@Autowired
+	private MediaRepository mediaRepository;
 
 	// creates loan record for a customer
 	// marks each loaned item as unavailable
@@ -60,77 +65,60 @@ public class MediaTransactionService implements MediaTransactionServiceInterface
 	}
 
 	@Override
-	public MediaTransaction loanMedia(String username, Collection<Long> editionIds, Date dueDate) {
+	public MediaTransaction loanMedia(String username, Long mediaId, Date dueDate) {
 	    // Validate dueDate
 	    Date today = new Date();
 	    if (dueDate.before(today)) {
 	        throw new IllegalArgumentException("Loan date cannot be in the past.");
 	    }
 
-	    // Find user by username
+	    // Find user
 	    User user = userRepository.findByUsername(username);
 	    if (user == null) {
-	        throw new IllegalArgumentException("User not found");
+	        throw new IllegalArgumentException("User not found.");
 	    }
 
-	    
-	    
-	    // Find all editions by their IDs
-	    Collection<Edition> editions = StreamSupport
-	            .stream(editionRepository.findAllById(editionIds).spliterator(), false)
-	            .collect(Collectors.toList());
+	    // Fetch media and available editions
+	    Media media = mediaRepository.findById(mediaId)
+	        .orElseThrow(() -> new IllegalArgumentException("Media not found."));
+	    List<Edition> availableEditions = editionRepository.findByMediaAndAvailable(media);
 
-	    if (editions.isEmpty()) {
-	        throw new IllegalArgumentException("No editions found for the provided IDs.");
+	    if (availableEditions.isEmpty()) {
+	        throw new IllegalArgumentException("No available editions for the selected media!");
 	    }
-	    
-	    List<Edition> validEditions = editions.stream()
-	    	    .filter(Edition::isAvailable) // Check only available editions
-	    	    .collect(Collectors.toList());
 
-	    	if (validEditions.size() != editionIds.size()) {
-	    	    throw new IllegalArgumentException("Some editions are not available for loan.");
-	    	}
-	    	validEditions.forEach(edition -> 
-	        System.out.println("Loaning Edition ID: " + edition.getId() + " for Media ID: " + edition.getMedia().getId()));
+	    // Select the first available edition
+	    Edition selectedEdition = availableEditions.get(0);
 
-
-	    // Process each edition separately
-	    MediaTransaction transaction = null;
-	    for (Edition edition : editions) {
-	        if (!edition.isAvailable()) {
-	            throw new IllegalStateException("Edition with ID " + edition.getId() + " is not available for loan!");
-	        }
-
-	        // Check if the user already has this edition on loan
-	        boolean isAlreadyLoaned = mediaTransactionRepository.existsByUserAndEditionAndStatus(
-	                user, edition, MediaTransaction.TransactionStatus.ACTIVE);
-	        if (isAlreadyLoaned) {
-	            throw new IllegalStateException("User already has this media on loan (Edition ID: " + edition.getId() + ").");
-	        }
-
-	        // Calculate transaction and expected return dates
-	        Date transactionDate = new Date();
-	        Calendar calendar = Calendar.getInstance();
-	        calendar.setTime(transactionDate);
-	        int loanPeriodDays = 14;
-	        calendar.add(Calendar.DAY_OF_YEAR, loanPeriodDays);
-	        Date expectedReturnDate = calendar.getTime();
-
-	        // Create and save the MediaTransaction
-	        transaction = new MediaTransaction(transactionDate, dueDate, edition, user);
-	        transaction.setExpectedReturnDate(expectedReturnDate);
-	        transaction.setStatus(MediaTransaction.TransactionStatus.ACTIVE);
-	        mediaTransactionRepository.save(transaction);
-
-	        // Update edition's availability
-	        edition.setAvailable(false);
-	        edition.setDueDate(expectedReturnDate);
-	        editionRepository.save(edition);
+	    // Validate loan status
+	    boolean isAlreadyLoaned = mediaTransactionRepository.existsByUserAndEditionAndStatus(
+	        user, selectedEdition, MediaTransaction.TransactionStatus.ACTIVE);
+	    if (isAlreadyLoaned) {
+	        throw new IllegalStateException("User already has this edition on loan.");
 	    }
+
+	    // Proceed with loaning
+	    Date transactionDate = new Date();
+	    Calendar calendar = Calendar.getInstance();
+	    calendar.setTime(transactionDate);
+	    calendar.add(Calendar.DAY_OF_YEAR, 14); // 14-day loan period
+	    Date expectedReturnDate = calendar.getTime();
+
+	    // Create and save the transaction
+	    MediaTransaction transaction = new MediaTransaction(transactionDate, dueDate, selectedEdition, user);
+	    transaction.setExpectedReturnDate(expectedReturnDate);
+	    transaction.setStatus(MediaTransaction.TransactionStatus.ACTIVE);
+
+	    mediaTransactionRepository.save(transaction);
+
+	    // Update edition availability
+	    selectedEdition.setAvailable(false);
+	    selectedEdition.setDueDate(expectedReturnDate);
+	    editionRepository.save(selectedEdition);
 
 	    return transaction;
 	}
+
 
 
 

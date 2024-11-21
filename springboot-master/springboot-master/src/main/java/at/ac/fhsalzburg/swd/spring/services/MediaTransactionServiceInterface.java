@@ -22,5 +22,5 @@ public interface MediaTransactionServiceInterface {
 	public abstract void returnMedia(Long transactionId);
 
 	// Thomas Clermont
-	public abstract MediaTransaction loanMedia(String username, Collection<Long> editionIds, Date dueDate);
+    MediaTransaction loanMedia(String username, Long mediaId, Date dueDate);
 }
