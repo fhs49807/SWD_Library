@@ -5,7 +5,6 @@ import at.ac.fhsalzburg.swd.spring.repository.EditionRepository;
 import at.ac.fhsalzburg.swd.spring.repository.GenreRepository;
 import at.ac.fhsalzburg.swd.spring.repository.MediaTypeRepository;
 import at.ac.fhsalzburg.swd.spring.services.*;
-import at.ac.fhsalzburg.swd.spring.util.DateUtils;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.CommandLineRunner;
 import org.springframework.context.annotation.Profile;
@@ -90,59 +89,59 @@ public class CommandLineAppStartupRunner implements CommandLineRunner {
 // TODO: remove and move to unit tests
 //    ---------------------------------------------------
 
-	private void loanMediaSimulation() {
+//	private void loanMediaSimulation() {
+//
+//		User existingCustomer = userService.getByUsername("john.doe");
+//
+//		// find available editions for loan
+//		Collection<Media> mediaItems = libraryService.validateMedia("10"); // "Harry Potter"
+//		if (!mediaItems.isEmpty()) {
+//			Media media = mediaItems.iterator().next();
+//			Collection<Edition> availableEditions = libraryService.checkForAvailableEditions(media);
+//
+//			// if there are available editions
+//			if (!availableEditions.isEmpty()) {
+//				// get the edition ids
+//				Collection<Long> editionIds = availableEditions.stream().map(Edition::getId).limit(1)
+//						.collect(Collectors.toList());
+//
+//				// set due date (14 days from today)
+//				Date dueDate = new Date(System.currentTimeMillis() + (14L * 24 * 60 * 60 * 1000));
+//
+//				// run loanMedia method
+//				MediaTransaction transaction = mediaTransactionService.loanMedia(existingCustomer.getUsername(),
+//						editionIds, dueDate);
+//				System.out.println("Media loaned with ID: " + transaction.getId());
+//			} else {
+//				System.out.println("No available editions!");
+//			}
+//		} else {
+//			System.out.println("No media found to loan!");
+//		}
+//	}
 
-		User existingCustomer = userService.getByUsername("john.doe");
-
-		// find available editions for loan
-		Collection<Media> mediaItems = libraryService.validateMedia("10"); // "Harry Potter"
-		if (!mediaItems.isEmpty()) {
-			Media media = mediaItems.iterator().next();
-			Collection<Edition> availableEditions = libraryService.checkForAvailableEditions(media);
-
-			// if there are available editions
-			if (!availableEditions.isEmpty()) {
-				// get the edition ids
-				Collection<Long> editionIds = availableEditions.stream().map(Edition::getId).limit(1)
-						.collect(Collectors.toList());
-
-				// set due date (14 days from today)
-				Date dueDate = new Date(System.currentTimeMillis() + (14L * 24 * 60 * 60 * 1000));
-
-				// run loanMedia method
-				MediaTransaction transaction = mediaTransactionService.loanMedia(existingCustomer.getUsername(),
-						editionIds, dueDate);
-				System.out.println("Media loaned with ID: " + transaction.getId());
-			} else {
-				System.out.println("No available editions!");
-			}
-		} else {
-			System.out.println("No media found to loan!");
-		}
-	}
-
-	private void reserveMediaSimulation() {
-        User user = userService.getByUsername("john");
-
-        System.out.println("What do you want to reserve?");
-        String mediaName = scanner.nextLine();
-
-        System.out.println("When do you want to reserve " + mediaName + "? (yyyy-MM-dd)");
-        Date reserveStartDate = DateUtils.getDateFromString(scanner.nextLine());
-
-        reserveMediaTransactionService.reserveMediaForCustomer(user, mediaName, reserveStartDate);
-	}
-
-	private void returnMediaSimulation() {
-		// simuliert zurückgebn von ausleihe
-		User user = userService.getByUsername("john.doe");
-		Collection<MediaTransaction> loans = mediaTransactionService.findLoansByUser(user);
-		if (!loans.isEmpty()) {
-			MediaTransaction transaction = loans.iterator().next();
-			mediaTransactionService.returnMedia(transaction.getId());
-			System.out.println("Media returned for transaction ID: " + transaction.getId());
-		}
-	}
+//	private void reserveMediaSimulation() {
+//        User user = userService.getByUsername("john");
+//
+//        System.out.println("What do you want to reserve?");
+//        String mediaName = scanner.nextLine();
+//
+//        System.out.println("When do you want to reserve " + mediaName + "? (yyyy-MM-dd)");
+//        Date reserveStartDate = DateUtils.getDateFromString(scanner.nextLine());
+//
+//        reserveMediaTransactionService.reserveMediaForCustomer(user, mediaName, reserveStartDate);
+//	}
+//
+//	private void returnMediaSimulation() {
+//		// simuliert zurückgebn von ausleihe
+//		User user = userService.getByUsername("john.doe");
+//		Collection<MediaTransaction> loans = mediaTransactionService.findLoansByUser(user);
+//		if (!loans.isEmpty()) {
+//			MediaTransaction transaction = loans.iterator().next();
+//			mediaTransactionService.returnMedia(transaction.getId());
+//			System.out.println("Media returned for transaction ID: " + transaction.getId());
+//		}
+//	}
 
 //  ---------------------------------------------------
 

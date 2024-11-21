@@ -208,15 +208,12 @@ public class TemplateController {
 	                                                        .map(String::valueOf)
 	                                                        .toList();
 
-	            // Log or display the edition IDs
-	            System.out.println("Edition IDs: " + editionIdsAsString);
 
 	            // Loan media
 	            mediaTransactionService.loanMedia(username, mediaId, parsedLoanDate);
 
 	            // Combine Edition IDs and Media ID in the success message
-	            String successMessage = "Loan created successfully! Edition IDs: " + editionIdsAsString 
-	                                    + ", Media ID: " + mediaId;
+	            String successMessage = "Loan created successfully! Media ID: " + mediaId;
 	            model.addAttribute("successMessage", successMessage);
 	        } catch (IllegalStateException e) {
 	            model.addAttribute("errorMessage", e.getMessage()); // User already has the media on loan
