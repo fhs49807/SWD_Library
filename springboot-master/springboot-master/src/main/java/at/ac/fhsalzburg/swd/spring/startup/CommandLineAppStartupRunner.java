@@ -193,33 +193,35 @@ public class CommandLineAppStartupRunner implements CommandLineRunner {
 		mediaTypeMovie = mediaTypeRepository.save(mediaTypeMovie);
 
 		// Create and add books
-		Book dune = new Book("55231", "Dune", scienceFictionGenre, mediaTypeBook, shelfA1);
+		Book dune = new Book("55231", "Dune", scienceFictionGenre, mediaTypeBook, shelfA1, 16);
 		mediaService.addMedia(dune);
 
-		Book harryPotter = new Book("234234", "Harry Potter", fantasyGenre, mediaTypeBook, shelfB1);
+		Book harryPotter = new Book("234234", "Harry Potter", fantasyGenre, mediaTypeBook, shelfB1, 12);
 		mediaService.addMedia(harryPotter);
 
-		Book goneGirl = new Book("9780307588371", "Gone Girl", thrillerGenre, mediaTypeBook, shelfA1);
+		Book goneGirl = new Book("9780307588371", "Gone Girl", thrillerGenre, mediaTypeBook, shelfA1, 18);
 		mediaService.addMedia(goneGirl);
 
+		
 		// Create and add audios
-		Audio duneAudio = new Audio("AAC", "Dune Audiobook", scienceFictionGenre, mediaTypeAudio, shelfA1);
+		Audio duneAudio = new Audio("AAC", "Dune Audiobook", scienceFictionGenre, mediaTypeAudio, shelfA1, 16);
 		mediaService.addMedia(duneAudio);
 
-		Audio harryPotterAudio = new Audio("MP3", "Harry Potter Audiobook", fantasyGenre, mediaTypeAudio, shelfB1);
+		Audio harryPotterAudio = new Audio("MP3", "Harry Potter Audiobook", fantasyGenre, mediaTypeAudio, shelfB1, 0);
 		mediaService.addMedia(harryPotterAudio);
 
-		Audio goneGirlAudio = new Audio("WAV", "Gone Girl Audiobook", thrillerGenre, mediaTypeAudio, shelfA1);
+		Audio goneGirlAudio = new Audio("WAV", "Gone Girl Audiobook", thrillerGenre, mediaTypeAudio, shelfA1, 18);
 		mediaService.addMedia(goneGirlAudio);
 
+		
 		// Create and add movies
-		Movie duneMovie = new Movie("tt0816692", "Dune Movie", scienceFictionGenre, mediaTypeMovie, shelfA1);
+		Movie duneMovie = new Movie("tt0816692", "Dune Movie", scienceFictionGenre, mediaTypeMovie, shelfA1, 16);
 		mediaService.addMedia(duneMovie);
 
-		Movie harryPotterMovie = new Movie("tt0241527", "Harry Potter Movie", fantasyGenre, mediaTypeMovie, shelfB1);
+		Movie harryPotterMovie = new Movie("tt0241527", "Harry Potter Movie", fantasyGenre, mediaTypeMovie, shelfB1, 0);
 		mediaService.addMedia(harryPotterMovie);
 
-		Movie goneGirlMovie = new Movie("tt2267998", "Gone Girl Movie", thrillerGenre, mediaTypeMovie, shelfA1);
+		Movie goneGirlMovie = new Movie("tt2267998", "Gone Girl Movie", thrillerGenre, mediaTypeMovie, shelfA1, 18);
 		mediaService.addMedia(goneGirlMovie);
 
 		System.out.println("Library with media created successfully.");

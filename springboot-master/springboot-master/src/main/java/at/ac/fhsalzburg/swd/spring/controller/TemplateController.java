@@ -152,22 +152,46 @@ public class TemplateController {
 	// TODO: add "/pay" to pay outstanding balances
 
 	@RequestMapping(value = "/loan", method = RequestMethod.GET)
-	public String showLoanPage(Model model) {
-		model.addAttribute("genres", mediaService.getAllGenres());
-		model.addAttribute("mediaTypes", mediaService.getAllMediaTypes());
-		model.addAttribute("mediaList", mediaService.searchMediaByGenreAndType("defaultGenre", "defaultType"));
-		return "loan";
+	public String showLoanPage(Model model, 
+	                           @CurrentSecurityContext(expression = "authentication") Authentication authentication) {
+	    // Retrieve the logged-in user's details
+	    if (!(authentication instanceof AnonymousAuthenticationToken)) {
+	        String username = authentication.getName();
+	        User user = userService.getByUsername(username);
+
+	        // Fetch genres, media types, and media list filtered by FSK
+	        model.addAttribute("genres", mediaService.getAllGenres());
+	        model.addAttribute("mediaTypes", mediaService.getAllMediaTypes());
+	        model.addAttribute("mediaList", mediaService.searchMediaByGenreAndType("defaultGenre", "defaultType", user));
+	        return "loan"; // Render the loan page with the filtered media list
+	    }
+
+	    // If the user is not logged in, redirect to the login page
+	    model.addAttribute("errorMessage", "You must log in to view the loan page.");
+	    return "login";
 	}
 
 	@GetMapping("/searchMedia")
-	public String searchMedia(@RequestParam String genre, @RequestParam String type, Model model) {
+	public String searchMedia(@RequestParam String genre, @RequestParam String type, Model model, 
+	                          @CurrentSecurityContext(expression = "authentication") Authentication authentication) {
+	    // Fetch the logged-in user's details
+	    if (!(authentication instanceof AnonymousAuthenticationToken)) {
+	        String username = authentication.getName();
+	        User user = userService.getByUsername(username);
 
-		model.addAttribute("genres", mediaService.getAllGenres());
-		model.addAttribute("mediaTypes", mediaService.getAllMediaTypes());
+	        // Get the filtered media list based on FSK and user age
+	        Iterable<Media> mediaList = mediaService.searchMediaByGenreAndType(genre, type, user);
 
-		Iterable<Media> mediaList = mediaService.searchMediaByGenreAndType(genre, type);//TODO: add fsk
-		model.addAttribute("mediaList", mediaList);
-		return "loan";
+	        model.addAttribute("genres", mediaService.getAllGenres());
+	        model.addAttribute("mediaTypes", mediaService.getAllMediaTypes());
+	        model.addAttribute("mediaList", mediaList);
+
+	        return "loan"; // Render the loan page with the filtered media list
+	    }
+
+	    // If the user is not logged in, show an error or redirect to the login page
+	    model.addAttribute("errorMessage", "You must be logged in to search for media.");
+	    return "login";
 	}
 
 	@RequestMapping(value = "/loanMedia", method = RequestMethod.POST)

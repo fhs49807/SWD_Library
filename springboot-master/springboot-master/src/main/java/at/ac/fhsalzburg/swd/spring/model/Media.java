@@ -39,15 +39,16 @@ public class Media {
     }
 
 
-	public Media(String name, Genre genre, MediaType mediaType, Shelf shelf) {
-        this.name = name;
-        this.genre = genre;
-        this.mediaType = mediaType;
-        this.shelf = shelf;
-        if (genre != null) {
-            this.price = genre.getPrice();
-        }
-    }
+	public Media(String name, Genre genre, MediaType mediaType, Shelf shelf, int FSK) {
+	    this.name = name;
+	    this.genre = genre;
+	    this.mediaType = mediaType;
+	    this.shelf = shelf;
+	    this.FSK = FSK;
+	    if (genre != null) {
+	        this.price = genre.getPrice();
+	    }
+	}
 
 	public Long getId() {
         return id;

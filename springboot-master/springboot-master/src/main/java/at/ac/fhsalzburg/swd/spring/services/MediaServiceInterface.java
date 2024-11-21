@@ -1,7 +1,10 @@
 package at.ac.fhsalzburg.swd.spring.services;
 
+import java.util.Date;
+
 import at.ac.fhsalzburg.swd.spring.model.Genre;
 import at.ac.fhsalzburg.swd.spring.model.Media;
+import at.ac.fhsalzburg.swd.spring.model.User;
 
 public interface MediaServiceInterface {
 
@@ -19,8 +22,8 @@ public interface MediaServiceInterface {
 	// get all currently existing mediaTypes
 	Iterable<String> getAllMediaTypes();
 
-
-	Iterable<Media> searchMediaByGenreAndType(String genre, String type);
+	//search by media and genre + FSK
+	Iterable<Media> searchMediaByGenreAndType(String genre, String type, User user);
 
     Boolean addMedia(Media media);
 

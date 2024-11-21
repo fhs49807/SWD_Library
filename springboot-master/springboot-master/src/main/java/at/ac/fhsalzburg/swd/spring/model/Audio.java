@@ -11,8 +11,8 @@ public class Audio extends Media {
 
 	private String codec;
 
-	public Audio(String codec, String name, Genre genre, MediaType mediaType, Shelf shelf) {
-        super(name, genre, mediaType, shelf); // Call Media's constructor
+	public Audio(String codec, String name, Genre genre, MediaType mediaType, Shelf shelf, int FSK) {
+        super(name, genre, mediaType, shelf, FSK); // Call Media's constructor
         this.codec = codec;
     }
 	

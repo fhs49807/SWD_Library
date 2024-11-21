@@ -11,8 +11,8 @@ public class Book extends Media {
 
 	private String ISBN;
 
-	public Book(String ISBN, String name, Genre genre, MediaType mediaType, Shelf shelf) {
-        super(name, genre, mediaType, shelf); // Call Media's constructor
+	public Book(String ISBN, String name, Genre genre, MediaType mediaType, Shelf shelf, int FSK) {
+        super(name, genre, mediaType, shelf, FSK); // Call Media's constructor
         this.ISBN = ISBN; // Initialize Book-specific field
     }
 
