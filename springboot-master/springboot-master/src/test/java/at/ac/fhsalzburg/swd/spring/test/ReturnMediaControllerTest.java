@@ -1,8 +1,14 @@
 package at.ac.fhsalzburg.swd.spring.test;
 
+import static org.mockito.Mockito.verify;
+import static org.mockito.Mockito.doNothing;
+import static org.mockito.Mockito.times;
+
+
 import at.ac.fhsalzburg.swd.spring.controller.TemplateController;
 import at.ac.fhsalzburg.swd.spring.model.MediaTransaction;
 import at.ac.fhsalzburg.swd.spring.model.User;
+import at.ac.fhsalzburg.swd.spring.services.InvoiceService;
 import at.ac.fhsalzburg.swd.spring.services.MediaTransactionServiceInterface;
 import at.ac.fhsalzburg.swd.spring.services.UserServiceInterface;
 import org.junit.jupiter.api.BeforeEach;
@@ -40,6 +46,9 @@ public class ReturnMediaControllerTest {
     @Mock
     private UserServiceInterface userService; // erstellt einen mock für den user service, um benutzerbezogene operationen zu simulieren
 
+    @Mock
+    private InvoiceService invoiceService;
+    
     @Mock
     private MediaTransactionServiceInterface mediaTransactionService; // erstellt einen mock für den media transaction service, um transaktionen zu simulieren
 
@@ -85,4 +94,31 @@ public class ReturnMediaControllerTest {
                 .andExpect(status().is3xxRedirection()) // erwartet einen umleitungsstatus (3xx)
                 .andExpect(redirectedUrl("/returnMedia")); // erwartet eine umleitung zur url "/returnMedia"
     }
+    
+    @Test 
+    @WithMockUser(username = "john.doe", roles = {"USER"}) // simuliert einen benutzer mit dem benutzernamen "john.doe" und der rolle "USER"
+    public void givenLateReturn_whenReturnMedia_thenInvoiceCreated() throws Exception {
+        MediaTransaction transaction = new MediaTransaction(); // erstelle eine neue instanz von media transaction
+        transaction.setId(1L); // setze die id der transaktion auf 1
+        transaction.setTransactionDate(new Date()); // setze das transaktionsdatum auf das aktuelle datum
+        
+        Date expirationDate = new Date(System.currentTimeMillis() - (1000 * 60 * 60 * 24 * 2));  // 2 tage verspätet
+        transaction.setExpirationDate(expirationDate); // setze das fälligkeitsdatum der transaktion
+        transaction.setStatus(MediaTransaction.TransactionStatus.ACTIVE); // setze den status der transaktion auf "aktiv"
+        transaction.setReturnDate(new Date());  // setze das rückgabedatum auf heute
+
+        User mockUser = new User("john.doe", "John Doe", "john.doe@example.com", "123456789", new Date(), "pw", "USER", null, null, 5); // erstelle einen mock-benutzer
+        transaction.setUser(mockUser); // setze den benutzer für diese transaktion
+
+        doNothing().when(mediaTransactionService).returnMedia(Mockito.anyLong()); // mocke den rückgabeprozess
+        Mockito.doNothing().when(invoiceService).deductAmount(Mockito.any(User.class), Mockito.any(MediaTransaction.class)); // mocke die berechnung der rechnung
+
+        double expectedPenalty = 2.0;  // beispiel für 2 tage verspätung à 1 euro pro tag
+
+        mediaTransactionService.returnMedia(1L); // führe die rückgabe der transaktion aus
+
+        verify(invoiceService, times(1)).deductAmount(mockUser, transaction); // stelle sicher, dass deductAmount genau einmal aufgerufen wurde
+    }
+
+
 }
