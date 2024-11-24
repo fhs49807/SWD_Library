@@ -36,4 +36,6 @@ public interface UserServiceInterface {
 
 	// check if customer has outstanding fees
 	public abstract boolean hasOutstandingFees(User user);
+	
+	void updateUser(User user);
 }

@@ -34,7 +34,7 @@ public class InvoiceService implements InvoiceServiceInterface{
 	    }
 	}
 
-	private double calculatePenalty(MediaTransaction transaction) {
+	public double calculatePenalty(MediaTransaction transaction) {
         // mahngebühren calc: 1€ pro tag verspätung
         long overdueDays = (transaction.getReturnDate().getTime() - transaction.getExpirationDate().getTime()) / (1000 * 60 * 60 * 24);
         return overdueDays > 0 ? overdueDays * 1.0 : 0.0;

@@ -10,5 +10,7 @@ public interface InvoiceServiceInterface {
 	
 	// get outstanding balance from customer
 	public abstract double getOutstandingBalance(User user);
+	
+	double calculatePenalty(MediaTransaction transaction); // berechnung der mahngebühren methode
 
 }

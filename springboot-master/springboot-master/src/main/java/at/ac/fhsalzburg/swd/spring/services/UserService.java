@@ -151,5 +151,10 @@ public class UserService implements UserServiceInterface {
 
 		return true;
 	}
+	
+	public void updateUser(User user) {
+	    repo.save(user);  // änderungen des users in datenbank speichern
+	}
+
 
 }

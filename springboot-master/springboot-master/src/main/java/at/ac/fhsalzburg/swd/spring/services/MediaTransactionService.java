@@ -36,6 +36,9 @@ public class MediaTransactionService implements MediaTransactionServiceInterface
 	private UserRepository userRepository;
 	
 	@Autowired
+	private UserServiceInterface userService;
+
+	@Autowired
 	private MediaRepository mediaRepository;
 
 	// creates loan record for a customer
@@ -124,29 +127,29 @@ public class MediaTransactionService implements MediaTransactionServiceInterface
 
 
 	@Override
-	public void returnMedia(Long transactionId) {
-	    MediaTransaction transaction = mediaTransactionRepository.findById(transactionId)
-	            .orElseThrow(() -> new IllegalArgumentException("Transaction not found"));
+	public void returnMedia(Long transactionId) {  
+	    MediaTransaction transaction = mediaTransactionRepository.findById(transactionId)  // sucht die transaktion anhand der id
+	            .orElseThrow(() -> new IllegalArgumentException("Transaction not found"));  // wenn keine transaktion gefunden wird, wirft eine exception
 
-	    // Update the return date and status
-	    transaction.setReturnDate(new Date());
-	    transaction.setStatus(MediaTransaction.TransactionStatus.COMPLETED);
+	    transaction.setReturnDate(new Date());  // setzt das rückgabedatum auf das aktuelle datum
+	    transaction.setStatus(MediaTransaction.TransactionStatus.COMPLETED);  // ändert den status der transaktion auf "abgeschlossen"
 
-	    // Mark the edition as available
-	    Edition edition = transaction.getEdition();
-	    edition.setAvailable(true);
-	    editionRepository.save(edition);
+	    double penaltyAmount = invoiceService.calculatePenalty(transaction);  // ruft die methode zur berechnung der mahngebühr auf
 
-	    // Calculate fees and generate invoice if return is overdue
-	    if (transaction.getReturnDate().after(transaction.getExpirationDate())) {
-	        invoiceService.deductAmount(transaction.getUser(), transaction);
+	    User user = transaction.getUser();  // holt den benutzer, der die transaktion durchgeführt hat
+	    if (user.getCredit() < penaltyAmount) {  // prüft, ob das guthaben des benutzers kleiner als die mahngebühr ist
+	        throw new IllegalStateException("Nicht genügend Guthaben auf dem Konto, um die Mahngebühren zu bezahlen.");  // wirft eine exception, wenn nicht genug guthaben vorhanden ist
 	    }
 
-	    // Save the updated transaction
-	    mediaTransactionRepository.save(transaction);
+	    user.setCredit(user.getCredit() - (long) penaltyAmount);  // zieht die mahngebühr vom guthaben des benutzers ab
+
+	    userService.updateUser(user);  // ruft die methode auf, um den benutzer mit dem aktualisierten guthaben zu speichern
+
+	    mediaTransactionRepository.save(transaction);  // speichert die aktualisierte transaktion
+
+	    invoiceService.deductAmount(user, transaction);  // erstellt und speichert eine rechnung für den benutzer
 	}
-	
-	
+
 
 
 }
