@@ -1,0 +1,32 @@
+<!DOCTYPE html>
+<html xmlns:layout="http://www.ultraq.net.nz/thymeleaf/layout"
+      xmlns:th="http://www.thymeleaf.org"
+      layout:decorate="~{layouts/main-layout}" 
+      xmlns:sec="https://www.thymeleaf.org/thymeleaf-extras-springsecurity5">
+
+<head>
+    <title>Loan Success</title>
+</head>
+
+<body>
+    <main layout:fragment="content" th:remove="tag">
+
+        <h1>Loan Successful!</h1>
+        <p>Thank you for your loan request. Here are the details:</p>
+        <ul>
+            <li><strong>Username:</strong> <span th:text="${username}"></span></li>
+            <li><strong>Loan Date:</strong> <span th:text="${loanDate}"></span></li>
+            <li><strong>Media ID:</strong> <span th:text="${mediaId}"></span></li>
+            <li><strong>Media Title:</strong> <span th:text="${mediaTitle}"></span></li>
+            <li><strong>Genre:</strong> <span th:text="${mediaGenre}"></span></li>
+            <li><strong>Media Type:</strong> <span th:text="${mediaType}"></span></li>
+            <li><strong>Edition IDs:</strong>
+                <ul>
+                    <li th:each="id : ${editionIds}" th:text="${id}"></li>
+                </ul>
+            </li>
+        </ul>
+        <a href="/" class="btn btn-primary">Back to Homepage</a>
+    </main>
+</body>
+</html>

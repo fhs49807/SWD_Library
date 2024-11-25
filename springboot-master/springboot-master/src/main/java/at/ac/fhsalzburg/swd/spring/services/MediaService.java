@@ -45,33 +45,32 @@ public class MediaService implements MediaServiceInterface {
 
 	@Override
 	public Boolean addMedia(Media media) {
-	    if ((media.getName() != null) && (media.getName().length() > 0) && (media.getFSK() >= 0)
-	            && (media.getFSK() <= 18)) {
-	        // Save media in the main media repository
-	        mediaRepository.save(media);
+		if ((media.getName() != null) && (media.getName().length() > 0) && (media.getFSK() >= 0)
+				&& (media.getFSK() <= 18)) {
+			// Save media in the main media repository
+			mediaRepository.save(media);
 
-	        // Handle specific types of media
-	        if (media instanceof Book) {
-	            bookRepository.save((Book) media);
-	        } else if (media instanceof Audio) {
-	            audioRepository.save((Audio) media);
-	        } else if (media instanceof Movie) {
-	            movieRepository.save((Movie) media);
-	        }
+			// Handle specific types of media
+			if (media instanceof Book) {
+				bookRepository.save((Book) media);
+			} else if (media instanceof Audio) {
+				audioRepository.save((Audio) media);
+			} else if (media instanceof Movie) {
+				movieRepository.save((Movie) media);
+			}
 
-	        // Add 2 exemplare (editions) for each medium
-	        for (int i = 0; i < 2; i++) {
-	            Edition edition = new Edition(media);
-	            edition.setMediaName(media.getName()); // Set the media name for each Edition
-	            editionRepository.save(edition);
-	        }
+			// Add 2 exemplare (editions) for each medium
+			for (int i = 0; i < 2; i++) {
+				Edition edition = new Edition(media);
+				edition.setMediaName(media.getName()); // Set the media name for each Edition
+				editionRepository.save(edition);
+			}
 
-	        return true; // Media successfully added
-	    }
+			return true; // Media successfully added
+		}
 
-	    return false; // Media validation failed
+		return false; // Media validation failed
 	}
-
 
 	// saves genre entry to repository
 	public void saveGenre(Genre genre) {
@@ -88,18 +87,11 @@ public class MediaService implements MediaServiceInterface {
 	}
 
 	public List<Long> getEditionIdsByMediaId(Long mediaId) {
-	    List<Long> editionIds = editionRepository.findById(mediaId)
-	            .stream()
-	            .map(Edition::getId)
-	            .collect(Collectors.toList());
-	    System.out.println("Edition IDs for Media ID " + mediaId + ": " + editionIds);
-	    return editionIds;
+		List<Long> editionIds = mediaRepository.findEditionIdsByMediaId(mediaId);
+		System.out.println("Edition IDs for Media ID " + mediaId + ": " + editionIds);
+		return editionIds;
 	}
 
-
-
-
-	
 	@Override
 	public Iterable<String> getAllGenres() {
 		return StreamSupport.stream(genreRepository.findAll().spliterator(), false).map(Genre::getName)
@@ -114,14 +106,15 @@ public class MediaService implements MediaServiceInterface {
 
 	@Override
 	public Iterable<Media> searchMediaByGenreAndType(String genre, String type, User user) {
-        // Get the user's age using UserService
-        int userAge = userService.getAge(user);
+		// Get the user's age using UserService
+		int userAge = userService.getAge(user);
 
-        // Fetch media by genre and type, then filter by FSK restriction
-        return mediaRepository.findByGenreAndType(genre, type).stream()
-                .filter(media -> media.getFSK() <= userAge) // Filter by FSK
-                .collect(Collectors.toList());
-    }
+		// Fetch media by genre and type, then filter by FSK restriction
+		return mediaRepository.findByGenreAndType(genre, type).stream().filter(media -> media.getFSK() <= userAge) // Filter
+																													// by
+																													// FSK
+				.collect(Collectors.toList());
+	}
 
 	@Override
 	public Media findByName(String name) {

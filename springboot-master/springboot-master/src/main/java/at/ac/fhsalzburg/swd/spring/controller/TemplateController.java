@@ -138,6 +138,7 @@ public class TemplateController {
 	public String login(Model model) {
 		logger.info("login called");
 		return "login";
+
 	}
 
 	// TODO: add "/media" to view all mediums in library
@@ -151,70 +152,93 @@ public class TemplateController {
 	// TODO: add "/pay" to pay outstanding balances
 
 	@RequestMapping(value = "/loan", method = RequestMethod.GET)
-	public String showLoanPage(Model model, 
-	                           @CurrentSecurityContext(expression = "authentication") Authentication authentication) {
-	    // Retrieve the logged-in user's details
-	    if (!(authentication instanceof AnonymousAuthenticationToken)) {
-	        String username = authentication.getName();
-	        User user = userService.getByUsername(username);
+	public String showLoanPage(Model model,
+			@CurrentSecurityContext(expression = "authentication") Authentication authentication) {
+		// Retrieve the logged-in user's details
+		if (!(authentication instanceof AnonymousAuthenticationToken)) {
+			String username = authentication.getName();
+			User user = userService.getByUsername(username);
 
-	        // Fetch genres, media types, and media list filtered by FSK
-	        model.addAttribute("genres", mediaService.getAllGenres());
-	        model.addAttribute("mediaTypes", mediaService.getAllMediaTypes());
-	        model.addAttribute("mediaList", mediaService.searchMediaByGenreAndType("defaultGenre", "defaultType", user));
-	        return "loan"; // Render the loan page with the filtered media list
-	    }
+			// Fetch genres, media types, and media list filtered by FSK
+			model.addAttribute("genres", mediaService.getAllGenres());
+			model.addAttribute("mediaTypes", mediaService.getAllMediaTypes());
+			model.addAttribute("mediaList",
+					mediaService.searchMediaByGenreAndType("defaultGenre", "defaultType", user));
+			return "loan"; // Render the loan page with the filtered media list
+		}
 
-	    // If the user is not logged in, redirect to the login page
-	    model.addAttribute("errorMessage", "You must log in to view the loan page.");
-	    return "login";
+		// If the user is not logged in, redirect to the login page
+		model.addAttribute("errorMessage", "You must log in to view the loan page.");
+		return "login";
 	}
 
 	@GetMapping("/searchMedia")
-	public String searchMedia(@RequestParam String genre, @RequestParam String type, Model model, 
-	                          @CurrentSecurityContext(expression = "authentication") Authentication authentication) {
-	    // Fetch the logged-in user's details
-	    if (!(authentication instanceof AnonymousAuthenticationToken)) {
-	        String username = authentication.getName();
-	        User user = userService.getByUsername(username);
+	public String searchMedia(@RequestParam String genre, @RequestParam String type, Model model,
+			@CurrentSecurityContext(expression = "authentication") Authentication authentication) {
+		// Fetch the logged-in user's details
+		if (!(authentication instanceof AnonymousAuthenticationToken)) {
+			String username = authentication.getName();
+			User user = userService.getByUsername(username);
 
-	        // Get the filtered media list based on FSK and user age
-	        Iterable<Media> mediaList = mediaService.searchMediaByGenreAndType(genre, type, user);
+			// Get the filtered media list based on FSK and user age
+			Iterable<Media> mediaList = mediaService.searchMediaByGenreAndType(genre, type, user);
 
-	        model.addAttribute("genres", mediaService.getAllGenres());
-	        model.addAttribute("mediaTypes", mediaService.getAllMediaTypes());
-	        model.addAttribute("mediaList", mediaList);
+			model.addAttribute("genres", mediaService.getAllGenres());
+			model.addAttribute("mediaTypes", mediaService.getAllMediaTypes());
+			model.addAttribute("mediaList", mediaList);
 
-	        return "loan"; // Render the loan page with the filtered media list
-	    }
+			return "loan"; // Render the loan page with the filtered media list
+		}
 
-	    // If the user is not logged in, show an error or redirect to the login page
-	    model.addAttribute("errorMessage", "You must be logged in to search for media.");
-	    return "login";
+		// If the user is not logged in, show an error or redirect to the login page
+		model.addAttribute("errorMessage", "You must be logged in to search for media.");
+		return "login";
 	}
 
 	@RequestMapping(value = "/loanMedia", method = RequestMethod.POST)
-	public String loanMedia(@RequestParam Long mediaId, @RequestParam String loanDate,
-	                        @CurrentSecurityContext(expression = "authentication") Authentication authentication, Model model) {
+	public String loanMedia(
+	    @RequestParam(required = false) Long mediaId,
+	    @RequestParam(required = false) String loanDate,
+	    @CurrentSecurityContext(expression = "authentication") Authentication authentication,
+	    Model model
+	) {
 	    if (!(authentication instanceof AnonymousAuthenticationToken)) {
-	        System.out.println("Media ID from UI: " + mediaId);
 	        String username = authentication.getName();
+
+	        // Validate required fields
+	        if (mediaId == null || loanDate == null || loanDate.isEmpty()) {
+	            model.addAttribute("errorMessage", "Please select a media item and specify the loan date.");
+	            
+	            // Populate genres and media types to re-render the loan page properly
+	            model.addAttribute("genres", mediaService.getAllGenres());
+	            model.addAttribute("mediaTypes", mediaService.getAllMediaTypes());
+	            model.addAttribute("mediaList", mediaService.searchMediaByGenreAndType("defaultGenre", "defaultType", userService.getByUsername(username)));
+
+	            return "loan"; // Return to the loan page with an error message
+	        }
+
 	        try {
+	            // Parse the loan date
 	            Date parsedLoanDate = new SimpleDateFormat("yyyy-MM-dd'T'HH:mm").parse(loanDate);
 
-	            // Retrieve edition IDs and convert to String for display
-	            List<Long> editionIds = mediaService.getEditionIdsByMediaId(mediaId);
-	            List<String> editionIdsAsString = editionIds.stream()
-	                                                        .map(String::valueOf)
-	                                                        .toList();
+	            // Use loanMedia logic to create the transaction
+	            MediaTransaction transaction = mediaTransactionService.loanMedia(username, mediaId, parsedLoanDate);
 
+	            // Fetch media details
+	            Media media = transaction.getEdition().getMedia(); // Use the Edition to fetch the Media
 
-	            // Loan media
-	            mediaTransactionService.loanMedia(username, mediaId, parsedLoanDate);
+	            // Populate model for the success page
+	            model.addAttribute("username", username);
+	            model.addAttribute("loanDate", loanDate);
+	            model.addAttribute("mediaId", mediaId);
+	            model.addAttribute("mediaTitle", media.getName());
+	            model.addAttribute("mediaGenre", media.getGenre().getName());
+	            model.addAttribute("mediaType", media.getMediaType().getType());
 
-	            // Combine Edition IDs and Media ID in the success message
-	            String successMessage = "Loan created successfully! Media ID: " + mediaId;
-	            model.addAttribute("successMessage", successMessage);
+	            // Add the specific loaned Edition ID
+	            model.addAttribute("editionIds", List.of(transaction.getEdition().getId()));
+
+	            return "loanSuccess"; // Redirect to the loan success page
 	        } catch (IllegalStateException e) {
 	            model.addAttribute("errorMessage", e.getMessage()); // User already has the media on loan
 	        } catch (Exception e) {
@@ -227,14 +251,10 @@ public class TemplateController {
 	    // Populate genres and media types to re-render the loan page properly
 	    model.addAttribute("genres", mediaService.getAllGenres());
 	    model.addAttribute("mediaTypes", mediaService.getAllMediaTypes());
-	    model.addAttribute("mediaList", Collections.emptyList()); // Or keep mediaList populated if needed
+	    model.addAttribute("mediaList", mediaService.searchMediaByGenreAndType("defaultGenre", "defaultType", userService.getByUsername(authentication.getName())));
 
 	    return "loan"; // Return to loan page with feedback
 	}
-
-
-
-
 
 
 	@RequestMapping(value = { "/login-error" })
@@ -288,27 +308,43 @@ public class TemplateController {
 
 		return "redirect:/";
 	}
-	
-	@GetMapping("/returnMedia") // definiert die http get-anforderung, um die seite zur medienrückgabe anzuzeigen; url = "/returnMedia"
-	public String showReturnMediaPage(Model model, @CurrentSecurityContext(expression = "authentication") Authentication authentication) {
-	    if (!(authentication instanceof AnonymousAuthenticationToken)) { // prüft, ob der benutzer authentifiziert ist und keine anonyme authentifizierung vorliegt
-	        String username = authentication.getName(); // holt den benutzernamen des aktuell angemeldeten benutzers
-	        User user = userService.getByUsername(username); // holt den benutzer anhand des benutzernamens aus der datenbank
-	        Collection<MediaTransaction> loans = mediaTransactionService.findLoansByUser(user); // holt alle derzeitigen ausleihen des benutzers
-	        model.addAttribute("loans", loans); // fügt die ausleihen zur modellattributliste hinzu, um sie in der view darzustellen
-	    }
-	    return "returnMedia"; // gibt den namen der html-seite zurück, die angezeigt werden soll ("returnMedia.html")
+
+	@GetMapping("/returnMedia") // definiert die http get-anforderung, um die seite zur medienrückgabe
+								// anzuzeigen; url = "/returnMedia"
+	public String showReturnMediaPage(Model model,
+			@CurrentSecurityContext(expression = "authentication") Authentication authentication) {
+		if (!(authentication instanceof AnonymousAuthenticationToken)) { // prüft, ob der benutzer authentifiziert ist
+																			// und keine anonyme authentifizierung
+																			// vorliegt
+			String username = authentication.getName(); // holt den benutzernamen des aktuell angemeldeten benutzers
+			User user = userService.getByUsername(username); // holt den benutzer anhand des benutzernamens aus der
+																// datenbank
+			Collection<MediaTransaction> loans = mediaTransactionService.findLoansByUser(user); // holt alle derzeitigen
+																								// ausleihen des
+																								// benutzers
+			model.addAttribute("loans", loans); // fügt die ausleihen zur modellattributliste hinzu, um sie in der view
+												// darzustellen
+		}
+		return "returnMedia"; // gibt den namen der html-seite zurück, die angezeigt werden soll
+								// ("returnMedia.html")
 	}
 
 	@PostMapping("/returnMedia") // post-mapping zur verarbeitung der rückgabe von medien
-	public String returnMedia(@RequestParam Long transactionId, Model model) { // methode zum zurückgeben von medien, nimmt die transaktions-id als parameter
-	    try {
-	        mediaTransactionService.returnMedia(transactionId); // aufruf der service-methode, um das medium zurückzugeben
-	        model.addAttribute("successMessage", "Media returned successfully."); // nachricht hinzufügen, dass die rückgabe erfolgreich war
-	    } catch (Exception e) { // fängt eine ausnahme, falls etwas schiefgeht
-	        model.addAttribute("errorMessage", "Error returning media: " + e.getMessage()); // nachricht hinzufügen, wenn ein fehler bei der rückgabe aufgetreten ist
-	    }
-	    return "redirect:/returnMedia"; // nach der bearbeitung wird zur rückgabeseite umgeleitet, um die aktualisierte ansicht anzuzeigen
+	public String returnMedia(@RequestParam Long transactionId, Model model) { // methode zum zurückgeben von medien,
+																				// nimmt die transaktions-id als
+																				// parameter
+		try {
+			mediaTransactionService.returnMedia(transactionId); // aufruf der service-methode, um das medium
+																// zurückzugeben
+			model.addAttribute("successMessage", "Media returned successfully."); // nachricht hinzufügen, dass die
+																					// rückgabe erfolgreich war
+		} catch (Exception e) { // fängt eine ausnahme, falls etwas schiefgeht
+			model.addAttribute("errorMessage", "Error returning media: " + e.getMessage()); // nachricht hinzufügen,
+																							// wenn ein fehler bei der
+																							// rückgabe aufgetreten ist
+		}
+		return "redirect:/returnMedia"; // nach der bearbeitung wird zur rückgabeseite umgeleitet, um die aktualisierte
+										// ansicht anzuzeigen
 	}
 
 }

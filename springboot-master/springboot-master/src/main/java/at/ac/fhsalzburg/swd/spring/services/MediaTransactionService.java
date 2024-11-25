@@ -34,7 +34,7 @@ public class MediaTransactionService implements MediaTransactionServiceInterface
 
 	@Autowired
 	private UserRepository userRepository;
-	
+
 	@Autowired
 	private UserServiceInterface userService;
 
@@ -46,13 +46,13 @@ public class MediaTransactionService implements MediaTransactionServiceInterface
 	// saves transaction to repository
 	@Override
 	public Collection<MediaTransaction> createLoanRecord(User user, Date dueDate, Collection<Edition> editions) {
-	    Collection<MediaTransaction> transactions = editions.stream().map(edition -> {
-	        MediaTransaction loan = new MediaTransaction(new Date(), dueDate, Collections.emptyList(), edition, user);
-	        edition.setAvailable(false); // Mark the edition as unavailable
-	        editionRepository.save(edition); // Persist availability change
-	        return mediaTransactionRepository.save(loan);
-	    }).collect(Collectors.toList());
-	    return transactions;
+		Collection<MediaTransaction> transactions = editions.stream().map(edition -> {
+			MediaTransaction loan = new MediaTransaction(new Date(), dueDate, Collections.emptyList(), edition, user);
+			edition.setAvailable(false); // Mark the edition as unavailable
+			editionRepository.save(edition); // Persist availability change
+			return mediaTransactionRepository.save(loan);
+		}).collect(Collectors.toList());
+		return transactions;
 	}
 
 	// finds all loan transactions for specific customer
@@ -69,87 +69,95 @@ public class MediaTransactionService implements MediaTransactionServiceInterface
 
 	@Override
 	public MediaTransaction loanMedia(String username, Long mediaId, Date dueDate) {
-	    // Validate dueDate
-	    Date today = new Date();
-	    if (dueDate.before(today)) {
-	        throw new IllegalArgumentException("Loan date cannot be in the past.");
-	    }
+		// Validate dueDate
+		Date today = new Date();
+		if (dueDate.before(today)) {
+			throw new IllegalArgumentException("Loan date cannot be in the past.");
+		}
 
-	    // Find user
-	    User user = userRepository.findByUsername(username);
-	    if (user == null) {
-	        throw new IllegalArgumentException("User not found.");
-	    }
+		// Find user
+		User user = userRepository.findByUsername(username);
+		if (user == null) {
+			throw new IllegalArgumentException("User not found.");
+		}
 
-	    // Fetch media and available editions
-	    Media media = mediaRepository.findById(mediaId)
-	        .orElseThrow(() -> new IllegalArgumentException("Media not found."));
-	    List<Edition> availableEditions = editionRepository.findByMediaAndAvailable(media);
+		// Fetch media and available editions
+		Media media = mediaRepository.findById(mediaId)
+				.orElseThrow(() -> new IllegalArgumentException("Media not found."));
+		List<Edition> availableEditions = editionRepository.findByMediaAndAvailable(media);
 
-	    if (availableEditions.isEmpty()) {
-	        throw new IllegalArgumentException("No available editions for the selected media!");
-	    }
+		if (availableEditions.isEmpty()) {
+			throw new IllegalArgumentException("No available editions for the selected media!");
+		}
 
-	    // Select the first available edition
-	    Edition selectedEdition = availableEditions.get(0);
+		// Select the first available edition
+		Edition selectedEdition = availableEditions.get(0);
 
-	    // Validate loan status
-	    boolean isAlreadyLoaned = mediaTransactionRepository.existsByUserAndEditionAndStatus(
-	        user, selectedEdition, MediaTransaction.TransactionStatus.ACTIVE);
-	    if (isAlreadyLoaned) {
-	        throw new IllegalStateException("User already has this edition on loan.");
-	    }
+		// Validate loan status
+		boolean isAlreadyLoaned = mediaTransactionRepository.existsByUserAndEditionAndStatus(user, selectedEdition,
+				MediaTransaction.TransactionStatus.ACTIVE);
+		if (isAlreadyLoaned) {
+			throw new IllegalStateException("User already has this edition on loan.");
+		}
 
-	    // Proceed with loaning
-	    Date transactionDate = new Date();
-	    Calendar calendar = Calendar.getInstance();
-	    calendar.setTime(transactionDate);
-	    calendar.add(Calendar.DAY_OF_YEAR, 14); // 14-day loan period
-	    Date expectedReturnDate = calendar.getTime();
+		// Proceed with loaning
+		Date transactionDate = new Date();
+		Calendar calendar = Calendar.getInstance();
+		calendar.setTime(transactionDate);
+		calendar.add(Calendar.DAY_OF_YEAR, 14); // 14-day loan period
+		Date expectedReturnDate = calendar.getTime();
 
-	    // Create and save the transaction
-	    MediaTransaction transaction = new MediaTransaction(transactionDate, dueDate, selectedEdition, user);
-	    transaction.setExpectedReturnDate(expectedReturnDate);
-	    transaction.setStatus(MediaTransaction.TransactionStatus.ACTIVE);
+		// Create and save the transaction
+		MediaTransaction transaction = new MediaTransaction(transactionDate, dueDate, selectedEdition, user);
+		transaction.setExpectedReturnDate(expectedReturnDate);
+		transaction.setStatus(MediaTransaction.TransactionStatus.ACTIVE);
 
-	    mediaTransactionRepository.save(transaction);
+		mediaTransactionRepository.save(transaction);
 
-	    // Update edition availability
-	    selectedEdition.setAvailable(false);
-	    selectedEdition.setDueDate(expectedReturnDate);
-	    editionRepository.save(selectedEdition);
+		// Update edition availability
+		selectedEdition.setAvailable(false);
+		selectedEdition.setDueDate(expectedReturnDate);
+		editionRepository.save(selectedEdition);
 
-	    return transaction;
+		return transaction;
 	}
-
-
-
-
 
 	@Override
-	public void returnMedia(Long transactionId) {  
-	    MediaTransaction transaction = mediaTransactionRepository.findById(transactionId)  // sucht die transaktion anhand der id
-	            .orElseThrow(() -> new IllegalArgumentException("Transaction not found"));  // wenn keine transaktion gefunden wird, wirft eine exception
+	public void returnMedia(Long transactionId) {
+		MediaTransaction transaction = mediaTransactionRepository.findById(transactionId) // sucht die transaktion
+																							// anhand der id
+				.orElseThrow(() -> new IllegalArgumentException("Transaction not found")); // wenn keine transaktion
+																							// gefunden wird, wirft eine
+																							// exception
 
-	    transaction.setReturnDate(new Date());  // setzt das rückgabedatum auf das aktuelle datum
-	    transaction.setStatus(MediaTransaction.TransactionStatus.COMPLETED);  // ändert den status der transaktion auf "abgeschlossen"
+		transaction.setReturnDate(new Date()); // setzt das rückgabedatum auf das aktuelle datum
+		transaction.setStatus(MediaTransaction.TransactionStatus.COMPLETED); // ändert den status der transaktion auf
+																				// "abgeschlossen"
 
-	    double penaltyAmount = invoiceService.calculatePenalty(transaction);  // ruft die methode zur berechnung der mahngebühr auf
+		double penaltyAmount = invoiceService.calculatePenalty(transaction); // ruft die methode zur berechnung der
+																				// mahngebühr auf
 
-	    User user = transaction.getUser();  // holt den benutzer, der die transaktion durchgeführt hat
-	    if (user.getCredit() < penaltyAmount) {  // prüft, ob das guthaben des benutzers kleiner als die mahngebühr ist
-	        throw new IllegalStateException("Nicht genügend Guthaben auf dem Konto, um die Mahngebühren zu bezahlen.");  // wirft eine exception, wenn nicht genug guthaben vorhanden ist
-	    }
+		User user = transaction.getUser(); // holt den benutzer, der die transaktion durchgeführt hat
+		if (user.getCredit() < penaltyAmount) { // prüft, ob das guthaben des benutzers kleiner als die mahngebühr ist
+			throw new IllegalStateException("Nicht genügend Guthaben auf dem Konto, um die Mahngebühren zu bezahlen."); // wirft
+																														// eine
+																														// exception,
+																														// wenn
+																														// nicht
+																														// genug
+																														// guthaben
+																														// vorhanden
+																														// ist
+		}
 
-	    user.setCredit(user.getCredit() - (long) penaltyAmount);  // zieht die mahngebühr vom guthaben des benutzers ab
+		user.setCredit(user.getCredit() - (long) penaltyAmount); // zieht die mahngebühr vom guthaben des benutzers ab
 
-	    userService.updateUser(user);  // ruft die methode auf, um den benutzer mit dem aktualisierten guthaben zu speichern
+		userService.updateUser(user); // ruft die methode auf, um den benutzer mit dem aktualisierten guthaben zu
+										// speichern
 
-	    mediaTransactionRepository.save(transaction);  // speichert die aktualisierte transaktion
+		mediaTransactionRepository.save(transaction); // speichert die aktualisierte transaktion
 
-	    invoiceService.deductAmount(user, transaction);  // erstellt und speichert eine rechnung für den benutzer
+		invoiceService.deductAmount(user, transaction); // erstellt und speichert eine rechnung für den benutzer
 	}
-
-
 
 }
