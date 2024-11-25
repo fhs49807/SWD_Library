@@ -12,8 +12,8 @@ public class Media {
 	@GeneratedValue(strategy = GenerationType.AUTO)
 	private Long id;
 
-    @Column(unique = true)
-    private String name;
+	@Column(unique = true)
+	private String name;
 	private int FSK;
 	private double price;// set price automatically based on genre ('setGenre')
 
@@ -28,82 +28,84 @@ public class Media {
 	private MediaType mediaType;
 
 	@ManyToOne
-    @JoinColumn(name = "shelf_id")
-    private Shelf shelf;
+	@JoinColumn(name = "shelf_id")
+	private Shelf shelf;
 
 	// One Media can have multiple Editions
-    @OneToMany(mappedBy = "media", cascade = CascadeType.ALL, orphanRemoval = true)
-    private List<Edition> editions;
+	@OneToMany(mappedBy = "media", cascade = CascadeType.ALL, orphanRemoval = true)
+	private List<Edition> editions;
 
 	public Media() {
-    }
-
+	}
 
 	public Media(String name, Genre genre, MediaType mediaType, Shelf shelf, int FSK) {
-	    this.name = name;
-	    this.genre = genre;
-	    this.mediaType = mediaType;
-	    this.shelf = shelf;
-	    this.FSK = FSK;
-	    if (genre != null) {
-	        this.price = genre.getPrice();
-	    }
+		this.name = name;
+		this.genre = genre;
+		this.mediaType = mediaType;
+		this.shelf = shelf;
+		this.FSK = FSK;
+		if (genre != null) {
+			this.price = genre.getPrice();
+		}
 	}
 
 	public Long getId() {
-        return id;
-    }
+		return id;
+	}
 
-    public String getName() {
-        return name;
-    }
+	public void setId(Long id) {
+		this.id = id;
+	}
 
-    public void setName(String name) {
-        this.name = name;
-    }
+	public String getName() {
+		return name;
+	}
 
-    public double getPrice() {
-        return price;
-    }
+	public void setName(String name) {
+		this.name = name;
+	}
 
-    public void setPrice(double price) {
-        this.price = price;
-    }
+	public double getPrice() {
+		return price;
+	}
 
-    public Genre getGenre() {
-        return genre;
-    }
+	public void setPrice(double price) {
+		this.price = price;
+	}
 
-    public void setGenre(Genre genre) {
-        this.genre = genre;
-        if (genre != null) {
-            this.price = genre.getPrice();
-        }
-    }
+	public Genre getGenre() {
+		return genre;
+	}
 
-    public MediaType getMediaType() {
-        return mediaType;
-    }
+	public void setGenre(Genre genre) {
+		this.genre = genre;
+		if (genre != null) {
+			this.price = genre.getPrice();
+		}
+	}
 
-    public void setMediaType(MediaType mediaType) {
-        this.mediaType = mediaType;
-    }
+	public MediaType getMediaType() {
+		return mediaType;
+	}
 
-    public Shelf getShelf() {
-        return shelf;
-    }
+	public void setMediaType(MediaType mediaType) {
+		this.mediaType = mediaType;
+	}
 
-    public void setShelf(Shelf shelf) {
-        this.shelf = shelf;
-    }
+	public Shelf getShelf() {
+		return shelf;
+	}
 
+	public void setShelf(Shelf shelf) {
+		this.shelf = shelf;
+	}
 
 	public int getFSK() {
 		return FSK;
 	}
 
-
 	public void setFSK(int fSK) {
 		FSK = fSK;
 	}
+
 }
