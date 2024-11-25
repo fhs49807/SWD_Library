@@ -152,53 +152,81 @@ public class TemplateController {
 	// TODO: add "/pay" to pay outstanding balances
 
 	@RequestMapping(value = "/loan", method = RequestMethod.GET)
-	public String showLoanPage(Model model,
-			@CurrentSecurityContext(expression = "authentication") Authentication authentication) {
-		// Retrieve the logged-in user's details
-		if (!(authentication instanceof AnonymousAuthenticationToken)) {
-			String username = authentication.getName();
-			User user = userService.getByUsername(username);
+	public String showLoanPage(
+	    @RequestParam(value = "selectedGenre", required = false, defaultValue = "Thriller") String selectedGenre,
+	    @RequestParam(value = "selectedType", required = false, defaultValue = "Movie") String selectedType,
+	    Model model,
+	    @CurrentSecurityContext(expression = "authentication") Authentication authentication
+	) {
+	    if (!(authentication instanceof AnonymousAuthenticationToken)) {
+	        String username = authentication.getName();
+	        User user = userService.getByUsername(username);
 
-			// Fetch genres, media types, and media list filtered by FSK
-			model.addAttribute("genres", mediaService.getAllGenres());
-			model.addAttribute("mediaTypes", mediaService.getAllMediaTypes());
-			model.addAttribute("mediaList",
-					mediaService.searchMediaByGenreAndType("defaultGenre", "defaultType", user));
-			return "loan"; // Render the loan page with the filtered media list
-		}
+	        // Populate dropdowns and retain selected values
+	        model.addAttribute("genres", mediaService.getAllGenres());
+	        model.addAttribute("mediaTypes", mediaService.getAllMediaTypes());
+	        model.addAttribute("selectedGenre", selectedGenre);
+	        model.addAttribute("selectedType", selectedType);
 
-		// If the user is not logged in, redirect to the login page
-		model.addAttribute("errorMessage", "You must log in to view the loan page.");
-		return "login";
+	        // Get filtered media
+	        Iterable<Media> mediaList = mediaService.searchMediaByGenreAndType(selectedGenre, selectedType, user);
+	        if (!mediaList.iterator().hasNext()) {
+	            model.addAttribute("errorMessage", "No media found for the selected Genre and Media Type. Please check FSK compliance.");
+	        }
+	        model.addAttribute("mediaList", mediaList);
+
+	        return "loan";
+	    }
+
+	    // Redirect to login if user is not authenticated
+	    model.addAttribute("errorMessage", "You must log in to view the loan page.");
+	    return "login";
 	}
+
+
+
 
 	@GetMapping("/searchMedia")
-	public String searchMedia(@RequestParam String genre, @RequestParam String type, Model model,
-			@CurrentSecurityContext(expression = "authentication") Authentication authentication) {
-		// Fetch the logged-in user's details
-		if (!(authentication instanceof AnonymousAuthenticationToken)) {
-			String username = authentication.getName();
-			User user = userService.getByUsername(username);
+	public String searchMedia(
+	    @RequestParam(value = "genre", required = true) String genre,
+	    @RequestParam(value = "type", required = true) String type,
+	    Model model,
+	    @CurrentSecurityContext(expression = "authentication") Authentication authentication
+	) {
+	    if (!(authentication instanceof AnonymousAuthenticationToken)) {
+	        String username = authentication.getName();
+	        User user = userService.getByUsername(username);
 
-			// Get the filtered media list based on FSK and user age
-			Iterable<Media> mediaList = mediaService.searchMediaByGenreAndType(genre, type, user);
+	        // Filter media based on selected genre, type, and user FSK compliance
+	        Iterable<Media> mediaList = mediaService.searchMediaByGenreAndType(genre, type, user);
+	        model.addAttribute("genres", mediaService.getAllGenres());
+	        model.addAttribute("mediaTypes", mediaService.getAllMediaTypes());
+	        model.addAttribute("selectedGenre", genre); // Retain the selected genre
+	        model.addAttribute("selectedType", type);   // Retain the selected type
 
-			model.addAttribute("genres", mediaService.getAllGenres());
-			model.addAttribute("mediaTypes", mediaService.getAllMediaTypes());
-			model.addAttribute("mediaList", mediaList);
+	        // Display error message if no media is found
+	        if (!mediaList.iterator().hasNext()) {
+	            model.addAttribute("errorMessage", "No media found for the selected Genre and Media Type. Please check FSK compliance.");
+	        }
+	        model.addAttribute("mediaList", mediaList);
 
-			return "loan"; // Render the loan page with the filtered media list
-		}
+	        return "loan";
+	    }
 
-		// If the user is not logged in, show an error or redirect to the login page
-		model.addAttribute("errorMessage", "You must be logged in to search for media.");
-		return "login";
+	    // Redirect to login if user is not authenticated
+	    model.addAttribute("errorMessage", "You must be logged in to search for media.");
+	    return "login";
 	}
+
+
+
 
 	@RequestMapping(value = "/loanMedia", method = RequestMethod.POST)
 	public String loanMedia(
 	    @RequestParam(required = false) Long mediaId,
 	    @RequestParam(required = false) String loanDate,
+	    @RequestParam(required = false) String selectedGenre,
+	    @RequestParam(required = false) String selectedType,
 	    @CurrentSecurityContext(expression = "authentication") Authentication authentication,
 	    Model model
 	) {
@@ -208,39 +236,37 @@ public class TemplateController {
 	        // Validate required fields
 	        if (mediaId == null || loanDate == null || loanDate.isEmpty()) {
 	            model.addAttribute("errorMessage", "Please select a media item and specify the loan date.");
-	            
-	            // Populate genres and media types to re-render the loan page properly
+
+	            // Populate genres, media types, and reapply user selections
 	            model.addAttribute("genres", mediaService.getAllGenres());
 	            model.addAttribute("mediaTypes", mediaService.getAllMediaTypes());
-	            model.addAttribute("mediaList", mediaService.searchMediaByGenreAndType("defaultGenre", "defaultType", userService.getByUsername(username)));
+	            model.addAttribute("selectedGenre", selectedGenre);
+	            model.addAttribute("selectedType", selectedType);
+	            model.addAttribute("mediaList", mediaService.searchMediaByGenreAndType(selectedGenre, selectedType, userService.getByUsername(username)));
 
-	            return "loan"; // Return to the loan page with an error message
+	            return "loan";
 	        }
 
 	        try {
 	            // Parse the loan date
 	            Date parsedLoanDate = new SimpleDateFormat("yyyy-MM-dd'T'HH:mm").parse(loanDate);
 
-	            // Use loanMedia logic to create the transaction
+	            // Create the transaction
 	            MediaTransaction transaction = mediaTransactionService.loanMedia(username, mediaId, parsedLoanDate);
 
-	            // Fetch media details
-	            Media media = transaction.getEdition().getMedia(); // Use the Edition to fetch the Media
-
-	            // Populate model for the success page
+	            // Populate success details
+	            Media media = transaction.getEdition().getMedia();
 	            model.addAttribute("username", username);
 	            model.addAttribute("loanDate", loanDate);
 	            model.addAttribute("mediaId", mediaId);
 	            model.addAttribute("mediaTitle", media.getName());
 	            model.addAttribute("mediaGenre", media.getGenre().getName());
 	            model.addAttribute("mediaType", media.getMediaType().getType());
-
-	            // Add the specific loaned Edition ID
 	            model.addAttribute("editionIds", List.of(transaction.getEdition().getId()));
 
-	            return "loanSuccess"; // Redirect to the loan success page
+	            return "loanSuccess";
 	        } catch (IllegalStateException e) {
-	            model.addAttribute("errorMessage", e.getMessage()); // User already has the media on loan
+	            model.addAttribute("errorMessage", e.getMessage());
 	        } catch (Exception e) {
 	            model.addAttribute("errorMessage", "Error creating loan: " + e.getMessage());
 	        }
@@ -248,13 +274,16 @@ public class TemplateController {
 	        model.addAttribute("errorMessage", "You must log in to loan media.");
 	    }
 
-	    // Populate genres and media types to re-render the loan page properly
+	    // Reapply user selections in case of error
 	    model.addAttribute("genres", mediaService.getAllGenres());
 	    model.addAttribute("mediaTypes", mediaService.getAllMediaTypes());
-	    model.addAttribute("mediaList", mediaService.searchMediaByGenreAndType("defaultGenre", "defaultType", userService.getByUsername(authentication.getName())));
+	    model.addAttribute("selectedGenre", selectedGenre);
+	    model.addAttribute("selectedType", selectedType);
+	    model.addAttribute("mediaList", mediaService.searchMediaByGenreAndType(selectedGenre, selectedType, userService.getByUsername(authentication.getName())));
 
-	    return "loan"; // Return to loan page with feedback
+	    return "loan";
 	}
+
 
 
 	@RequestMapping(value = { "/login-error" })
