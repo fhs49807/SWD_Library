@@ -24,9 +24,8 @@ import org.springframework.web.bind.annotation.*;
 import javax.annotation.Resource;
 import javax.persistence.EntityManager;
 import javax.servlet.http.HttpSession;
-import java.text.SimpleDateFormat;
+import java.time.LocalDate;
 import java.util.Collection;
-import java.util.Date;
 import java.util.List;
 
 @Controller // marks the class as a web controller, capable of handling the HTTP requests.
@@ -192,8 +191,7 @@ public class TemplateController {
             model.addAttribute("mediaTypes", mediaService.getAllMediaTypes());
             model.addAttribute("selectedGenre", genre); // Retain the selected genre
             model.addAttribute("selectedType", type);   // Retain the selected type
-            model.addAttribute("reserveStartDate", new Date().toString());
-            model.addAttribute("todayDate", "2024-11-26");
+            model.addAttribute("todayDate", LocalDate.now().toString());
 
             // Display error message if no media is found
             if (!mediaList.iterator().hasNext()) {
