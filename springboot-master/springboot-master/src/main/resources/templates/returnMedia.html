@@ -1,43 +1,55 @@
 <!DOCTYPE html>
-<html xmlns:th="http://www.thymeleaf.org">
+<html xmlns:layout="http://www.ultraq.net.nz/thymeleaf/layout"
+      xmlns:th="http://www.thymeleaf.org"
+      layout:decorate="~{layouts/main-layout}"
+      xmlns:sec="https://www.thymeleaf.org/thymeleaf-extras-springsecurity5">
+
 <head>
-    <meta charset="UTF-8">
     <title>Return Media</title>
-    <link rel="stylesheet" th:href="@{/css/styles.css}"> 
 </head>
+
 <body>
-    <h1>Return Media</h1>
+    <main layout:fragment="content" th:remove="tag">
 
-    <div th:if="${successMessage}" class="success">
-        <p th:text="${successMessage}"></p>
-    </div>
-    <div th:if="${errorMessage}" class="error">
-        <p th:text="${errorMessage}"></p>
-    </div>
+        <h2>Return Media</h2>
 
-    <h3>Your Current Loans</h3>
-    <table>
-        <thead>
-            <tr>
-                <th>Media Name</th>
-                <th>Due Date</th>
-                <th>Action</th>
-            </tr>
-        </thead>
-        <tbody>
-            <tr th:each="transaction : ${loans}">
-                <td th:text="${transaction.media.name}">Media Name</td>
-                <td th:text="${#dates.format(transaction.expirationDate, 'yyyy-MM-dd')}">Due Date</td>
-                <td>
-                    <form th:action="@{/returnMedia}" method="post">
-                        <input type="hidden" name="transactionId" th:value="${transaction.id}" />
-                        <button type="submit">Return</button>
-                    </form>
-                </td>
-            </tr>
-        </tbody>
-    </table>
+        <!-- Feedback Messages -->
+        <div th:if="${successMessage}" class="alert alert-success" th:text="${successMessage}"></div>
+        <div th:if="${errorMessage}" class="alert alert-danger" th:text="${errorMessage}"></div>
 
-    <a th:href="@{/loan}">Back to Loan Page</a>
+        <!-- Display user loans -->
+        <div>
+            <h3>Your Current Loans</h3>
+
+            <table class="table table-hover mt-4">
+                <thead>
+                    <tr>
+                        <th>Media Name</th>
+                        <th>Due Date</th>
+                        <th>Action</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    <tr th:each="transaction : ${loans}">
+                        <td th:text="${transaction.media.name}">Media Name</td>
+                        <td th:text="${#dates.format(transaction.expirationDate, 'yyyy-MM-dd')}">Due Date</td>
+                        <td>
+                            <form th:action="@{/returnMedia}" method="post">
+                                <input type="hidden" name="transactionId" th:value="${transaction.id}" />
+                                <button type="submit" class="btn btn-danger">Return</button>
+                            </form>
+                        </td>
+                    </tr>
+                </tbody>
+            </table>
+
+            <div th:if="${loans.isEmpty()}" class="alert alert-info">
+                <p>No loans available to return.</p>
+            </div>
+        </div>
+
+        <!-- Back to Loan Page Button -->
+        <a th:href="@{/loan}" class="btn btn-primary mt-3">Back to Loan Page</a>
+    </main>
 </body>
 </html>
