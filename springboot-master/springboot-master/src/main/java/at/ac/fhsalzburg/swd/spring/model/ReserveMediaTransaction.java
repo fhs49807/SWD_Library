@@ -28,9 +28,13 @@ public class ReserveMediaTransaction {
     @DateTimeFormat(pattern = "yyyy-MM-dd")
     private Date reserveStartDate;
 
-    public ReserveMediaTransaction(User user, Edition edition, Date reserveStartDate) {
+    @DateTimeFormat(pattern = "yyyy-MM-dd")
+    private Date reserveEndDate;
+
+    public ReserveMediaTransaction(User user, Edition edition, Date reserveStartDate, Date reserveEndDate) {
         this.user = user;
         this.edition = edition;
         this.reserveStartDate = reserveStartDate;
+        this.reserveEndDate = reserveEndDate;
     }
 }

@@ -6,6 +6,8 @@ import java.util.Date;
 
 public interface ReserveMediaTransactionServiceInterface {
 
-    void reserveMediaForCustomer(User user, String mediaName, Date reserveStartDate);
+    void reserveMediaForCustomer(User user, String mediaName, Date reserveStartDate, Date reserveEndDate);
+
+    void reserveMediaForCustomer(String userName, Long mediaId, Date reserveStartDate, Date reserveEndDate);
 
 }
