@@ -265,42 +265,31 @@ public class TemplateController {
         return "redirect:/";
     }
 
-    @GetMapping("/returnMedia") // definiert die http get-anforderung, um die seite zur medienrückgabe
-    // anzuzeigen; url = "/returnMedia"
+    @GetMapping("/returnMedia") // definiert die http get-anforderung, um die seite zur medienrückgabe anzuzeigen
     public String showReturnMediaPage(Model model,
-        @CurrentSecurityContext(expression = "authentication") Authentication authentication) {
+            @CurrentSecurityContext(expression = "authentication") Authentication authentication) {
         if (!(authentication instanceof AnonymousAuthenticationToken)) { // prüft, ob der benutzer authentifiziert ist
-            // und keine anonyme authentifizierung
-            // vorliegt
             String username = authentication.getName(); // holt den benutzernamen des aktuell angemeldeten benutzers
-            User user = userService.getByUsername(username); // holt den benutzer anhand des benutzernamens aus der
-            // datenbank
-            Collection<MediaTransaction> loans = mediaTransactionService.findLoansByUser(user); // holt alle derzeitigen
-            // ausleihen des
-            // benutzers
-            model.addAttribute("loans", loans); // fügt die ausleihen zur modellattributliste hinzu, um sie in der view
-            // darzustellen
+            User user = userService.getByUsername(username); // holt den benutzer anhand des benutzernamens aus der datenbank
+            Collection<MediaTransaction> loans = mediaTransactionService.findLoansByUser(user); // holt alle ausleihen des benutzers
+            if (loans == null) { // prüft, ob loans null ist
+                loans = List.of(); // setzt loans auf eine leere liste, falls keine ausleihen vorhanden sind
+            }
+            model.addAttribute("loans", loans); // fügt die ausleihen zum modell hinzu, um sie in der view darzustellen
         }
-        return "returnMedia"; // gibt den namen der html-seite zurück, die angezeigt werden soll
-        // ("returnMedia.html")
+        return "returnMedia"; // gibt den namen der html-seite zurück, die angezeigt werden soll ("returnMedia.html")
     }
 
-    @PostMapping("/returnMedia") // post-mapping zur verarbeitung der rückgabe von medien
-    public String returnMedia(@RequestParam Long transactionId, Model model) { // methode zum zurückgeben von medien,
-        // nimmt die transaktions-id als
-        // parameter
+    // startet HTTP-anfrage für rückgabeprozess
+    @PostMapping("/returnMedia") // definiert die http post-anforderung zur verarbeitung der medienrückgabe
+    public String returnMedia(@RequestParam Long transactionId, Model model) { // methode zur rückgabe eines mediums
         try {
-            mediaTransactionService.returnMedia(transactionId); // aufruf der service-methode, um das medium
-            // zurückzugeben
-            model.addAttribute("successMessage", "Media returned successfully."); // nachricht hinzufügen, dass die
-            // rückgabe erfolgreich war
-        } catch (Exception e) { // fängt eine ausnahme, falls etwas schiefgeht
-            model.addAttribute("errorMessage", "Error returning media: " + e.getMessage()); // nachricht hinzufügen,
-            // wenn ein fehler bei der
-            // rückgabe aufgetreten ist
+            mediaTransactionService.returnMedia(transactionId); // aufruf der service-methode, um die rückgabe zu verarbeiten
+            model.addAttribute("successMessage", "Media returned successfully."); // fügt eine erfolgsmeldung zum modell hinzu
+        } catch (Exception e) { // behandelt fehler, falls die rückgabe fehlschlägt
+            model.addAttribute("errorMessage", "Error returning media: " + e.getMessage()); // fügt eine fehlermeldung zum modell hinzu
         }
-        return "redirect:/returnMedia"; // nach der bearbeitung wird zur rückgabeseite umgeleitet, um die aktualisierte
-        // ansicht anzuzeigen
+        return "redirect:/returnMedia"; // leitet zur rückgabeseite um, um die aktualisierte ansicht anzuzeigen
     }
 
 }

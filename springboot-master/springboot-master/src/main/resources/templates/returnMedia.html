@@ -21,30 +21,36 @@
         <div>
             <h3>Your Current Loans</h3>
 
-            <table class="table table-hover mt-4">
-                <thead>
-                    <tr>
-                        <th>Media Name</th>
-                        <th>Due Date</th>
-                        <th>Action</th>
-                    </tr>
-                </thead>
-                <tbody>
-                    <tr th:each="transaction : ${loans}">
-                        <td th:text="${transaction.media.name}">Media Name</td>
-                        <td th:text="${#dates.format(transaction.expirationDate, 'yyyy-MM-dd')}">Due Date</td>
-                        <td>
-                            <form th:action="@{/returnMedia}" method="post">
-                                <input type="hidden" name="transactionId" th:value="${transaction.id}" />
-                                <button type="submit" class="btn btn-danger">Return</button>
-                            </form>
-                        </td>
-                    </tr>
-                </tbody>
-            </table>
+            <div th:if="${loans != null}">
+                <table class="table table-hover mt-4" th:if="${!loans.isEmpty()}">
+                    <thead>
+                        <tr>
+                            <th>Media Name</th>
+                            <th>Due Date</th>
+                            <th>Action</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        <tr th:each="transaction : ${loans}">
+                            <td th:text="${transaction.media.name}">Media Name</td>
+                            <td th:text="${#dates.format(transaction.expirationDate, 'yyyy-MM-dd')}">Due Date</td>
+                            <td>
+                                <form th:action="@{/returnMedia}" method="post">
+                                    <input type="hidden" name="transactionId" th:value="${transaction.id}" />
+                                    <button type="submit" class="btn btn-danger">Return</button>
+                                </form>
+                            </td>
+                        </tr>
+                    </tbody>
+                </table>
 
-            <div th:if="${loans.isEmpty()}" class="alert alert-info">
-                <p>No loans available to return.</p>
+                <div th:if="${loans.isEmpty()}" class="alert alert-info">
+                    <p>No loans available to return.</p>
+                </div>
+            </div>
+
+            <div th:if="${loans == null}" class="alert alert-info">
+                <p>Unable to fetch loans at the moment.</p>
             </div>
         </div>
 

@@ -21,6 +21,7 @@ public class InvoiceService implements InvoiceServiceInterface{
     private InvoiceRepository invoiceRepository;
 
 
+	//erstellt & speichert die Rg nach abzug der fälligen beträge -> user service updateUser()
 	@Override
 	public void deductAmount(User user, MediaTransaction transaction) {
 	    double penaltyAmount = calculatePenalty(transaction);
@@ -34,6 +35,7 @@ public class InvoiceService implements InvoiceServiceInterface{
 	    }
 	}
 
+	//berechnet mahngebühr basierend auf überfälligkeit -> deductAmount()
 	public double calculatePenalty(MediaTransaction transaction) {
         // mahngebühren calc: 1€ pro tag verspätung
         long overdueDays = (transaction.getReturnDate().getTime() - transaction.getExpirationDate().getTime()) / (1000 * 60 * 60 * 24);
