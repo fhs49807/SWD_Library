@@ -80,7 +80,8 @@
             <br>
             <div class="nativeDatePicker">
                 <label for="reserveEndDate">Select End Date:</label>
-                <input type="date" id="reserveEndDate" name="reserveEndDate" th:attr="min=${todayDate}"
+                <input type="date" id="reserveEndDate" name="reserveEndDate" th:value="${endDate}"
+                       th:attr="min=${todayDate}"
                        class="form-control" required>
             </div>
             <input type="hidden" name="genre" th:value="${selectedGenre}">
