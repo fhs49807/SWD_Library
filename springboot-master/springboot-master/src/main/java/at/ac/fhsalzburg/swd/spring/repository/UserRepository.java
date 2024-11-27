@@ -23,7 +23,7 @@ public interface UserRepository extends CrudRepository<User, String> {
 
 	// finds amount of active loans by customer
 	// loans are still active if they have no return date
-	@Query("SELECT COUNT(m) FROM MediaTransaction m WHERE m.user = :user AND m.returnDate IS NULL")
+	@Query("SELECT COUNT(m) FROM MediaTransaction m WHERE m.user = :user AND m.return_date IS NULL")
 	int countActiveLoansByUser(@Param("user") User user);
 
 }

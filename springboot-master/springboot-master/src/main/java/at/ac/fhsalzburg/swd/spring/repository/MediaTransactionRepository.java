@@ -34,9 +34,9 @@ public interface MediaTransactionRepository extends CrudRepository<MediaTransact
 	// get all reservations between startDate and endDate
 	// used in handleReservations in LibraryService to determine availability of
 	// edition for loan period
-	@Query("SELECT m FROM MediaTransaction m WHERE :media MEMBER OF m.media AND m.expirationDate BETWEEN :startDate AND :endDate")
+	@Query("SELECT m FROM MediaTransaction m WHERE :media MEMBER OF m.media AND m.last_possible_return_date BETWEEN :start_date AND :end_date")
 	Collection<MediaTransaction> findReservationsByDateRange(@Param("media") Media media,
-			@Param("startDate") Date startDate, @Param("endDate") Date endDate);
+			@Param("start_date") Date startDate, @Param("end_date") Date endDate);
 
     boolean existsByUserAndEditionAndStatus(User user, Edition edition, MediaTransaction.TransactionStatus status);
 

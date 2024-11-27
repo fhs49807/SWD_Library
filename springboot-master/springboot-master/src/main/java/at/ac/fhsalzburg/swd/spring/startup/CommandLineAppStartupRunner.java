@@ -70,7 +70,7 @@ public class CommandLineAppStartupRunner implements CommandLineRunner {
 		orderService.addOrder(new Date(), user, productService.getAll());
 
 		// Create sample customer
-		boolean newCustomer = userService.addUser("john", "John Doe", "john.doe@example.com", "123456789", new Date(),
+		boolean newCustomer = userService.addUser("john", "John Doe", "john.doe@example.com", "123456789", new Date(),//TODO: change birthday for FSK check
 				"pw", "Customer", User.CustomerType.REGULAR, 5);
 		if (newCustomer) {
 			System.out.println("User created successfully.");

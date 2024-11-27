@@ -31,54 +31,49 @@ public class MediaTransaction {
 	private ReturnCondition condition;
 
 	@DateTimeFormat(pattern = "yyyy-MM-dd")
-	private Date expectedReturnDate;// transactionDate + days Loaned for
+	private Date end_date;// start_date + days Loaned for
 
 	@DateTimeFormat(pattern = "yyyy-MM-dd")
-	private Date expirationDate;// date when loan expires and penalties apply
+	private Date last_possible_return_date;// date when loan expires and penalties apply
 
 	@DateTimeFormat(pattern = "yyyy-MM-dd")
-	private Date transactionDate;// date when item was loaned or reserved
+	private Date start_date;// date when item was loaned or reserved
 
 	@DateTimeFormat(pattern = "yyyy-MM-dd")
-	private Date returnDate; // date when item was actually returned
+	private Date return_date; // date when item was actually returned
 
-	
-	//TODO: add to class diagram
+	// TODO: add to class diagram
 	@ManyToMany
 	private Collection<Media> media;// one transaction can reserve multiple media items
-	
-	@ManyToOne
-    @JoinColumn(name = "edition_id", nullable = false)
-    private Edition edition; // Link a single edition to the transaction
 
+	@ManyToOne
+	@JoinColumn(name = "edition_id", nullable = false)
+	private Edition edition; // Link a single edition to the transaction
 
 	@ManyToOne
 	private User user;
-	
+
 	public MediaTransaction() {
-		
+
 	}
 
-	
-	public MediaTransaction(Date transactionDate, Date expirationDate, Collection<Media> media, Edition edition, User user) {
-	    this.transactionDate = transactionDate;
-	    this.expirationDate = expirationDate;
-	    this.media = media;
-	    this.edition = edition;
-	    this.user = user;
-	    this.status = TransactionStatus.ACTIVE; // default status: ACTIVE
+	public MediaTransaction(Date transactionDate, Date expirationDate, Collection<Media> media, Edition edition,
+			User user) {
+		this.start_date = transactionDate;
+		this.last_possible_return_date = expirationDate;
+		this.media = media;
+		this.edition = edition;
+		this.user = user;
+		this.status = TransactionStatus.ACTIVE; // default status: ACTIVE
 	}
-
-
 
 	public MediaTransaction(Date transactionDate, Date expirationDate, Edition edition, User user) {
-        this.transactionDate = transactionDate;
-        this.expirationDate = expirationDate;
-        this.edition = edition;
-        this.user = user;
-        this.status = TransactionStatus.ACTIVE; // Default status
-    }
-
+		this.start_date = transactionDate;
+		this.last_possible_return_date = expirationDate;
+		this.edition = edition;
+		this.user = user;
+		this.status = TransactionStatus.ACTIVE; // Default status
+	}
 
 	public TransactionStatus getStatus() {
 		return status;
@@ -97,35 +92,35 @@ public class MediaTransaction {
 	}
 
 	public Date getExpectedReturnDate() {
-		return expectedReturnDate;
+		return end_date;
 	}
 
 	public void setExpectedReturnDate(Date expectedReturnDate) {
-		this.expectedReturnDate = expectedReturnDate;
+		this.end_date = expectedReturnDate;
 	}
 
 	public Date getExpirationDate() {
-		return expirationDate;
+		return last_possible_return_date;
 	}
 
 	public void setExpirationDate(Date expirationDate) {
-		this.expirationDate = expirationDate;
+		this.last_possible_return_date = expirationDate;
 	}
 
 	public Date getTransactionDate() {
-		return transactionDate;
+		return start_date;
 	}
 
 	public void setTransactionDate(Date transactionDate) {
-		this.transactionDate = transactionDate;
+		this.start_date = transactionDate;
 	}
 
 	public Date getReturnDate() {
-		return returnDate;
+		return return_date;
 	}
 
 	public void setReturnDate(Date returnDate) {
-		this.returnDate = returnDate;
+		this.return_date = returnDate;
 	}
 
 	public Edition getEdition() {
@@ -137,21 +132,21 @@ public class MediaTransaction {
 	}
 
 	public User getUser() {
-	    return user;
+		return user;
 	}
 
 	public void setUser(User user) {
-	    this.user = user;
+		this.user = user;
 	}
 
 	public Long getId() {
 		return id;
 	}
-	
-	//  Setter nur für Testzwecke
-    public void setId(Long id) {
-        this.id = id;
-    }
+
+	// Setter nur für Testzwecke
+	public void setId(Long id) {
+		this.id = id;
+	}
 
 	public enum TransactionStatus {
 		ACTIVE, COMPLETED, OVERDUE
