@@ -15,7 +15,7 @@ import at.ac.fhsalzburg.swd.spring.model.User.CustomerType;
 public interface UserRepository extends CrudRepository<User, String> {
 
 	@Transactional(timeout = 10)
-	User findByUsername(String username);
+	User findByUsername(String username); // -> wird user gefunden, der mit einer transaktion verknüpft ist -> MediaTransactionSerice
 
 	// finds all customers with specific type
 	@Transactional(timeout = 10)

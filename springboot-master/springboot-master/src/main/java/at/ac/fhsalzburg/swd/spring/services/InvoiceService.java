@@ -21,7 +21,7 @@ public class InvoiceService implements InvoiceServiceInterface{
     private InvoiceRepository invoiceRepository;
 
 
-	//erstellt & speichert die Rg nach abzug der fälligen beträge -> user service updateUser()
+	//erstellt & speichert die Rg nach abzug der fälligen beträge -> userservice updateUser()
 	@Override
 	public void deductAmount(User user, MediaTransaction transaction) {
 	    double penaltyAmount = calculatePenalty(transaction);
