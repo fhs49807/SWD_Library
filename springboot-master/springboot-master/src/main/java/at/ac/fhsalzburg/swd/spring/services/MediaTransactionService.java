@@ -122,6 +122,7 @@ public class MediaTransactionService implements MediaTransactionServiceInterface
 		return transaction;
 	}
 
+	//ruft die transaktion auf, aktualisiert den status & berechnet gebühren
 	@Override
 	public void returnMedia(Long transactionId) {
 	    // sucht die transaktion anhand der id
@@ -144,19 +145,17 @@ public class MediaTransactionService implements MediaTransactionServiceInterface
 	    // berechnet die mahngebühren für die transaktion
 	    double penaltyAmount = invoiceService.calculatePenalty(transaction);
 
-	    // holt den benutzer, der die transaktion durchgeführt hat
-	    User user = transaction.getUser();
+	    User user = transaction.getUser();  // holt den benutzer, der die transaktion durchgeführt hat zur guthaben aktualisierung 
 	    if (user.getCredit() < penaltyAmount) { 
 	        // prüft, ob der benutzer genug guthaben hat, um die mahngebühren zu zahlen
 	        throw new IllegalStateException("nicht genügend guthaben auf dem konto, um die mahngebühren zu bezahlen."); 
 	    }
 
-	    // zieht die mahngebühr vom guthaben des benutzers ab
+	    // wenn rückgabe gebührenpflichtig, prüfung ob genug guthaben & zieht die mahngebühr vom guthaben des benutzers ab
 	    user.setCredit(user.getCredit() - (long) penaltyAmount);
 	    userService.updateUser(user); // aktualisiert die benutzerdaten in der datenbank
 
-	    // speichert die aktualisierte transaktion
-	    mediaTransactionRepository.save(transaction);
+	    mediaTransactionRepository.save(transaction); //aktualisiert die Transaktion nach der Rückgabe.
 
 	    // erstellt und speichert eine rechnung für den benutzer
 	    invoiceService.deductAmount(user, transaction);

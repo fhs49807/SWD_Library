@@ -276,6 +276,7 @@ public class TemplateController {
         return "returnMedia"; // gibt den namen der html-seite zurück, die angezeigt werden soll ("returnMedia.html")
     }
 
+    // startet HTTP-anfrage für rückgabeprozess
     @PostMapping("/returnMedia") // definiert die http post-anforderung zur verarbeitung der medienrückgabe
     public String returnMedia(@RequestParam Long transactionId, Model model) { // methode zur rückgabe eines mediums
         try {
