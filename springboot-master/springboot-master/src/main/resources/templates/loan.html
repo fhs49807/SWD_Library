@@ -9,92 +9,95 @@
 </head>
 
 <body>
-    <main layout:fragment="content" th:remove="tag">
+<main layout:fragment="content" th:remove="tag">
 
-        <h2>Loan Media</h2>
+    <h2>Loan Media</h2>
 
-        <!-- Feedback Messages -->
-        <div th:if="${successMessage}" class="alert alert-success" th:text="${successMessage}"></div>
-        <div th:if="${errorMessage}" class="alert alert-danger" th:text="${errorMessage}"></div>
+    <!-- Feedback Messages -->
+    <div th:if="${successMessage}" class="alert alert-success" th:text="${successMessage}"></div>
+    <div th:if="${errorMessage}" class="alert alert-danger" th:text="${errorMessage}"></div>
 
-        <!-- Alert if the user is not logged in -->
-        <div sec:authorize="!isAuthenticated()">
-            <div class="alert alert-danger">
-                <span>You must log in to loan media!</span>
+    <!-- Alert if the user is not logged in -->
+    <div sec:authorize="!isAuthenticated()">
+        <div class="alert alert-danger">
+            <span>You must log in to loan media!</span>
+        </div>
+    </div>
+
+    <!-- Loan functionality for authenticated users -->
+    <div sec:authorize="isAuthenticated()">
+        <h3>Select Media to Loan</h3>
+
+        <!-- Dropdowns for filtering media -->
+        <form id="searchForm" th:action="@{/searchMedia}" method="get">
+            <div>
+                <label for="genre">Genre:</label>
+                <select id="genre" name="genre" class="form-control">
+                    <option th:each="genre : ${genres}" th:value="${genre}"
+                            th:text="${genre}" th:selected="${genre == selectedGenre}"></option>
+                </select>
             </div>
-        </div>
+            <div>
+                <label for="type">Media Type:</label>
+                <select id="type" name="type" class="form-control">
+                    <option th:each="type : ${mediaTypes}" th:value="${type}"
+                            th:text="${type}" th:selected="${type == selectedType}"></option>
+                </select>
+            </div>
+            <button type="submit" class="btn btn-primary mt-3">Search Media</button>
+        </form>
 
-        <!-- Loan functionality for authenticated users -->
-        <div sec:authorize="isAuthenticated()">
-            <h3>Select Media to Loan</h3>
+        <!-- Media table -->
+        <table class="table table-hover mt-4" th:if="${mediaList != null && mediaList.iterator().hasNext()}">
+            <thead>
+            <tr>
+                <th>Select</th>
+                <th>Media ID</th>
+                <th>Title</th>
+                <th>Genre</th>
+                <th>Type</th>
+            </tr>
+            </thead>
+            <tbody>
+            <tr th:each="media : ${mediaList}">
+                <td><input type="radio" name="selectedMedia" th:value="${media.id}"></td>
+                <td th:text="${media.id}"></td>
+                <td th:text="${media.name}"></td>
+                <td th:text="${media.genre.name}"></td>
+                <td th:text="${media.mediaType.type}"></td>
+            </tr>
+            </tbody>
+        </table>
 
-            <!-- Dropdowns for filtering media -->
-            <form id="searchForm" th:action="@{/searchMedia}" method="get">
-                <div>
-                    <label for="genre">Genre:</label>
-                    <select id="genre" name="genre" class="form-control">
-                        <option th:each="genre : ${genres}" th:value="${genre}"
-                                th:text="${genre}" th:selected="${genre == selectedGenre}"></option>
-                    </select>
-                </div>
-                <div>
-                    <label for="type">Media Type:</label>
-                    <select id="type" name="type" class="form-control">
-                        <option th:each="type : ${mediaTypes}" th:value="${type}"
-                                th:text="${type}" th:selected="${type == selectedType}"></option>
-                    </select>
-                </div>
-                <button type="submit" class="btn btn-primary mt-3">Search Media</button>
-            </form>
+        <!-- Loan date and submit -->
+        <form id="loanForm" th:action="@{/loanReserveMedia}" method="post"
+              th:if="${mediaList != null && mediaList.iterator().hasNext()}">
+            <div class="nativeDatePicker">
+                <label for="reserveStartDate">Select Start Date:</label>
+                <input type="date" id="reserveStartDate" name="reserveStartDate" th:value="${todayDate}"
+                       th:attr="min=${todayDate}" class="form-control" required>
+            </div>
+            <br>
+            <div class="nativeDatePicker">
+                <label for="reserveEndDate">Select End Date:</label>
+                <input type="date" id="reserveEndDate" name="reserveEndDate" th:attr="min=${todayDate}"
+                       class="form-control" required>
+            </div>
+            <input type="hidden" name="genre" th:value="${selectedGenre}">
+            <input type="hidden" name="type" th:value="${selectedType}">
+            <input type="hidden" id="selectedMedia" name="mediaId" value="">
+            <button type="submit" class="btn btn-success mt-3">Submit Loan</button>
+        </form>
+    </div>
 
-            <!-- Media table -->
-            <table class="table table-hover mt-4" th:if="${mediaList != null && mediaList.iterator().hasNext()}">
-                <thead>
-                    <tr>
-                        <th>Select</th>
-                        <th>Media ID</th>
-                        <th>Title</th>
-                        <th>Genre</th>
-                        <th>Type</th>
-                    </tr>
-                </thead>
-                <tbody>
-                    <tr th:each="media : ${mediaList}">
-                        <td><input type="radio" name="selectedMedia" th:value="${media.id}"></td>
-                        <td th:text="${media.id}"></td>
-                        <td th:text="${media.name}"></td>
-                        <td th:text="${media.genre.name}"></td>
-                        <td th:text="${media.mediaType.type}"></td>
-                    </tr>
-                </tbody>
-            </table>
-
-            <!-- Loan date and submit -->
-            <form id="loanForm" th:action="@{/loanReserveMedia}" method="post" th:if="${mediaList != null && mediaList.iterator().hasNext()}">
-                <div class="nativeDatePicker">
-                    <label for="reserveStartDate">Select Start Date:</label>
-                    <input type="date" id="reserveStartDate" name="reserveStartDate" th:value="${todayDate}" th:attr="min=${todayDate}" class="form-control" required>
-                </div>
-                <br>
-                <div class="nativeDatePicker">
-                    <label for="reserveEndDate">Select End Date:</label>
-                    <input type="date" id="reserveEndDate" name="reserveEndDate" th:attr="min=${todayDate}" class="form-control" required>
-                </div>
-                <input type="hidden" name="genre" th:value="${selectedGenre}">
-                <input type="hidden" name="type" th:value="${selectedType}">
-                <input type="hidden" id="selectedMedia" name="mediaId" value="">
-                <button type="submit" class="btn btn-success mt-3">Submit Loan</button>
-            </form>
-        </div>
-
-        <script>
-            // JavaScript to update hidden media ID field
-            document.querySelectorAll('input[name="selectedMedia"]').forEach(input => {
-                input.addEventListener('change', () => {
-                    document.getElementById('selectedMedia').value = input.value;
-                });
+    <script>
+        // JavaScript to update hidden media ID field
+        document.querySelectorAll('input[name="selectedMedia"]').forEach(input => {
+            input.addEventListener('change', () => {
+                document.getElementById('selectedMedia').value = input.value;
             });
-        </script>
-    </main>
+        });
+    </script>
+</main>
 </body>
 </html>

@@ -185,13 +185,17 @@ public class TemplateController {
             String username = authentication.getName();
             User user = userService.getByUsername(username);
 
+            // Berechnung von todayDate
+            LocalDate todayDate = LocalDate.now();
+
             // Filter media based on selected genre, type, and user FSK compliance
             Iterable<Media> mediaList = mediaService.searchMediaByGenreAndType(genre, type, user);
             model.addAttribute("genres", mediaService.getAllGenres());
             model.addAttribute("mediaTypes", mediaService.getAllMediaTypes());
             model.addAttribute("selectedGenre", genre); // Retain the selected genre
             model.addAttribute("selectedType", type);   // Retain the selected type
-            model.addAttribute("todayDate", LocalDate.now().toString());
+            model.addAttribute("todayDate", todayDate); // Datum von heute
+
 
             // Display error message if no media is found
             if (!mediaList.iterator().hasNext()) {

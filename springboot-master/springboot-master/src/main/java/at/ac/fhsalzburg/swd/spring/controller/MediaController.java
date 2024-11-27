@@ -107,6 +107,7 @@ public class MediaController extends BaseController {
         model.addAttribute("mediaList", mediaService.searchMediaByGenreAndType(selectedGenre, selectedType,
             userService.getByUsername(authentication.getName())));
 
+
         return "loan";
     }
 }
