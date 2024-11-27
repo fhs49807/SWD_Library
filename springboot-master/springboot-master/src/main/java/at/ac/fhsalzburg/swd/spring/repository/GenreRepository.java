@@ -11,5 +11,6 @@ public interface GenreRepository extends CrudRepository<Genre, Long> {
     @Transactional(timeout = 10)
     Genre findById(long id);
 
+	@Transactional(timeout = 10)
     Genre findByName(String n);
 }

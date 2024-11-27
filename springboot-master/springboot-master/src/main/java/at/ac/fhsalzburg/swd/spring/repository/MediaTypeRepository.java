@@ -7,10 +7,12 @@ import org.springframework.transaction.annotation.Transactional;
 import at.ac.fhsalzburg.swd.spring.model.MediaType;
 
 @Repository
-public interface MediaTypeRepository extends CrudRepository<MediaType, Integer> {
+public interface MediaTypeRepository extends CrudRepository<MediaType, Long> {
 
     @Transactional(timeout = 10)
     MediaType findById(int id);
+	
+	@Transactional(timeout = 10)
+	MediaType findByTypeName(String typeName);
 
-    MediaType findByType(String type);
 }

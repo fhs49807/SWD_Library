@@ -1,64 +1,60 @@
 package at.ac.fhsalzburg.swd.spring.model;
 
-import java.sql.Date;
+import java.util.List;
 
-import javax.persistence.Entity;
-import javax.persistence.Inheritance;
-import javax.persistence.InheritanceType;
-import javax.persistence.ManyToOne;
-
-import lombok.NoArgsConstructor;
+import javax.persistence.*;
 
 @Entity
-@Inheritance(strategy = InheritanceType.JOINED)
-//@DiscriminatorColumn   TODO: ??
-@NoArgsConstructor
-public class Media extends BaseEntity {
+@Inheritance(strategy = InheritanceType.JOINED) // create tables for inhereting classes
+public class Media {
 
-	private int barcode;// id?
-	private String availabilityStatus;
-	private Date dueDate; // remove??
+	@Id
+	@GeneratedValue(strategy = GenerationType.AUTO)
+	private Long id;
+
+	@Column(unique = true)
 	private String name;
+	private int FSK;
+	private double price;// set price automatically based on genre ('setGenre')
+
+	// Each Media item belongs to a single Genre (fantasy, sci fi, etc.)
+	// One Genre can have multiple Media items
+	@ManyToOne
+	private Genre genre;
+
+	// Each Media item has a single MediaType (book, audio, movie)
+	// One MediaType can have multiple Media items
+	@ManyToOne
+	private MediaType mediaType;
 
 	@ManyToOne
-	private MediaType mediaType;// one mediaType can have multiple medias??
+	@JoinColumn(name = "shelf_id")
+	private Shelf shelf;
 
-	@ManyToOne
-	private Library library;// one library can have multiple media
+	// One Media can have multiple Editions
+	@OneToMany(mappedBy = "media", cascade = CascadeType.ALL, orphanRemoval = true)
+	private List<Edition> editions;
 
-	public Media(int barcode, String availabilityStatus, Date dueDate, String name, MediaType mediaType,
-			Library library) {
-		super();
-		this.barcode = barcode;
-		this.availabilityStatus = availabilityStatus;
-		this.dueDate = dueDate;
+	public Media() {
+	}
+
+	public Media(String name, Genre genre, MediaType mediaType, Shelf shelf, int FSK) {
 		this.name = name;
+		this.genre = genre;
 		this.mediaType = mediaType;
-		this.library = library;
+		this.shelf = shelf;
+		this.FSK = FSK;
+		if (genre != null) {
+			this.price = genre.getPrice();
+		}
 	}
 
-	public int getBarcode() {
-		return barcode;
+	public Long getId() {
+		return id;
 	}
 
-	public void setBarcode(int barcode) {
-		this.barcode = barcode;
-	}
-
-	public String getAvailabilityStatus() {
-		return availabilityStatus;
-	}
-
-	public void setAvailabilityStatus(String availabilityStatus) {
-		this.availabilityStatus = availabilityStatus;
-	}
-
-	public Date getDueDate() {
-		return dueDate;
-	}
-
-	public void setDueDate(Date dueDate) {
-		this.dueDate = dueDate;
+	public void setId(Long id) {
+		this.id = id;
 	}
 
 	public String getName() {
@@ -69,6 +65,25 @@ public class Media extends BaseEntity {
 		this.name = name;
 	}
 
+	public double getPrice() {
+		return price;
+	}
+
+	public void setPrice(double price) {
+		this.price = price;
+	}
+
+	public Genre getGenre() {
+		return genre;
+	}
+
+	public void setGenre(Genre genre) {
+		this.genre = genre;
+		if (genre != null) {
+			this.price = genre.getPrice();
+		}
+	}
+
 	public MediaType getMediaType() {
 		return mediaType;
 	}
@@ -77,12 +92,20 @@ public class Media extends BaseEntity {
 		this.mediaType = mediaType;
 	}
 
-	public Library getLibrary() {
-		return library;
+	public Shelf getShelf() {
+		return shelf;
 	}
 
-	public void setLibrary(Library library) {
-		this.library = library;
+	public void setShelf(Shelf shelf) {
+		this.shelf = shelf;
+	}
+
+	public int getFSK() {
+		return FSK;
+	}
+
+	public void setFSK(int fSK) {
+		FSK = fSK;
 	}
 
 }

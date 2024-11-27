@@ -1,20 +1,23 @@
 package at.ac.fhsalzburg.swd.spring.model;
 
-import java.sql.Date;
+import java.util.Date;
 
 import javax.persistence.Entity;
 
 import lombok.NoArgsConstructor;
 
 @Entity
-@NoArgsConstructor
 public class Movie extends Media {
 
 	private String IMDb;
 
-	public Movie(int barcode, String availabilityStatus, Date dueDate, String name, MediaType mediaType,
-			Library library) {
-		super(barcode, availabilityStatus, dueDate, name, mediaType, library);
+	public Movie(String imdb, String name, Genre genre, MediaType mediaType, Shelf shelf, int FSK) {
+		super(name, genre, mediaType, shelf, FSK); // Call Media's constructor
+		this.IMDb = imdb;
+	}
+
+	public Movie() {
+
 	}
 
 	public String getIMDb() {

@@ -1,0 +1,61 @@
+<!DOCTYPE html>
+<html xmlns:layout="http://www.ultraq.net.nz/thymeleaf/layout"
+      xmlns:th="http://www.thymeleaf.org"
+      layout:decorate="~{layouts/main-layout}"
+      xmlns:sec="https://www.thymeleaf.org/thymeleaf-extras-springsecurity5">
+
+<head>
+    <title>Return Media</title>
+</head>
+
+<body>
+    <main layout:fragment="content" th:remove="tag">
+
+        <h2>Return Media</h2>
+
+        <!-- Feedback Messages -->
+        <div th:if="${successMessage}" class="alert alert-success" th:text="${successMessage}"></div>
+        <div th:if="${errorMessage}" class="alert alert-danger" th:text="${errorMessage}"></div>
+
+        <!-- Display user loans -->
+        <div>
+            <h3>Your Current Loans</h3>
+
+            <div th:if="${loans != null}">
+                <table class="table table-hover mt-4" th:if="${!loans.isEmpty()}">
+                    <thead>
+                        <tr>
+                            <th>Media Name</th>
+                            <th>Due Date</th>
+                            <th>Action</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        <tr th:each="transaction : ${loans}">
+                            <td th:text="${transaction.edition.media.name}">Media Name</td>
+                            <td th:text="${#dates.format(transaction.expirationDate, 'yyyy-MM-dd')}">Due Date</td>
+                            <td>
+                                <form th:action="@{/returnMedia}" method="post">
+                                    <input type="hidden" name="transactionId" th:value="${transaction.id}" />
+                                    <button type="submit" class="btn btn-danger">Return</button>
+                                </form>
+                            </td>
+                        </tr>
+                    </tbody>
+                </table>
+
+                <div th:if="${loans.isEmpty()}" class="alert alert-info">
+                    <p>No loans available to return.</p>
+                </div>
+            </div>
+
+            <div th:if="${loans == null}" class="alert alert-info">
+                <p>No loans available to return.</p>
+            </div>
+        </div>
+
+        <!-- Back to Loan Page Button -->
+        <a th:href="@{/loan}" class="btn btn-primary mt-3">Back to Loan Page</a>
+    </main>
+</body>
+</html>

@@ -1,21 +1,24 @@
 package at.ac.fhsalzburg.swd.spring.model;
 
-import java.sql.Date;
+import java.util.Date;
 
 import javax.persistence.Entity;
 
 import lombok.NoArgsConstructor;
 
 @Entity
-@NoArgsConstructor
 public class Audio extends Media {
 
 	private String codec;
 
-	public Audio(int barcode, String availabilityStatus, Date dueDate, String name, MediaType mediaType,
-			Library library) {
-		super(barcode, availabilityStatus, dueDate, name, mediaType, library);
-	}
+	public Audio(String codec, String name, Genre genre, MediaType mediaType, Shelf shelf, int FSK) {
+        super(name, genre, mediaType, shelf, FSK); // Call Media's constructor
+        this.codec = codec;
+    }
+	
+	public Audio() {
+        
+    }
 
 	public String getCodec() {
 		return codec;
