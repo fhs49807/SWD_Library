@@ -1,39 +1,72 @@
 package at.ac.fhsalzburg.swd.spring.model;
 
-import javax.persistence.Entity;
-import javax.persistence.Id;
-
 import lombok.NoArgsConstructor;
+
+import java.util.List;
+
+import javax.persistence.CascadeType;
+import javax.persistence.Entity;
+import javax.persistence.FetchType;
+import javax.persistence.GeneratedValue;
+import javax.persistence.GenerationType;
+import javax.persistence.Id;
+import javax.persistence.OneToMany;
+import javax.persistence.Table;
+
+//library name, library id, address
+
+//-->manage inventory of library
+//Methods: addMedia, createEdition, delete...
 
 @Entity
 @NoArgsConstructor
+@Table(name = "LIBRARIES")
 public class Library {
+
 	@Id
-    private Long id; 
+	@GeneratedValue(strategy = GenerationType.IDENTITY)
+	private Long id;
 
-	private int row;
-	private int shelf;
+	private String name;
+	private String location;
 
-	public Library(int row, int shelf) {
+	@OneToMany(mappedBy = "library", cascade = CascadeType.ALL, fetch = FetchType.LAZY)
+	private List<Section> sections;// one library has many sections
+
+	public Library(Long id, String name, String location, List<Section> sections) {
 		super();
-		this.row = row;
-		this.shelf = shelf;
+		this.id = id;
+		this.name = name;
+		this.location = location;
+		this.sections = sections;
 	}
 
-	public int getRow() {
-		return row;
+	public String getName() {
+		return name;
 	}
 
-	public void setRow(int row) {
-		this.row = row;
+	public void setName(String name) {
+		this.name = name;
 	}
 
-	public int getShelf() {
-		return shelf;
+	public String getLocation() {
+		return location;
 	}
 
-	public void setShelf(int shelf) {
-		this.shelf = shelf;
+	public void setLocation(String location) {
+		this.location = location;
+	}
+
+	public List<Section> getSections() {
+		return sections;
+	}
+
+	public void setSections(List<Section> sections) {
+		this.sections = sections;
+	}
+
+	public Long getId() {
+		return id;
 	}
 
 }

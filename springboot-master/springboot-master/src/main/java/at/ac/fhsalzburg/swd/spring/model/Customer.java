@@ -1,91 +1,77 @@
-package at.ac.fhsalzburg.swd.spring.model;
-
-import java.sql.Date;
-
-import javax.persistence.Column;
-import javax.persistence.Entity;
-import javax.persistence.GeneratedValue;
-import javax.persistence.GenerationType;
-import javax.persistence.Id;
-import javax.persistence.Table;
-
-import lombok.NoArgsConstructor;
-
-@Entity
-@Table(name = "CUSTOMER")
-@NoArgsConstructor
-public class Customer {
-	
-	
-	@Id
-//    @Column(name = "CUSTOMER_ID")
-//    @GeneratedValue(strategy = GenerationType.AUTO)
-	private int customerID;
-    private Date birthDate;
-    private String customerType; //remove?
-    private int loanLimit;
-    private String name;
-    
-    
-	public Customer(int customerID, Date birthDate, String customerType, int loanLimit, String name) {
-		super();
-		this.customerID = customerID;
-		this.birthDate = birthDate;
-		this.customerType = customerType;
-		this.loanLimit = loanLimit;
-		this.name = name;
-	}
-
-
-	public int getCustomerID() {
-		return customerID;
-	}
-
-
-	public void setCustomerID(int customerID) {
-		this.customerID = customerID;
-	}
-
-
-	public Date getBirthDate() {
-		return birthDate;
-	}
-
-
-	public void setBirthDate(Date birthDate) {
-		this.birthDate = birthDate;
-	}
-
-
-	public String getCustomerType() {
-		return customerType;
-	}
-
-
-	public void setCustomerType(String customerType) {
-		this.customerType = customerType;
-	}
-
-
-	public int getLoanLimit() {
-		return loanLimit;
-	}
-
-
-	public void setLoanLimit(int loanLimit) {
-		this.loanLimit = loanLimit;
-	}
-
-
-	public String getName() {
-		return name;
-	}
-
-
-	public void setName(String name) {
-		this.name = name;
-	}
-    	
-    
-    
-}
+//package at.ac.fhsalzburg.swd.spring.model;
+//
+//import lombok.AllArgsConstructor;
+//import lombok.NoArgsConstructor;
+//
+//import javax.persistence.*;
+//
+//import org.springframework.format.annotation.DateTimeFormat;
+//
+//import java.util.Date;
+//
+//@Entity
+//@Table(name = "CUSTOMERS")
+//@NoArgsConstructor
+//@AllArgsConstructor
+//public class Customer {
+//
+//	@Id
+//	@GeneratedValue(strategy = GenerationType.IDENTITY)
+//	private Long id;
+//
+//	@DateTimeFormat(pattern = "yyyy-MM-dd")
+//	private Date birthDate;
+//
+//	// customer role --> student, regular
+//	@Enumerated(EnumType.STRING)
+//	private CustomerType customerType;
+//
+//	private int loanLimit;// based on customerType enum
+//
+//	@Column(unique = true)
+//	private String name;// username
+//
+//	public Long getId() {
+//		return id;
+//	}
+//
+//	public void setId(Long id) {
+//		this.id = id;
+//	}
+//
+//	public Date getBirthDate() {
+//		return birthDate;
+//	}
+//
+//	public void setBirthDate(Date birthDate) {
+//		this.birthDate = birthDate;
+//	}
+//
+//	public CustomerType getCustomerType() {
+//		return customerType;
+//	}
+//
+//	public void setCustomerType(CustomerType customerType) {
+//		this.customerType = customerType;
+//	}
+//
+//	public int getLoanLimit() {
+//		return loanLimit;
+//	}
+//
+//	public void setLoanLimit(int loanLimit) {
+//		this.loanLimit = loanLimit;
+//	}
+//
+//	public String getName() {
+//		return name;
+//	}
+//
+//	public void setName(String name) {
+//		this.name = name;
+//	}
+//
+//	public enum CustomerType {
+//		STUDENT, REGULAR
+//	}
+//}

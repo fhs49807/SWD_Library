@@ -30,7 +30,7 @@ public class SecurityConfiguration {
 			.hasAnyRole("USER", "ADMIN") // everything under /user needs either user or admin role		
 	    .and().csrf().disable().formLogin() // add form based authentication
 	    	.loginPage("/login") // our login page
-	    	.defaultSuccessUrl("/") // where to go when login was successful
+	    	.defaultSuccessUrl("/", true) // where to go when login was successful
 	    	.failureUrl("/login-error")
 	    .and().csrf().disable().logout()    	
     		.logoutSuccessUrl("/") // where to go after logout

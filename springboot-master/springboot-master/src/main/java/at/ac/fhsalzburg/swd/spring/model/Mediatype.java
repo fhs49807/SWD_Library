@@ -5,38 +5,35 @@ import javax.persistence.GeneratedValue;
 import javax.persistence.GenerationType;
 import javax.persistence.Id;
 
-import lombok.NoArgsConstructor;
+//MediaType = Audio, Book, Movie
 
 @Entity
-@NoArgsConstructor
-public class Mediatype {
+public class MediaType {
 
 	@Id
 	@GeneratedValue(strategy = GenerationType.IDENTITY)
-	private int typeID;
+	private Long id;
 
-	private String type;
+	private String typeName;
 
-	// TODO: @ManyToOne Media??
-
-	public Mediatype(String type) {
-		this.type = type;
+	
+	public MediaType() {
 	}
-
-	public int getTypeID() {
-		return typeID;
-	}
-
-	public void setTypeID(int typeID) {
-		this.typeID = typeID;
+	
+	public MediaType(String typeName) {
+		this.typeName = typeName;
 	}
 
 	public String getType() {
-		return type;
+		return typeName;
 	}
 
-	public void setType(String type) {
-		this.type = type;
+	public void setType(String typeName) {
+		this.typeName = typeName;
 	}
 
+	public Long getId() {
+		return id;
+	}
+		
 }

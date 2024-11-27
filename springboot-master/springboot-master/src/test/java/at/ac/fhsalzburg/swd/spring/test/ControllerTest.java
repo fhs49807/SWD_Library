@@ -13,7 +13,6 @@ import java.util.Arrays;
 import java.util.Date;
 import java.util.List;
 
-import org.junit.Before;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
@@ -115,7 +114,7 @@ public class ControllerTest {
     @WithMockUser(username="test", roles = {"USER"})
     public void givenCustomer_whenGetCustomer_thenReturnJsonArrayTest() throws Exception {
 
-        User customer = new User("Max", "Mustermann", "max@muster.com", "123", new Date(),"","USER",null);
+        User customer = new User("Max", "Mustermann", "max@muster.com", "123", new Date(),"","USER",null, null, 0);
 
         List<User> allCustomers = Arrays.asList(customer);
 

@@ -2,36 +2,46 @@ package at.ac.fhsalzburg.swd.spring.model;
 
 import javax.persistence.*;
 
+//Genre = Fantasy, SciFi, etc.
+
 @Entity
 public class Genre {
-    @Id
-    @GeneratedValue(strategy = GenerationType.IDENTITY)
-    private Long id;
 
-    @Column(unique = true)
-    private String name;
+	@Id
+	@GeneratedValue(strategy = GenerationType.IDENTITY)
+	private Long id;
 
-    public Genre(String n){
-        this.name = n;
-    };
+	private String name;
+	private double price;
 
-    public Genre() {
+	public Genre() {
+	}
 
-    }
+	public Genre(Long id, String name, double price) {
+		super();
+		this.id = id;
+		this.name = name;
+		this.price = price;
+	}
 
-    public Long getId() {
-        return id;
-    }
+	public String getName() {
+		return name;
+	}
 
-    public void setId(Long id) {
-        this.id = id;
-    }
+	public void setName(String name) {
+		this.name = name;
+	}
 
-    public String getName() {
-        return name;
-    }
+	public Long getId() {
+		return id;
+	}
 
-    public void setName(String name) {
-        this.name = name;
-    }
+	public double getPrice() {
+		return price;
+	}
+
+	public void setPrice(double price) {
+		this.price = price;
+	}
+
 }

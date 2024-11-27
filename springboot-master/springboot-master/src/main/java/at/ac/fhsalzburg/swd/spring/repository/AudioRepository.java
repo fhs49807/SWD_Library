@@ -8,9 +8,9 @@ import at.ac.fhsalzburg.swd.spring.model.Audio;
 import at.ac.fhsalzburg.swd.spring.model.Media;
 
 @Repository
-public interface AudioRepository extends CrudRepository<Audio, Integer> {
+public interface AudioRepository extends CrudRepository<Audio, Long> {
 
 	@Transactional(timeout = 10)
-	Media findById(int id);
+	Media findById(long id);
 
 }

@@ -18,10 +18,9 @@ public class OrderService implements OrderServiceInterface {
 
     private final UserServiceInterface userService;
 
-    @Autowired
     private final OrderRepository repo;
 
-    
+
     public OrderService(UserServiceInterface userService, OrderRepository orderRepo) {
     	this.userService = userService;
     	this.repo = orderRepo;

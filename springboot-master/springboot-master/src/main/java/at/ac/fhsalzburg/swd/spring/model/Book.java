@@ -1,29 +1,31 @@
 package at.ac.fhsalzburg.swd.spring.model;
 
-import java.sql.Date;
-import org.springframework.http.MediaType;
+import java.util.Date;
 
 import javax.persistence.Entity;
 
 import lombok.NoArgsConstructor;
 
 @Entity
-@NoArgsConstructor
 public class Book extends Media {
 
 	private String ISBN;
 
-	public Book(int barcode, String availabilityStatus, Date dueDate, String name, MediaType mediaType,
-			Library library) {
-		super(barcode, availabilityStatus, dueDate, name, mediaType, library);
+	public Book(String ISBN, String name, Genre genre, MediaType mediaType, Shelf shelf, int FSK) {
+        super(name, genre, mediaType, shelf, FSK); // Call Media's constructor
+        this.ISBN = ISBN; // Initialize Book-specific field
+    }
+
+	public Book() {
+		// TODO Auto-generated constructor stub
 	}
 
 	public String getISBN() {
 		return ISBN;
 	}
 
-	public void setISBN(String iSBN) {
-		ISBN = iSBN;
+	public void setISBN(String ISBN) {
+		this.ISBN = ISBN;
 	}
 
 }
