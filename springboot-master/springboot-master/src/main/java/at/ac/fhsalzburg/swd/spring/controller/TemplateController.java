@@ -185,13 +185,19 @@ public class TemplateController {
             String username = authentication.getName();
             User user = userService.getByUsername(username);
 
+            // Berechnung von todayDate
+            LocalDate todayDate = LocalDate.now();
+            LocalDate endDate = todayDate.plusDays(1);
+
             // Filter media based on selected genre, type, and user FSK compliance
             Iterable<Media> mediaList = mediaService.searchMediaByGenreAndType(genre, type, user);
             model.addAttribute("genres", mediaService.getAllGenres());
             model.addAttribute("mediaTypes", mediaService.getAllMediaTypes());
             model.addAttribute("selectedGenre", genre); // Retain the selected genre
             model.addAttribute("selectedType", type);   // Retain the selected type
-            model.addAttribute("todayDate", LocalDate.now().toString());
+            model.addAttribute("todayDate", todayDate); // Datum von heute
+            model.addAttribute("endDate", endDate);
+
 
             // Display error message if no media is found
             if (!mediaList.iterator().hasNext()) {
@@ -263,11 +269,13 @@ public class TemplateController {
 
     @GetMapping("/returnMedia") // definiert die http get-anforderung, um die seite zur medienrückgabe anzuzeigen
     public String showReturnMediaPage(Model model,
-            @CurrentSecurityContext(expression = "authentication") Authentication authentication) {
+        @CurrentSecurityContext(expression = "authentication") Authentication authentication) {
         if (!(authentication instanceof AnonymousAuthenticationToken)) { // prüft, ob der benutzer authentifiziert ist
             String username = authentication.getName(); // holt den benutzernamen des aktuell angemeldeten benutzers
-            User user = userService.getByUsername(username); // holt den benutzer anhand des benutzernamens aus der datenbank
-            Collection<MediaTransaction> loans = mediaTransactionService.findLoansByUser(user); // holt alle ausleihen des benutzers
+            User user =
+                userService.getByUsername(username); // holt den benutzer anhand des benutzernamens aus der datenbank
+            Collection<MediaTransaction> loans =
+                mediaTransactionService.findLoansByUser(user); // holt alle ausleihen des benutzers
             if (loans == null) { // prüft, ob loans null ist
                 loans = List.of(); // setzt loans auf eine leere liste, falls keine ausleihen vorhanden sind
             }
@@ -280,10 +288,13 @@ public class TemplateController {
     @PostMapping("/returnMedia") // definiert die http post-anforderung zur verarbeitung der medienrückgabe
     public String returnMedia(@RequestParam Long transactionId, Model model) { // methode zur rückgabe eines mediums
         try {
-            mediaTransactionService.returnMedia(transactionId); // aufruf der service-methode, um die rückgabe zu verarbeiten
-            model.addAttribute("successMessage", "Media returned successfully."); // fügt eine erfolgsmeldung zum modell hinzu
+            mediaTransactionService.returnMedia(
+                transactionId); // aufruf der service-methode, um die rückgabe zu verarbeiten
+            model.addAttribute("successMessage",
+                "Media returned successfully."); // fügt eine erfolgsmeldung zum modell hinzu
         } catch (Exception e) { // behandelt fehler, falls die rückgabe fehlschlägt
-            model.addAttribute("errorMessage", "Error returning media: " + e.getMessage()); // fügt eine fehlermeldung zum modell hinzu
+            model.addAttribute("errorMessage",
+                "Error returning media: " + e.getMessage()); // fügt eine fehlermeldung zum modell hinzu
         }
         return "redirect:/returnMedia"; // leitet zur rückgabeseite um, um die aktualisierte ansicht anzuzeigen
     }
