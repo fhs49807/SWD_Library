@@ -152,6 +152,7 @@ public class UserService implements UserServiceInterface {
 		return true;
 	}
 	
+	//aktualisiert das guthaben des user nach der abwicklung der rückgabe
 	public void updateUser(User user) {
 	    repo.save(user);  // änderungen des users in datenbank speichern
 	}
