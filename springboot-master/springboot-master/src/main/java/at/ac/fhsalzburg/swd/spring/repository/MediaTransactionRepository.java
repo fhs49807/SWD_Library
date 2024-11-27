@@ -20,7 +20,7 @@ import org.springframework.transaction.annotation.Transactional;
 public interface MediaTransactionRepository extends CrudRepository<MediaTransaction, Long> {
 
 	@Transactional(timeout = 10)
-	Optional<MediaTransaction> findById(long id);
+	Optional<MediaTransaction> findById(long id); //findet die spezifische transaktion basierend auf der ID -> MediaTransactionService mediaTransactionRepository.save(transaction)
 
 	@Transactional(timeout = 10)
     Collection<MediaTransaction> findByEdition(Edition edition);
