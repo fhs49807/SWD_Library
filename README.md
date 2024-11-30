@@ -11,3 +11,4 @@
 - Create unit test for UI
 - Isolate the unit tests by mocking
 - If date(today) > ExpirationDate ---> Status = overdue + invoice anpassen
+- Mahnungen/Erinnerungen jede Woche --> also nur wenn es länger als 7 Tage ausgeliehen wird
