@@ -107,8 +107,8 @@ public class MediaController extends BaseController {
         model.addAttribute("selectedType", selectedType);
         model.addAttribute("mediaList", mediaService.searchMediaByGenreAndType(selectedGenre, selectedType,
             userService.getByUsername(username)));
-        model.addAttribute("todayDate", DateUtils.getLocalDateFromDate(reserveStartDate));
-        model.addAttribute("endDate", DateUtils.getLocalDateFromDate(reserveEndDate));
+        model.addAttribute("todayDate", DateUtils.getLocalDateFromDate(new Date()));
+        model.addAttribute("endDate", DateUtils.getLocalDateFromDate(new Date()).plusDays(1));
 
         addErrorMessage(errorMessage, model);
 

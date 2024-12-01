@@ -29,16 +29,10 @@ public class ReserveMediaTransactionService implements ReserveMediaTransactionSe
     @Override
     public void reserveMediaForCustomer(String userName, Long mediaId, Date reserveStartDate, Date reserveEndDate) {
         User user = userService.getByUsername(userName);
-        Media media = mediaService.findById(mediaId); // TODO
-        reserveMediaForCustomer(user, media.getName(), reserveStartDate, reserveEndDate);
-    }
-
-    @Override
-    public void reserveMediaForCustomer(User user, String mediaName, Date reserveStartDate, Date reserveEndDate) {
-        Media media = mediaService.findByName(mediaName);
+        Media media = mediaService.findById(mediaId);
 
         // check if media is available
-        List<Edition> editions = editionService.findByMediaAndAvailable(media);
+        List<Edition> editions = editionService.findAvailableForReserve(media, reserveStartDate, reserveEndDate);
         if (editions.isEmpty()) {
             // media is not available => reserve media for customer
             //ReserveMediaTransaction reserveMediaTransaction = new ReserveMediaTransaction(user, media);
