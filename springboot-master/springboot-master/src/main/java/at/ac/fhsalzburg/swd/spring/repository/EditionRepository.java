@@ -1,6 +1,7 @@
 package at.ac.fhsalzburg.swd.spring.repository;
 
 import java.util.Collection;
+import java.util.Date;
 import java.util.List;
 
 import org.springframework.data.jpa.repository.Query;
@@ -25,5 +26,11 @@ public interface EditionRepository extends CrudRepository<Edition, Long> {
 	// finds all available editions associated with specific media item
 	@Query("SELECT e FROM Edition e WHERE e.media = :media AND e.available = true")
 	List<Edition> findByMediaAndAvailable(@Param("media") Media media);
+
+    @Query("SELECT e " +
+           "FROM Edition e left join ReserveMediaTransaction t on t.edition = e " +
+           "WHERE e.media = :media " +
+           "AND (t is null OR t.reserveStartDate > :endDate or t.reserveEndDate < :startDate)")
+    List<Edition> findAvailableForReserve(Media media, Date startDate, Date endDate);
 
 }

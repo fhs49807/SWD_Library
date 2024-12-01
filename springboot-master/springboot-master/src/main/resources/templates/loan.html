@@ -11,7 +11,7 @@
 <body>
 <main layout:fragment="content" th:remove="tag">
 
-    <h2>Loan Media</h2>
+    <h2>Loan/Reserve Media</h2>
 
     <!-- Feedback Messages -->
     <div th:if="${successMessage}" class="alert alert-success" th:text="${successMessage}"></div>
@@ -26,7 +26,7 @@
 
     <!-- Loan functionality for authenticated users -->
     <div sec:authorize="isAuthenticated()">
-        <h3>Select Media to Loan</h3>
+        <h3>Select Media</h3>
 
         <!-- Dropdowns for filtering media -->
         <form id="searchForm" th:action="@{/searchMedia}" method="get">
@@ -84,10 +84,10 @@
                        th:attr="min=${todayDate}"
                        class="form-control" required>
             </div>
-            <input type="hidden" name="genre" th:value="${selectedGenre}">
-            <input type="hidden" name="type" th:value="${selectedType}">
+            <input type="hidden" name="selectedGenre" th:value="${selectedGenre}">
+            <input type="hidden" name="selectedType" th:value="${selectedType}">
             <input type="hidden" id="selectedMedia" name="mediaId" value="">
-            <button type="submit" class="btn btn-success mt-3">Submit Loan</button>
+            <button type="submit" class="btn btn-success mt-3">Submit</button>
         </form>
     </div>
 

@@ -24,16 +24,13 @@ public class User {
 	private String role;
 	private String jwttoken;
 
-	@GeneratedValue(strategy = GenerationType.IDENTITY)
-	private Long id; // unique identifier but not primary key
-
 	// customer role --> student, regular
 	@Enumerated(EnumType.STRING)
 	private CustomerType customerType;
 
 	private int loanLimit;// based on customerType enum
 
-	// defailt constructor
+	// default constructor
 	public User() {
 	}
 
@@ -50,16 +47,6 @@ public class User {
 		this.jwttoken = jwtToken;
 		this.customerType = customerType;
 		this.loanLimit = loanLimit;
-//		this.id = id;
-
-	}
-
-	public Long getId() {
-		return id;
-	}
-
-	public void setId(Long id) {
-		this.id = id;
 	}
 
 	public CustomerType getCustomerType() {
