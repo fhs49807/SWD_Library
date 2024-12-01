@@ -6,6 +6,7 @@ import at.ac.fhsalzburg.swd.spring.services.MediaServiceInterface;
 import at.ac.fhsalzburg.swd.spring.services.MediaTransactionServiceInterface;
 import at.ac.fhsalzburg.swd.spring.services.ReserveMediaTransactionServiceInterface;
 import at.ac.fhsalzburg.swd.spring.services.UserServiceInterface;
+import at.ac.fhsalzburg.swd.spring.util.DateUtils;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.security.authentication.AnonymousAuthenticationToken;
 import org.springframework.security.core.Authentication;
@@ -16,7 +17,6 @@ import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestMethod;
 import org.springframework.web.bind.annotation.RequestParam;
 
-import java.text.SimpleDateFormat;
 import java.util.Date;
 import java.util.List;
 
@@ -39,8 +39,8 @@ public class MediaController extends BaseController {
     @SuppressWarnings("unused")
     public String loanReserveMedia(
         @RequestParam(required = false) Long mediaId,
-        @RequestParam(required = false) String reserveStartDate, // TODO better as Date object
-        @RequestParam(required = false) String reserveEndDate,
+        @RequestParam(required = false) Date reserveStartDate,
+        @RequestParam(required = false) Date reserveEndDate,
         @RequestParam(required = false) String selectedGenre,
         @RequestParam(required = false) String selectedType,
         @CurrentSecurityContext(expression = "authentication") Authentication authentication,
@@ -50,50 +50,33 @@ public class MediaController extends BaseController {
 
             // Validate required fields
             if (mediaId == null || reserveStartDate == null || reserveEndDate == null) {
-                addErrorMessage("Please select a media item and specify the reserve date period.", model);
-
-                // Populate genres, media types, and reapply user selections
-                model.addAttribute("genres", mediaService.getAllGenres());
-                model.addAttribute("mediaTypes", mediaService.getAllMediaTypes());
-                model.addAttribute("selectedGenre", selectedGenre);
-                model.addAttribute("selectedType", selectedType);
-                model.addAttribute("mediaList", mediaService.searchMediaByGenreAndType(selectedGenre, selectedType,
-                    userService.getByUsername(username)));
-
-                return "loan";
+                return handleError("Please select a media item and specify the reserve date period.", reserveStartDate,
+                    reserveEndDate, selectedGenre, selectedType, username, model);
+            } else if (reserveStartDate.after(reserveEndDate)) {
+                return handleError("Start date has to be on the same day or after end date", reserveStartDate,
+                    reserveEndDate, selectedGenre, selectedType, username, model);
             }
 
-            try {
-                // Parse the reserve start date
-                Date parsedReserveStartDate = new SimpleDateFormat("yyyy-MM-dd").parse(reserveStartDate);
-
-                Date today = new Date();
-                if (parsedReserveStartDate.after(today)) {
-                    Date parsedReserveEndDate = new SimpleDateFormat("yyyy-MM-dd").parse(reserveEndDate);
-                    reserveMediaTransactionService.reserveMediaForCustomer(username, mediaId, parsedReserveStartDate,
-                        parsedReserveEndDate);
-                }
-
-                // Create the transaction
-                MediaTransaction transaction =
-                    mediaTransactionService.loanMedia(username, mediaId, parsedReserveStartDate);
-
-                // Populate success details
-                Media media = transaction.getEdition().getMedia();
-                model.addAttribute("username", username);
-                model.addAttribute("loanDate", reserveStartDate);
-                model.addAttribute("mediaId", mediaId);
-                model.addAttribute("mediaTitle", media.getName());
-                model.addAttribute("mediaGenre", media.getGenre().getName());
-                model.addAttribute("mediaType", media.getMediaType().getType());
-                model.addAttribute("editionIds", List.of(transaction.getEdition().getId()));
-
-                return "loanSuccess";
-            } catch (IllegalStateException e) {
-                addErrorMessage(e.getMessage(), model);
-            } catch (Exception e) {
-                addErrorMessage("Error creating loan: " + e.getMessage(), model);
+            if (reserveStartDate.after(new Date())) {
+                reserveMediaTransactionService.reserveMediaForCustomer(username, mediaId, reserveStartDate,
+                    reserveEndDate);
             }
+
+            // Create the transaction
+            MediaTransaction transaction =
+                mediaTransactionService.loanMedia(username, mediaId, reserveStartDate);
+
+            // Populate success details
+            Media media = transaction.getEdition().getMedia();
+            model.addAttribute("username", username);
+            model.addAttribute("loanDate", reserveStartDate);
+            model.addAttribute("mediaId", mediaId);
+            model.addAttribute("mediaTitle", media.getName());
+            model.addAttribute("mediaGenre", media.getGenre().getName());
+            model.addAttribute("mediaType", media.getMediaType().getType());
+            model.addAttribute("editionIds", List.of(transaction.getEdition().getId()));
+
+            return "loanSuccess";
         } else {
             addErrorMessage("You must log in to loan media.", model);
         }
@@ -107,6 +90,27 @@ public class MediaController extends BaseController {
         model.addAttribute("mediaList", mediaService.searchMediaByGenreAndType(selectedGenre, selectedType,
             userService.getByUsername(authentication.getName())));
 
+        return "loan";
+    }
+
+    /**
+     * Return to loan page with default data and error message.
+     *
+     * @return path to loan html page
+     */
+    private String handleError(String errorMessage, Date reserveStartDate, Date reserveEndDate, String selectedGenre,
+        String selectedType, String username, Model model) {
+        // Populate genres, media types, and reapply user selections
+        model.addAttribute("genres", mediaService.getAllGenres());
+        model.addAttribute("mediaTypes", mediaService.getAllMediaTypes());
+        model.addAttribute("selectedGenre", selectedGenre);
+        model.addAttribute("selectedType", selectedType);
+        model.addAttribute("mediaList", mediaService.searchMediaByGenreAndType(selectedGenre, selectedType,
+            userService.getByUsername(username)));
+        model.addAttribute("todayDate", DateUtils.getLocalDateFromDate(reserveStartDate));
+        model.addAttribute("endDate", DateUtils.getLocalDateFromDate(reserveEndDate));
+
+        addErrorMessage(errorMessage, model);
 
         return "loan";
     }
