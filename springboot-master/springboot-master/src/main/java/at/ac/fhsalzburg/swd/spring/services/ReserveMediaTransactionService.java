@@ -27,6 +27,13 @@ public class ReserveMediaTransactionService implements ReserveMediaTransactionSe
     private UserServiceInterface userService;
 
     @Override
+    public ReserveMediaTransaction getLatestReservation(Long mediaId, String username) {
+        return reserveMediaTransactionRepository.findTopByEdition_Media_IdAndUser_UsernameOrderByIdDesc(mediaId, username)
+                .orElseThrow(() -> new IllegalArgumentException("No reservation found for user and media."));
+    }
+
+    
+    @Override
     public void reserveMediaForCustomer(String userName, Long mediaId, Date reserveStartDate, Date reserveEndDate) {
         User user = userService.getByUsername(userName);
         Media media = mediaService.findById(mediaId);

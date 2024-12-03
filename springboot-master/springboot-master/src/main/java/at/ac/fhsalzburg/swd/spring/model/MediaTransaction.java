@@ -31,13 +31,14 @@ public class MediaTransaction {
 	private ReturnCondition condition;
 
 	@DateTimeFormat(pattern = "yyyy-MM-dd")
-	private Date end_date;// start_date + days Loaned for
-
-	@DateTimeFormat(pattern = "yyyy-MM-dd")
-	private Date last_possible_return_date;// date when loan expires and penalties apply
-
-	@DateTimeFormat(pattern = "yyyy-MM-dd")
 	private Date start_date;// date when item was loaned or reserved
+
+	@DateTimeFormat(pattern = "yyyy-MM-dd")
+	private Date end_date;// start_date + days Loaned for (selected end_date)
+
+	@DateTimeFormat(pattern = "yyyy-MM-dd")
+	private Date last_possible_return_date;// date when loan expires and penalties apply (depends on customer type -->
+											// student/regular)
 
 	@DateTimeFormat(pattern = "yyyy-MM-dd")
 	private Date return_date; // date when item was actually returned
@@ -67,13 +68,15 @@ public class MediaTransaction {
 		this.status = TransactionStatus.ACTIVE; // default status: ACTIVE
 	}
 
+	//constructor used to create transaction in MediaTransactionService.java
 	public MediaTransaction(Date transactionDate, Date expirationDate, Edition edition, User user) {
-		this.start_date = transactionDate;
-		this.last_possible_return_date = expirationDate;
-		this.edition = edition;
-		this.user = user;
-		this.status = TransactionStatus.ACTIVE; // Default status
+	    this.start_date = transactionDate;
+	    this.last_possible_return_date = expirationDate;
+	    this.edition = edition;
+	    this.user = user;
+	    this.status = TransactionStatus.ACTIVE; // Default status
 	}
+
 
 	public TransactionStatus getStatus() {
 		return status;
@@ -91,28 +94,28 @@ public class MediaTransaction {
 		this.condition = condition;
 	}
 
-	public Date getExpectedReturnDate() {
+	public Date getEnd_date() {
 		return end_date;
 	}
 
-	public void setExpectedReturnDate(Date expectedReturnDate) {
-		this.end_date = expectedReturnDate;
+	public void setEnd_date(Date end_date) {
+		this.end_date = end_date;
 	}
 
-	public Date getExpirationDate() {
+	public Date getLast_possible_return_date() {
 		return last_possible_return_date;
 	}
 
-	public void setExpirationDate(Date expirationDate) {
-		this.last_possible_return_date = expirationDate;
+	public void setLast_possible_return_date(Date last_possible_return_date) {
+		this.last_possible_return_date = last_possible_return_date;
 	}
 
-	public Date getTransactionDate() {
+	public Date getStart_date() {
 		return start_date;
 	}
 
-	public void setTransactionDate(Date transactionDate) {
-		this.start_date = transactionDate;
+	public void setStart_date(Date start_date) {
+		this.start_date = start_date;
 	}
 
 	public Date getReturnDate() {

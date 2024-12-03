@@ -73,17 +73,18 @@
         <form id="loanForm" th:action="@{/loanReserveMedia}" method="post"
               th:if="${mediaList != null && mediaList.iterator().hasNext()}">
             <div class="nativeDatePicker">
-                <label for="reserveStartDate">Select Start Date:</label>
-                <input type="date" id="reserveStartDate" name="reserveStartDate" th:value="${todayDate}"
-                       th:attr="min=${todayDate}" class="form-control" required>
-            </div>
-            <br>
-            <div class="nativeDatePicker">
-                <label for="reserveEndDate">Select End Date:</label>
-                <input type="date" id="reserveEndDate" name="reserveEndDate" th:value="${endDate}"
-                       th:attr="min=${todayDate}"
-                       class="form-control" required>
-            </div>
+    <label for="start_date">Select Start Date:</label>
+    <input type="date" id="start_date" name="start_date" th:value="${todayDate}"
+           th:attr="min=${todayDate}" class="form-control" required>
+</div>
+<br>
+<div class="nativeDatePicker">
+    <label for="end_date">Select End Date:</label>
+    <input type="date" id="end_date" name="end_date" th:value="${endDate}"
+           th:attr="min=${todayDate.plusDays(1)}" class="form-control" required>
+</div>
+
+
             <input type="hidden" name="selectedGenre" th:value="${selectedGenre}">
             <input type="hidden" name="selectedType" th:value="${selectedType}">
             <input type="hidden" id="selectedMedia" name="mediaId" value="">
