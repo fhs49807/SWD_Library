@@ -5,7 +5,6 @@
 - Context Diagram aufräumen
 
 
-  </br></br>
 ## UI
 - on LoanSuccess html --> Add start_date and end_date instead of loan_date
 - on LoanSuccess html --> rename header to reserve/loan success depending on method run
@@ -13,7 +12,6 @@
 - add returnMediaSuccess html page with details (return date, etc.) and fee calculations
 
   
-  </br></br>
 ## Database
 - START_DATE --> incorrect assignment of start_date (currently uses transaction_date when reserving media for the future)
 - END_DATE --> end date currently incorrectly calculated as START_DATE + 14 days
@@ -21,7 +19,6 @@
 - TRANSACTIONS_MEDIA --> remove table (everything is in TRANSACTIONS table)
 
 
-  </br></br>
 ## Backend
 - Wartelisten Logik fuer ReserveMedia
 - Fix Autowires (@Autowire (Dependency Injection))
@@ -31,7 +28,6 @@
 - check loanLimits (loanAmount & max loanPeriod)
 
 
-  </br></br>
 ## Unit Tests
 - Create at least one unit test for each selected use-case --> remove use cases from clsr
 - Isolate the unit tests by mocking
