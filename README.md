@@ -6,7 +6,7 @@
 
 
   </br></br>
-##UI
+## UI
 - on LoanSuccess html --> Add start_date and end_date instead of loan_date
 - on LoanSuccess html --> rename header to reserve/loan success depending on method run
 - Return Media Page --> completed transactions are not removed from view
@@ -14,7 +14,7 @@
 
   
   </br></br>
-##Database
+## Database
 - START_DATE --> incorrect assignment of start_date (currently uses transaction_date when reserving media for the future)
 - END_DATE --> end date currently incorrectly calculated as START_DATE + 14 days
 - LAST_POSSIBLE_RETURN_DATE --> set depending on customer type (student/ regular loan durations)
@@ -22,7 +22,7 @@
 
 
   </br></br>
-##Backend
+## Backend
 - Wartelisten Logik fuer ReserveMedia
 - Fix Autowires (@Autowire (Dependency Injection))
 - If date(today) > ExpirationDate ---> Status = overdue + invoice anpassen
@@ -32,7 +32,7 @@
 
 
   </br></br>
-##Unit Tests
+## Unit Tests
 - Create at least one unit test for each selected use-case --> remove use cases from clsr
 - Isolate the unit tests by mocking
 - Create unit test for UI
