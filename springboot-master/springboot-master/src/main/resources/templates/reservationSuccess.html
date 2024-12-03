@@ -5,28 +5,24 @@
       xmlns:sec="https://www.thymeleaf.org/thymeleaf-extras-springsecurity5">
 
 <head>
-    <title>Loan Success</title>
+    <title>Reservation Success</title>
 </head>
 
 <body>
     <main layout:fragment="content" th:remove="tag">
 
-        <h1>Loan Successful!</h1>
-        <p>Thank you for your loan request. Here are the details:</p>
+        <h1>Reservation Successful!</h1>
+        <p>Thank you for your reservation request. Here are the details:</p>
         <ul>
             <li><strong>Username:</strong> <span th:text="${username}"></span></li>
-            <li><strong>Transaction Date:</strong> <span th:text="${transaction_date}"></span></li>
+            <li><strong>Reservation Date:</strong> <span th:text="${reservation_date}"></span></li>
             <li><strong>Start Date:</strong> <span th:text="${start_date}"></span></li>
             <li><strong>End Date:</strong> <span th:text="${end_date}"></span></li>
             <li><strong>Media ID:</strong> <span th:text="${mediaId}"></span></li>
             <li><strong>Media Title:</strong> <span th:text="${mediaTitle}"></span></li>
             <li><strong>Genre:</strong> <span th:text="${mediaGenre}"></span></li>
             <li><strong>Media Type:</strong> <span th:text="${mediaType}"></span></li>
-            <li><strong>Edition IDs:</strong>
-                <ul>
-                    <li th:each="id : ${editionIds}" th:text="${id}"></li>
-                </ul>
-            </li>
+            <li><strong>Edition ID:</strong> <span th:text="${editionId}"></span></li>
         </ul>
         <a href="/" class="btn btn-primary">Back to Homepage</a>
     </main>

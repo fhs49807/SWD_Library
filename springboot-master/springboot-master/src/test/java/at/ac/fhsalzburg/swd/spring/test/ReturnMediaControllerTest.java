@@ -68,7 +68,7 @@ public class ReturnMediaControllerTest {
         User mockUser = new User("john.doe", "John Doe", "john.doe@example.com", "123456789", new Date(), "pw", "USER", null, null, 5);
         MediaTransaction transaction = new MediaTransaction();
         transaction.setId(1L); // setzt die id der transaktion auf 1
-        transaction.setTransactionDate(new Date()); // setzt das transaktionsdatum
+        transaction.setStart_date(new Date()); // setzt das transaktionsdatum
         Collection<MediaTransaction> mockLoans = Arrays.asList(transaction); // erstellt eine liste mit mock-transaktionen
 
         when(userService.getByUsername(anyString())).thenReturn(mockUser); // mockuser wird zurückgegeben, wenn der userService getByUsername aufgerufen wird
@@ -100,10 +100,10 @@ public class ReturnMediaControllerTest {
     public void givenLateReturn_whenReturnMedia_thenInvoiceCreated() throws Exception {
         MediaTransaction transaction = new MediaTransaction(); // erstelle eine neue instanz von media transaction
         transaction.setId(1L); // setze die id der transaktion auf 1
-        transaction.setTransactionDate(new Date()); // setze das transaktionsdatum auf das aktuelle datum
+        transaction.setStart_date(new Date()); // setze das transaktionsdatum auf das aktuelle datum
         
         Date expirationDate = new Date(System.currentTimeMillis() - (1000 * 60 * 60 * 24 * 2));  // 2 tage verspätet
-        transaction.setExpirationDate(expirationDate); // setze das fälligkeitsdatum der transaktion
+        transaction.setLast_possible_return_date(expirationDate); // setze das fälligkeitsdatum der transaktion
         transaction.setStatus(MediaTransaction.TransactionStatus.ACTIVE); // setze den status der transaktion auf "aktiv"
         transaction.setReturnDate(new Date());  // setze das rückgabedatum auf heute
 

@@ -35,268 +35,267 @@ import java.util.List;
 // establish the routing table to know which methods serve which endpoints.
 public class TemplateController {
 
-    Logger logger = LoggerFactory.getLogger(TemplateController.class);
+	Logger logger = LoggerFactory.getLogger(TemplateController.class);
 
-    // Dependency Injection
-    // ----------------------------------------------------------------------
+	// Dependency Injection
+	// ----------------------------------------------------------------------
 
-    @Autowired // To wire the application parts together, use @Autowired on the fields,
-    // constructors, or methods in a component. Spring's dependency injection
-    // mechanism
-    // wires appropriate beans into the class members marked with @Autowired.
-    private ApplicationContext context;
+	@Autowired // To wire the application parts together, use @Autowired on the fields,
+	// constructors, or methods in a component. Spring's dependency injection
+	// mechanism
+	// wires appropriate beans into the class members marked with @Autowired.
+	private ApplicationContext context;
 
-    @Autowired
-    private EntityManager entityManager;
+	@Autowired
+	private EntityManager entityManager;
 
-    @Autowired
-    UserServiceInterface userService;
+	@Autowired
+	UserServiceInterface userService;
 
-    @Autowired
-    MediaService mediaService;
+	@Autowired
+	MediaService mediaService;
 
-    @Autowired
-    MediaTransactionService mediaTransactionService;
+	@Autowired
+	MediaTransactionService mediaTransactionService;
 
-    @Resource(name = "sessionBean") // The @Resource annotation is part of the JSR-250 annotation
-    // collection and is packaged with Jakarta EE. This annotation
-    // has the following execution paths, listed by Match by Name,
-    // Match by Type, Match by Qualifier. These execution paths are
-    // applicable to both setter and field injection.
-    // https://www.baeldung.com/spring-annotations-resource-inject-autowire
-    TestBean sessionBean;
+	@Resource(name = "sessionBean") // The @Resource annotation is part of the JSR-250 annotation
+	// collection and is packaged with Jakarta EE. This annotation
+	// has the following execution paths, listed by Match by Name,
+	// Match by Type, Match by Qualifier. These execution paths are
+	// applicable to both setter and field injection.
+	// https://www.baeldung.com/spring-annotations-resource-inject-autowire
+	TestBean sessionBean;
 
-    @Autowired
-    TestBean singletonBean;
+	@Autowired
+	TestBean singletonBean;
 
-    // HTTP Request Mappings GET/POST/... and URL Paths
-    // ----------------------------------------------------------------------
+	// HTTP Request Mappings GET/POST/... and URL Paths
+	// ----------------------------------------------------------------------
 
-    @RequestMapping("/") // The @RequestMapping(method = RequestMethod.GET, value = "/path")
-    // annotation specifies a method in the controller that should be
-    // responsible for serving the HTTP request to the given path. Spring will
-    // work the implementation details of how it's done. You simply specify the
-    // path value on the annotation and Spring will route the requests into the
-    // correct action methods:
-    // https://springframework.guru/spring-requestmapping-annotation/#:~:text=%40RequestMapping%20is%20one%20of%20the,map%20Spring%20MVC%20controller%20methods.
-    public String index(Model model, HttpSession session,
-        @CurrentSecurityContext(expression = "authentication") Authentication authentication) {
+	@RequestMapping("/") // The @RequestMapping(method = RequestMethod.GET, value = "/path")
+	// annotation specifies a method in the controller that should be
+	// responsible for serving the HTTP request to the given path. Spring will
+	// work the implementation details of how it's done. You simply specify the
+	// path value on the annotation and Spring will route the requests into the
+	// correct action methods:
+	// https://springframework.guru/spring-requestmapping-annotation/#:~:text=%40RequestMapping%20is%20one%20of%20the,map%20Spring%20MVC%20controller%20methods.
+	public String index(Model model, HttpSession session,
+			@CurrentSecurityContext(expression = "authentication") Authentication authentication) {
 
-        logger.info("index called");
+		logger.info("index called");
 
-        if (session == null) {
-            model.addAttribute("message", "no session");
-        } else {
-            Integer count = (Integer) session.getAttribute("count");
-            if (count == null) {
-                count = Integer.valueOf(0);
-            }
-            count++;
-            session.setAttribute("count", count);
-        }
+		if (session == null) {
+			model.addAttribute("message", "no session");
+		} else {
+			Integer count = (Integer) session.getAttribute("count");
+			if (count == null) {
+				count = Integer.valueOf(0);
+			}
+			count++;
+			session.setAttribute("count", count);
+		}
 
-        // check if user is logged in
-        if (!(authentication instanceof AnonymousAuthenticationToken)) {
-            String currentUserName = authentication.getName();
-            model.addAttribute("user", currentUserName);
-        }
+		// check if user is logged in
+		if (!(authentication instanceof AnonymousAuthenticationToken)) {
+			String currentUserName = authentication.getName();
+			model.addAttribute("user", currentUserName);
+		}
 
-        model.addAttribute("message", userService.doSomething());
+		model.addAttribute("message", userService.doSomething());
 
-        model.addAttribute("halloNachricht", "welchem to SWD lab");
+		model.addAttribute("halloNachricht", "welchem to SWD lab");
 
-        // map list of entities to list of DTOs
-        List<UserDTO> listOfUserTO = ObjectMapperUtils.mapAll(userService.getAll(), UserDTO.class);
+		// map list of entities to list of DTOs
+		List<UserDTO> listOfUserTO = ObjectMapperUtils.mapAll(userService.getAll(), UserDTO.class);
 
-        model.addAttribute("users", listOfUserTO);
+		model.addAttribute("users", listOfUserTO);
 
-        model.addAttribute("beanSingleton", singletonBean.getHashCode());
+		model.addAttribute("beanSingleton", singletonBean.getHashCode());
 
-        TestBean prototypeBean = context.getBean("prototypeBean", TestBean.class);
-        model.addAttribute("beanPrototype", prototypeBean.getHashCode());
+		TestBean prototypeBean = context.getBean("prototypeBean", TestBean.class);
+		model.addAttribute("beanPrototype", prototypeBean.getHashCode());
 
-        model.addAttribute("beanSession", sessionBean.getHashCode());
+		model.addAttribute("beanSession", sessionBean.getHashCode());
 
-        Authentication lauthentication = SecurityContextHolder.getContext().getAuthentication();
-        model.addAttribute("authenticated", lauthentication);
+		Authentication lauthentication = SecurityContextHolder.getContext().getAuthentication();
+		model.addAttribute("authenticated", lauthentication);
 
-        return "index";
-    }
+		return "index";
+	}
 
-    @RequestMapping(value = {"/login"})
-    public String login(Model model) {
-        logger.info("login called");
-        return "login";
+	@RequestMapping(value = { "/login" })
+	public String login(Model model) {
+		logger.info("login called");
+		return "login";
 
-    }
+	}
 
-    // TODO: add "/media" to view all mediums in library
-    // TODO: add "/media/add,update,delete"??
+	// TODO: add "/media" to view all mediums in library
+	// TODO: add "/media/add,update,delete"??
 
-    // TODO: add "/loan" to loan exemplar to customer
-    // TODO: add "/return" to return medium back
-    // TODO: add "/reserve" to reserve medium
+	// TODO: add "/loan" to loan exemplar to customer
+	// TODO: add "/return" to return medium back
+	// TODO: add "/reserve" to reserve medium
 
-    // TODO: add "/invoices" to get all unpaid invoices for customer
-    // TODO: add "/pay" to pay outstanding balances
+	// TODO: add "/invoices" to get all unpaid invoices for customer
+	// TODO: add "/pay" to pay outstanding balances
 
-    @RequestMapping(value = "/loan", method = RequestMethod.GET)
-    public String showLoanPage(
-        @RequestParam(value = "selectedGenre", required = false, defaultValue = "Thriller") String selectedGenre,
-        @RequestParam(value = "selectedType", required = false, defaultValue = "Movie") String selectedType,
-        Model model,
-        @CurrentSecurityContext(expression = "authentication") Authentication authentication
-                              ) {
-        if (!(authentication instanceof AnonymousAuthenticationToken)) {
-            String username = authentication.getName();
-            User user = userService.getByUsername(username);
+	@RequestMapping(value = "/loan", method = RequestMethod.GET)
+	public String showLoanPage(
+			@RequestParam(value = "selectedGenre", required = false, defaultValue = "Thriller") String selectedGenre,
+			@RequestParam(value = "selectedType", required = false, defaultValue = "Movie") String selectedType,
+			Model model, @CurrentSecurityContext(expression = "authentication") Authentication authentication) {
+		if (!(authentication instanceof AnonymousAuthenticationToken)) {
+			String username = authentication.getName();
+			User user = userService.getByUsername(username);
 
-            // Populate dropdowns and retain selected values
-            model.addAttribute("genres", mediaService.getAllGenres());
-            model.addAttribute("mediaTypes", mediaService.getAllMediaTypes());
-            model.addAttribute("selectedGenre", selectedGenre);
-            model.addAttribute("selectedType", selectedType);
+			// Calculate todayDate and endDate
+			LocalDate todayDate = LocalDate.now();
+			LocalDate endDate = todayDate.plusDays(1);
+			System.out.println("todayDate: " + todayDate + ", endDate: " + endDate);
 
-            // Get filtered media
-            Iterable<Media> mediaList = mediaService.searchMediaByGenreAndType(selectedGenre, selectedType, user);
-            if (!mediaList.iterator().hasNext()) {
-                model.addAttribute("errorMessage",
-                    "No media found for the selected Genre and Media Type. Please check FSK compliance.");
-            }
-            model.addAttribute("mediaList", mediaList);
+			// Populate dropdowns
+			model.addAttribute("genres", mediaService.getAllGenres());
+			model.addAttribute("mediaTypes", mediaService.getAllMediaTypes());
+			model.addAttribute("selectedGenre", selectedGenre);
+			model.addAttribute("selectedType", selectedType);
+			model.addAttribute("todayDate", todayDate);
+			model.addAttribute("endDate", endDate);
 
-            return "loan";
-        }
+			// get media based on selected dropdowns
+			Iterable<Media> mediaList = mediaService.searchMediaByGenreAndType(selectedGenre, selectedType, user);
+			if (!mediaList.iterator().hasNext()) {
+				model.addAttribute("errorMessage", "No media found for the selected Genre and Media Type.");
+			}
+			model.addAttribute("mediaList", mediaList);
 
-        // Redirect to login if user is not authenticated
-        model.addAttribute("errorMessage", "You must log in to view the loan page.");
-        return "login";
-    }
+			return "loan";
+		}
 
+		model.addAttribute("errorMessage", "You must log in to view the loan page.");
+		return "login";
+	}
 
-    @GetMapping("/searchMedia")
-    public String searchMedia(
-        @RequestParam(value = "genre", required = true) String genre,
-        @RequestParam(value = "type", required = true) String type,
-        Model model,
-        @CurrentSecurityContext(expression = "authentication") Authentication authentication
-                             ) {
-        if (!(authentication instanceof AnonymousAuthenticationToken)) {
-            String username = authentication.getName();
-            User user = userService.getByUsername(username);
+	@GetMapping("/searchMedia")
+	public String searchMedia(@RequestParam(value = "genre", required = true) String genre,
+			@RequestParam(value = "type", required = true) String type, Model model,
+			@CurrentSecurityContext(expression = "authentication") Authentication authentication) {
+		if (!(authentication instanceof AnonymousAuthenticationToken)) {
+			String username = authentication.getName();
+			User user = userService.getByUsername(username);
 
-            // Berechnung von todayDate
-            LocalDate todayDate = LocalDate.now();
-            LocalDate endDate = todayDate.plusDays(1);
+			// Berechnung von todayDate
+			LocalDate todayDate = LocalDate.now();
+			LocalDate endDate = todayDate.plusDays(1);
 
-            // Filter media based on selected genre, type, and user FSK compliance
-            Iterable<Media> mediaList = mediaService.searchMediaByGenreAndType(genre, type, user);
-            model.addAttribute("genres", mediaService.getAllGenres());
-            model.addAttribute("mediaTypes", mediaService.getAllMediaTypes());
-            model.addAttribute("selectedGenre", genre); // Retain the selected genre
-            model.addAttribute("selectedType", type);   // Retain the selected type
-            model.addAttribute("todayDate", todayDate); // Datum von heute
-            model.addAttribute("endDate", endDate);
+			// Filter media based on selected genre, type, and user FSK compliance
+			Iterable<Media> mediaList = mediaService.searchMediaByGenreAndType(genre, type, user);
+			model.addAttribute("genres", mediaService.getAllGenres());
+			model.addAttribute("mediaTypes", mediaService.getAllMediaTypes());
+			model.addAttribute("selectedGenre", genre); // Retain the selected genre
+			model.addAttribute("selectedType", type); // Retain the selected type
+			model.addAttribute("todayDate", todayDate); // Datum von heute
+			model.addAttribute("endDate", endDate);
 
+			// Display error message if no media is found
+			if (!mediaList.iterator().hasNext()) {
+				model.addAttribute("errorMessage",
+						"No media found for the selected Genre and Media Type. Please check FSK compliance.");
+			}
+			model.addAttribute("mediaList", mediaList);
 
-            // Display error message if no media is found
-            if (!mediaList.iterator().hasNext()) {
-                model.addAttribute("errorMessage",
-                    "No media found for the selected Genre and Media Type. Please check FSK compliance.");
-            }
-            model.addAttribute("mediaList", mediaList);
+			return "loan";
+		}
 
-            return "loan";
-        }
+		// Redirect to login if user is not authenticated
+		model.addAttribute("errorMessage", "You must be logged in to search for media.");
+		return "login";
+	}
 
-        // Redirect to login if user is not authenticated
-        model.addAttribute("errorMessage", "You must be logged in to search for media.");
-        return "login";
-    }
+	@RequestMapping(value = { "/login-error" })
+	public String loginError(Model model) {
+		logger.info("loginError called");
+		model.addAttribute("error", "Login error");
+		return "login";
+	}
 
+	@RequestMapping(value = { "/admin/addUser" }, method = RequestMethod.GET)
+	public String showAddPersonPage(Model model, @RequestParam(value = "username", required = false) String username) {
+		logger.info("showAddPersonPage called");
+		User modUser = null;
+		UserDTO userDto = new UserDTO();
 
-    @RequestMapping(value = {"/login-error"})
-    public String loginError(Model model) {
-        logger.info("loginError called");
-        model.addAttribute("error", "Login error");
-        return "login";
-    }
+		if (username != null) {
+			modUser = userService.getByUsername(username);
+		}
 
-    @RequestMapping(value = {"/admin/addUser"}, method = RequestMethod.GET)
-    public String showAddPersonPage(Model model, @RequestParam(value = "username", required = false) String username) {
-        logger.info("showAddPersonPage called");
-        User modUser = null;
-        UserDTO userDto = new UserDTO();
+		if (modUser != null) {
+			// map user to userDTO
+			userDto = ObjectMapperUtils.map(modUser, UserDTO.class);
+		} else {
+			userDto = new UserDTO();
+		}
 
-        if (username != null) {
-            modUser = userService.getByUsername(username);
-        }
+		model.addAttribute("user", userDto);
 
-        if (modUser != null) {
-            // map user to userDTO
-            userDto = ObjectMapperUtils.map(modUser, UserDTO.class);
-        } else {
-            userDto = new UserDTO();
-        }
+		return "addUser";
+	}
 
-        model.addAttribute("user", userDto);
+	@RequestMapping(value = { "/admin/addUser" }, method = RequestMethod.POST)
+	public String addUser(Model model, //
+			@ModelAttribute("UserForm") UserDTO userDTO) { // The @ModelAttribute is
+		// an annotation that binds
+		// a method parameter or
+		// method return value to a
+		// named model attribute
+		// and then exposes it to a
+		// web view:
 
-        return "addUser";
-    }
+		logger.info("addUser called");
 
-    @RequestMapping(value = {"/admin/addUser"}, method = RequestMethod.POST)
-    public String addUser(Model model, //
-        @ModelAttribute("UserForm") UserDTO userDTO) { // The @ModelAttribute is
-        // an annotation that binds
-        // a method parameter or
-        // method return value to a
-        // named model attribute
-        // and then exposes it to a
-        // web view:
+		// merge instances
+		User user = ObjectMapperUtils.map(userDTO, User.class);
 
-        logger.info("addUser called");
+		// if user already existed in DB, new information is already merged and saved
+		// a new user must be persisted (because not managed by entityManager yet)
+		if (!entityManager.contains(user))
+			userService.addUser(user);
 
-        // merge instances
-        User user = ObjectMapperUtils.map(userDTO, User.class);
+		return "redirect:/";
+	}
 
-        // if user already existed in DB, new information is already merged and saved
-        // a new user must be persisted (because not managed by entityManager yet)
-        if (!entityManager.contains(user))
-            userService.addUser(user);
+	@GetMapping("/returnMedia") // definiert die http get-anforderung, um die seite zur medienrückgabe
+								// anzuzeigen
+	public String showReturnMediaPage(Model model,
+			@CurrentSecurityContext(expression = "authentication") Authentication authentication) {
+		if (!(authentication instanceof AnonymousAuthenticationToken)) { // prüft, ob der benutzer authentifiziert ist
+			String username = authentication.getName(); // holt den benutzernamen des aktuell angemeldeten benutzers
+			User user = userService.getByUsername(username); // holt den benutzer anhand des benutzernamens aus der
+																// datenbank
+			Collection<MediaTransaction> loans = mediaTransactionService.findLoansByUser(user); // holt alle ausleihen
+																								// des benutzers
+			if (loans == null) { // prüft, ob loans null ist
+				loans = List.of(); // setzt loans auf eine leere liste, falls keine ausleihen vorhanden sind
+			}
+			model.addAttribute("loans", loans); // fügt die ausleihen zum modell hinzu, um sie in der view darzustellen
+		}
+		return "returnMedia"; // gibt den namen der html-seite zurück, die angezeigt werden soll
+								// ("returnMedia.html")
+	}
 
-        return "redirect:/";
-    }
-
-    @GetMapping("/returnMedia") // definiert die http get-anforderung, um die seite zur medienrückgabe anzuzeigen
-    public String showReturnMediaPage(Model model,
-        @CurrentSecurityContext(expression = "authentication") Authentication authentication) {
-        if (!(authentication instanceof AnonymousAuthenticationToken)) { // prüft, ob der benutzer authentifiziert ist
-            String username = authentication.getName(); // holt den benutzernamen des aktuell angemeldeten benutzers
-            User user =
-                userService.getByUsername(username); // holt den benutzer anhand des benutzernamens aus der datenbank
-            Collection<MediaTransaction> loans =
-                mediaTransactionService.findLoansByUser(user); // holt alle ausleihen des benutzers
-            if (loans == null) { // prüft, ob loans null ist
-                loans = List.of(); // setzt loans auf eine leere liste, falls keine ausleihen vorhanden sind
-            }
-            model.addAttribute("loans", loans); // fügt die ausleihen zum modell hinzu, um sie in der view darzustellen
-        }
-        return "returnMedia"; // gibt den namen der html-seite zurück, die angezeigt werden soll ("returnMedia.html")
-    }
-
-    // startet HTTP-anfrage für rückgabeprozess
-    @PostMapping("/returnMedia") // definiert die http post-anforderung zur verarbeitung der medienrückgabe
-    public String returnMedia(@RequestParam Long transactionId, Model model) { // methode zur rückgabe eines mediums
-        try {
-            mediaTransactionService.returnMedia(
-                transactionId); // aufruf der service-methode, um die rückgabe zu verarbeiten
-            model.addAttribute("successMessage",
-                "Media returned successfully."); // fügt eine erfolgsmeldung zum modell hinzu
-        } catch (Exception e) { // behandelt fehler, falls die rückgabe fehlschlägt
-            model.addAttribute("errorMessage",
-                "Error returning media: " + e.getMessage()); // fügt eine fehlermeldung zum modell hinzu
-        }
-        return "redirect:/returnMedia"; // leitet zur rückgabeseite um, um die aktualisierte ansicht anzuzeigen
-    }
+	// startet HTTP-anfrage für rückgabeprozess
+	@PostMapping("/returnMedia") // definiert die http post-anforderung zur verarbeitung der medienrückgabe
+	public String returnMedia(@RequestParam Long transactionId, Model model) { // methode zur rückgabe eines mediums
+		try {
+			mediaTransactionService.returnMedia(transactionId); // aufruf der service-methode, um die rückgabe zu
+																// verarbeiten
+			model.addAttribute("successMessage", "Media returned successfully."); // fügt eine erfolgsmeldung zum modell
+																					// hinzu
+		} catch (Exception e) { // behandelt fehler, falls die rückgabe fehlschlägt
+			model.addAttribute("errorMessage", "Error returning media: " + e.getMessage()); // fügt eine fehlermeldung
+																							// zum modell hinzu
+		}
+		return "redirect:/returnMedia"; // leitet zur rückgabeseite um, um die aktualisierte ansicht anzuzeigen
+	}
 
 }

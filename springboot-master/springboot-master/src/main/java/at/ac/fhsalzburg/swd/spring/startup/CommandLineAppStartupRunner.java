@@ -60,8 +60,12 @@ public class CommandLineAppStartupRunner implements CommandLineRunner {
 		if (userService.getByUsername("admin") != null)
 			return; // data already exists -> return
 
+		int loanLimitRegular = 28; //customer max. loan time (4 weeks)
+		int loanLimitStudent = 42; //students max. loan time (6 weeks)
+		
+		
 		userService.addUser("admin", "Administrator", "admin@work.org", "123", new Date(), "admin", "ADMIN",
-				User.CustomerType.REGULAR, 5);
+				User.CustomerType.REGULAR, loanLimitRegular);
 
 		productService.addProduct("first product", 3.30f);
 		User user = userService.getAll().iterator().next();
@@ -71,7 +75,7 @@ public class CommandLineAppStartupRunner implements CommandLineRunner {
 
 		// Create sample customer
 		boolean newCustomer = userService.addUser("john", "John Doe", "john.doe@example.com", "123456789", new Date(),//TODO: change birthday for FSK check
-				"pw", "Customer", User.CustomerType.REGULAR, 5);
+				"pw", "Customer", User.CustomerType.STUDENT, loanLimitStudent);
 		if (newCustomer) {
 			System.out.println("User created successfully.");
 		} else {
