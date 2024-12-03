@@ -44,7 +44,7 @@
 
 - Wartelisten Logik fuer ReserveMedia
 - Fix Autowires (@Autowire (Dependency Injection))
-- If date(today) > ExpirationDate ---> Status = overdue + invoice anpassen✅
+- If date(today) > ExpirationDate ---> Status = overdue + invoice anpassen
 - Mahnungen/Erinnerungen jede Woche --> also nur wenn es länger als 7 Tage ausgeliehen wird
 - Add synchronization to loanMedia and reserveMedia
 - check loanLimits (loanAmount & max loanPeriod)
