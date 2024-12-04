@@ -17,7 +17,7 @@
 - Customers should be able to reserve medias.✅
 - Customers should be able to cancel reserved medias.
 - Customers should be possible to ask for the availability of a specific media
-- Customers should be possible to ask for the physical position of a specific media
+- Customers should be possible to ask for the physical position of a specific media✅
 - If a customer has exceed the max. loan time (4 weeks), the customer has to pay a penalty fee for every additional day
 
 ## Feedback
