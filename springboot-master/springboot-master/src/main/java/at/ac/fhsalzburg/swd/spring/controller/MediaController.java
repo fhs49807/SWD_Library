@@ -1,8 +1,11 @@
 package at.ac.fhsalzburg.swd.spring.controller;
 
+import at.ac.fhsalzburg.swd.spring.model.Library;
 import at.ac.fhsalzburg.swd.spring.model.Media;
 import at.ac.fhsalzburg.swd.spring.model.MediaTransaction;
 import at.ac.fhsalzburg.swd.spring.model.ReserveMediaTransaction;
+import at.ac.fhsalzburg.swd.spring.model.Section;
+import at.ac.fhsalzburg.swd.spring.model.Shelf;
 import at.ac.fhsalzburg.swd.spring.services.MediaServiceInterface;
 import at.ac.fhsalzburg.swd.spring.services.MediaTransactionServiceInterface;
 import at.ac.fhsalzburg.swd.spring.services.ReserveMediaTransactionService;
@@ -105,18 +108,32 @@ public class MediaController extends BaseController {
 
 	// populate loan success page
 	private void populateLoanSuccessModel(MediaTransaction transaction, Model model, String selectedGenre,
-			String selectedType) {
-		Media media = transaction.getEdition().getMedia();
-		model.addAttribute("username", transaction.getUser().getUsername());
-		model.addAttribute("transaction_date", transaction.getStart_date());
-		model.addAttribute("start_date", transaction.getStart_date());
-		model.addAttribute("end_date", transaction.getEnd_date());
-		model.addAttribute("mediaId", media.getId());
-		model.addAttribute("mediaTitle", media.getName());
-		model.addAttribute("mediaGenre", media.getGenre().getName());
-		model.addAttribute("mediaType", media.getMediaType().getType());
-		model.addAttribute("editionIds", List.of(transaction.getEdition().getId()));
+	        String selectedType) {
+	    // Retrieve the Media entity associated with the transaction
+	    Media media = transaction.getEdition().getMedia();
+
+	    // Retrieve the Shelf and Section from the Media entity
+	    Shelf shelf = media.getShelf();
+	    Section section = shelf.getSection();
+	    Library library = section.getLibrary();
+
+	    // Populate model attributes
+	    model.addAttribute("username", transaction.getUser().getUsername());
+	    model.addAttribute("transaction_date", transaction.getStart_date());
+	    model.addAttribute("start_date", transaction.getStart_date());
+	    model.addAttribute("end_date", transaction.getEnd_date());
+	    model.addAttribute("mediaId", media.getId());
+	    model.addAttribute("mediaTitle", media.getName());
+	    model.addAttribute("mediaGenre", media.getGenre().getName());
+	    model.addAttribute("mediaType", media.getMediaType().getType());
+	    model.addAttribute("editionIds", List.of(transaction.getEdition().getId()));
+
+	    // Add physical location details
+	    model.addAttribute("shelfNumber", shelf.getNumber());
+	    model.addAttribute("sectionName", section.getName());
+	    model.addAttribute("libraryName", library.getName());
 	}
+
 
 	/**
 	 * Return to loan page with default data and error message.
