@@ -17,12 +17,12 @@
         <div th:if="${successMessage}" class="alert alert-success" th:text="${successMessage}"></div>
         <div th:if="${errorMessage}" class="alert alert-danger" th:text="${errorMessage}"></div>
 
-        <!-- Display user loans -->
+        <!-- Display User Loans -->
         <div>
             <h3>Your Current Loans</h3>
 
-            <div th:if="${loans != null}">
-                <table class="table table-hover mt-4" th:if="${!loans.isEmpty()}">
+            <div th:if="${loans != null && !loans.isEmpty()}">
+                <table class="table table-hover mt-4">
                     <thead>
                         <tr>
                             <th>Media Name</th>
@@ -33,7 +33,8 @@
                     <tbody>
                         <tr th:each="transaction : ${loans}">
                             <td th:text="${transaction.edition.media.name}">Media Name</td>
-                            <td th:text="${#dates.format(transaction.expirationDate, 'yyyy-MM-dd')}">Due Date</td>
+                            <td th:text="${#dates.format(transaction.last_possible_return_date, 'yyyy-MM-dd')}">
+                                Due Date</td>
                             <td>
                                 <form th:action="@{/returnMedia}" method="post">
                                     <input type="hidden" name="transactionId" th:value="${transaction.id}" />
@@ -43,13 +44,10 @@
                         </tr>
                     </tbody>
                 </table>
-
-                <div th:if="${loans.isEmpty()}" class="alert alert-info">
-                    <p>No loans available to return.</p>
-                </div>
             </div>
 
-            <div th:if="${loans == null}" class="alert alert-info">
+            <!-- Display Message If No Loans -->
+            <div th:if="${loans == null || loans.isEmpty()}" class="alert alert-info">
                 <p>No loans available to return.</p>
             </div>
         </div>

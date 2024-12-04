@@ -109,11 +109,18 @@ public class MediaService implements MediaServiceInterface {
 		// Get the user's age using UserService
 		int userAge = userService.getAge(user);
 
-		// Fetch media by genre and type, then filter by FSK restriction
-		return mediaRepository.findByGenreAndType(genre, type).stream().filter(media -> media.getFSK() <= userAge) // Filter
-																													// by
-																													// FSK
-				.collect(Collectors.toList());
+		// Use repository method with null-safe logic
+		List<Media> mediaList = mediaRepository.findByGenreAndTypeOptional(isAll(genre) ? null : genre,
+				isAll(type) ? null : type);
+
+		// Filter media by FSK restriction
+		return mediaList.stream().filter(media -> media.getFSK() <= userAge).collect(Collectors.toList());
+	}
+
+	// Helper method to check if "All" or empty
+	private boolean isAll(String value) {
+		return value == null || value.isEmpty() || value.equalsIgnoreCase("All Genres")
+				|| value.equalsIgnoreCase("All Media Types");
 	}
 
 	@Override

@@ -19,7 +19,6 @@ import javax.persistence.Table;
 //Methods: addMedia, createEdition, delete...
 
 @Entity
-@NoArgsConstructor
 @Table(name = "LIBRARIES")
 public class Library {
 
@@ -39,6 +38,9 @@ public class Library {
 		this.name = name;
 		this.location = location;
 		this.sections = sections;
+	}
+
+	public Library() {
 	}
 
 	public String getName() {

@@ -26,7 +26,10 @@ import javax.persistence.EntityManager;
 import javax.servlet.http.HttpSession;
 import java.time.LocalDate;
 import java.util.Collection;
+import java.util.Date;
 import java.util.List;
+import java.util.stream.Collectors;
+import java.util.stream.StreamSupport;
 
 @Controller // marks the class as a web controller, capable of handling the HTTP requests.
 // Spring
@@ -130,39 +133,39 @@ public class TemplateController {
 
 	}
 
-	// TODO: add "/media" to view all mediums in library
-	// TODO: add "/media/add,update,delete"??
-
-	// TODO: add "/loan" to loan exemplar to customer
-	// TODO: add "/return" to return medium back
-	// TODO: add "/reserve" to reserve medium
-
-	// TODO: add "/invoices" to get all unpaid invoices for customer
-	// TODO: add "/pay" to pay outstanding balances
+	// Add an empty/default option to the list of genres and media types
+	private List<String> addDefaultOption(List<String> options, String defaultLabel) {
+		options.add(0, defaultLabel); // Add an empty option at the beginning
+		return options;
+	}
 
 	@RequestMapping(value = "/loan", method = RequestMethod.GET)
 	public String showLoanPage(
-			@RequestParam(value = "selectedGenre", required = false, defaultValue = "Thriller") String selectedGenre,
-			@RequestParam(value = "selectedType", required = false, defaultValue = "Movie") String selectedType,
-			Model model, @CurrentSecurityContext(expression = "authentication") Authentication authentication) {
+			@RequestParam(value = "selectedGenre", required = false, defaultValue = "") String selectedGenre,
+			@RequestParam(value = "selectedType", required = false, defaultValue = "") String selectedType, Model model,
+			@CurrentSecurityContext(expression = "authentication") Authentication authentication) {
 		if (!(authentication instanceof AnonymousAuthenticationToken)) {
 			String username = authentication.getName();
 			User user = userService.getByUsername(username);
-
-			// Calculate todayDate and endDate
+ 
 			LocalDate todayDate = LocalDate.now();
 			LocalDate endDate = todayDate.plusDays(1);
-			System.out.println("todayDate: " + todayDate + ", endDate: " + endDate);
 
-			// Populate dropdowns
-			model.addAttribute("genres", mediaService.getAllGenres());
-			model.addAttribute("mediaTypes", mediaService.getAllMediaTypes());
+			// Fetch genres and media types with "All" as default
+			List<String> genres = addDefaultOption(
+					StreamSupport.stream(mediaService.getAllGenres().spliterator(), false).collect(Collectors.toList()),
+					"All Genres");
+			List<String> mediaTypes = addDefaultOption(StreamSupport
+					.stream(mediaService.getAllMediaTypes().spliterator(), false).collect(Collectors.toList()),
+					"All Media Types");
+
+			model.addAttribute("genres", genres);
+			model.addAttribute("mediaTypes", mediaTypes);
 			model.addAttribute("selectedGenre", selectedGenre);
 			model.addAttribute("selectedType", selectedType);
 			model.addAttribute("todayDate", todayDate);
 			model.addAttribute("endDate", endDate);
 
-			// get media based on selected dropdowns
 			Iterable<Media> mediaList = mediaService.searchMediaByGenreAndType(selectedGenre, selectedType, user);
 			if (!mediaList.iterator().hasNext()) {
 				model.addAttribute("errorMessage", "No media found for the selected Genre and Media Type.");
@@ -184,30 +187,33 @@ public class TemplateController {
 			String username = authentication.getName();
 			User user = userService.getByUsername(username);
 
-			// Berechnung von todayDate
 			LocalDate todayDate = LocalDate.now();
 			LocalDate endDate = todayDate.plusDays(1);
 
-			// Filter media based on selected genre, type, and user FSK compliance
+			// Fetch genres and media types with "All" as default
+			List<String> genres = addDefaultOption(
+					StreamSupport.stream(mediaService.getAllGenres().spliterator(), false).collect(Collectors.toList()),
+					"All Genres");
+			List<String> mediaTypes = addDefaultOption(StreamSupport
+					.stream(mediaService.getAllMediaTypes().spliterator(), false).collect(Collectors.toList()),
+					"All Media Types");
+
 			Iterable<Media> mediaList = mediaService.searchMediaByGenreAndType(genre, type, user);
-			model.addAttribute("genres", mediaService.getAllGenres());
-			model.addAttribute("mediaTypes", mediaService.getAllMediaTypes());
-			model.addAttribute("selectedGenre", genre); // Retain the selected genre
-			model.addAttribute("selectedType", type); // Retain the selected type
-			model.addAttribute("todayDate", todayDate); // Datum von heute
+			model.addAttribute("genres", genres);
+			model.addAttribute("mediaTypes", mediaTypes);
+			model.addAttribute("selectedGenre", genre);
+			model.addAttribute("selectedType", type);
+			model.addAttribute("todayDate", todayDate);
 			model.addAttribute("endDate", endDate);
 
-			// Display error message if no media is found
 			if (!mediaList.iterator().hasNext()) {
-				model.addAttribute("errorMessage",
-						"No media found for the selected Genre and Media Type. Please check FSK compliance.");
+				model.addAttribute("errorMessage", "No media found for the selected Genre and Media Type.");
 			}
 			model.addAttribute("mediaList", mediaList);
 
 			return "loan";
 		}
 
-		// Redirect to login if user is not authenticated
 		model.addAttribute("errorMessage", "You must be logged in to search for media.");
 		return "login";
 	}
@@ -264,24 +270,22 @@ public class TemplateController {
 		return "redirect:/";
 	}
 
-	@GetMapping("/returnMedia") // definiert die http get-anforderung, um die seite zur medienrückgabe
-								// anzuzeigen
+	@GetMapping("/returnMedia")
 	public String showReturnMediaPage(Model model,
-			@CurrentSecurityContext(expression = "authentication") Authentication authentication) {
-		if (!(authentication instanceof AnonymousAuthenticationToken)) { // prüft, ob der benutzer authentifiziert ist
-			String username = authentication.getName(); // holt den benutzernamen des aktuell angemeldeten benutzers
-			User user = userService.getByUsername(username); // holt den benutzer anhand des benutzernamens aus der
-																// datenbank
-			Collection<MediaTransaction> loans = mediaTransactionService.findLoansByUser(user); // holt alle ausleihen
-																								// des benutzers
-			if (loans == null) { // prüft, ob loans null ist
-				loans = List.of(); // setzt loans auf eine leere liste, falls keine ausleihen vorhanden sind
-			}
-			model.addAttribute("loans", loans); // fügt die ausleihen zum modell hinzu, um sie in der view darzustellen
-		}
-		return "returnMedia"; // gibt den namen der html-seite zurück, die angezeigt werden soll
-								// ("returnMedia.html")
+	        @CurrentSecurityContext(expression = "authentication") Authentication authentication) {
+	    if (!(authentication instanceof AnonymousAuthenticationToken)) { // check if user is authenticated
+	        String username = authentication.getName(); // get the authenticated user's username
+	        User user = userService.getByUsername(username); // fetch user by username
+	        Collection<MediaTransaction> loans = mediaTransactionService.findLoansByUser(user); // fetch user's loans
+	        if (loans == null) {
+	            loans = List.of(); // set loans to empty list if no loans exist
+	        }
+	        model.addAttribute("loans", loans);
+	        model.addAttribute("currentDate", new Date()); // pass current date for Thymeleaf formatting
+	    }
+	    return "returnMedia";
 	}
+
 
 	// startet HTTP-anfrage für rückgabeprozess
 	@PostMapping("/returnMedia") // definiert die http post-anforderung zur verarbeitung der medienrückgabe

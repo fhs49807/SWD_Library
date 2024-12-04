@@ -49,9 +49,9 @@ public class CommandLineAppStartupRunner implements CommandLineRunner {
 	@Autowired
 	private ReserveMediaTransactionServiceInterface reserveMediaTransactionService;
 
-    private final Scanner scanner = new Scanner(System.in);
+	private final Scanner scanner = new Scanner(System.in);
 
-    // Initialize System with preset accounts and stocks
+	// Initialize System with preset accounts and stocks
 	@Override
 	@Transactional // this method runs within one database transaction; performing a commit at the
 	// end
@@ -60,12 +60,32 @@ public class CommandLineAppStartupRunner implements CommandLineRunner {
 		if (userService.getByUsername("admin") != null)
 			return; // data already exists -> return
 
-		int loanLimitRegular = 28; //customer max. loan time (4 weeks)
-		int loanLimitStudent = 42; //students max. loan time (6 weeks)
-		
-		
+		int loanLimitRegular = 28; // customer max. loan time (4 weeks)
+		int loanLimitStudent = 42; // students max. loan time (6 weeks)
+
+		// create regular admin user (Age 0)
+		// username: admin
+		// password: admin
 		userService.addUser("admin", "Administrator", "admin@work.org", "123", new Date(), "admin", "ADMIN",
 				User.CustomerType.REGULAR, loanLimitRegular);
+
+		// Child/Youth Student customer (Age 15)
+		// username: John
+		// password: pw
+		userService.addUser("john", "TestStudent", "john@email.com", "111", getBirthDate(-15), "pw", "Student",
+				User.CustomerType.STUDENT, loanLimitStudent);
+
+		// Adult customer (Age 30)
+		// username: Jane
+		// password: pw
+		userService.addUser("jane", "TestRegular", "jane@email.com", "222", getBirthDate(-30), "pw", "Regular Customer",
+				User.CustomerType.REGULAR, loanLimitRegular);
+
+		// Student customer (Age 22)
+		// username: Joe
+		// password: pw
+		userService.addUser("joe", "TestStudent", "joe@email.com", "333", getBirthDate(-22), "pw", "Student",
+				User.CustomerType.STUDENT, loanLimitStudent);
 
 		productService.addProduct("first product", 3.30f);
 		User user = userService.getAll().iterator().next();
@@ -73,162 +93,97 @@ public class CommandLineAppStartupRunner implements CommandLineRunner {
 		user = userService.getByUsername("admin");
 		orderService.addOrder(new Date(), user, productService.getAll());
 
-		// Create sample customer
-		boolean newCustomer = userService.addUser("john", "John Doe", "john.doe@example.com", "123456789", new Date(),//TODO: change birthday for FSK check
-				"pw", "Customer", User.CustomerType.STUDENT, loanLimitStudent);
-		if (newCustomer) {
-			System.out.println("User created successfully.");
-		} else {
-			System.out.println("Failed to create user.");
-		}
-
 		createLibraryWithMedia();
 
-//		returnMediaSimulation();
-//		loanMediaSimulation();
-
-//		reserveMediaSimulation();
 	}
 
-// TODO: remove and move to unit tests
-//    ---------------------------------------------------
-
-//	private void loanMediaSimulation() {
-//
-//		User existingCustomer = userService.getByUsername("john.doe");
-//
-//		// find available editions for loan
-//		Collection<Media> mediaItems = libraryService.validateMedia("10"); // "Harry Potter"
-//		if (!mediaItems.isEmpty()) {
-//			Media media = mediaItems.iterator().next();
-//			Collection<Edition> availableEditions = libraryService.checkForAvailableEditions(media);
-//
-//			// if there are available editions
-//			if (!availableEditions.isEmpty()) {
-//				// get the edition ids
-//				Collection<Long> editionIds = availableEditions.stream().map(Edition::getId).limit(1)
-//						.collect(Collectors.toList());
-//
-//				// set due date (14 days from today)
-//				Date dueDate = new Date(System.currentTimeMillis() + (14L * 24 * 60 * 60 * 1000));
-//
-//				// run loanMedia method
-//				MediaTransaction transaction = mediaTransactionService.loanMedia(existingCustomer.getUsername(),
-//						editionIds, dueDate);
-//				System.out.println("Media loaned with ID: " + transaction.getId());
-//			} else {
-//				System.out.println("No available editions!");
-//			}
-//		} else {
-//			System.out.println("No media found to loan!");
-//		}
-//	}
-
-//	private void reserveMediaSimulation() {
-//        User user = userService.getByUsername("john");
-//
-//        System.out.println("What do you want to reserve?");
-//        String mediaName = scanner.nextLine();
-//
-//        System.out.println("When do you want to reserve " + mediaName + "? (yyyy-MM-dd)");
-//        Date reserveStartDate = DateUtils.getDateFromString(scanner.nextLine());
-//
-//        reserveMediaTransactionService.reserveMediaForCustomer(user, mediaName, reserveStartDate);
-//	}
-//
-//	private void returnMediaSimulation() {
-//		// simuliert zurückgebn von ausleihe
-//		User user = userService.getByUsername("john.doe");
-//		Collection<MediaTransaction> loans = mediaTransactionService.findLoansByUser(user);
-//		if (!loans.isEmpty()) {
-//			MediaTransaction transaction = loans.iterator().next();
-//			mediaTransactionService.returnMedia(transaction.getId());
-//			System.out.println("Media returned for transaction ID: " + transaction.getId());
-//		}
-//	}
-
-//  ---------------------------------------------------
+	// Helper method to calculate birth date based on age
+	private Date getBirthDate(int yearsAgo) {
+		Calendar calendar = Calendar.getInstance();
+		calendar.add(Calendar.YEAR, yearsAgo);
+		return calendar.getTime();
+	}
 
 	private void createLibraryWithMedia() {
-		// Create sections and shelves for the library
-		Section sectionA = new Section("Section A");
-		Section sectionB = new Section("Section B");
-		Shelf shelfA1 = new Shelf(1, sectionA);
-		Shelf shelfB1 = new Shelf(1, sectionB);
+	    // Create sections
+	    Section fantasySection = new Section("Fantasy");
+	    Section scienceFictionSection = new Section("Science Fiction");
+	    Section thrillerSection = new Section("Thriller");
 
-		// Assign shelves to sections
-		sectionA.setShelves(List.of(shelfA1));
-		sectionB.setShelves(List.of(shelfB1));
+	    // Create shelves for each section
+	    Shelf shelfF1 = new Shelf(1, fantasySection);
+	    Shelf shelfF2 = new Shelf(2, fantasySection);
+	    Shelf shelfF3 = new Shelf(3, fantasySection);
 
-		// Create the library and save it with sections
-		Library library = new Library(null, "Central Library", "123 Library St", Arrays.asList(sectionA, sectionB));
-		libraryService.save(library);
-		System.out.println("Library created: " + library);
+	    Shelf shelfSF1 = new Shelf(1, scienceFictionSection);
+	    Shelf shelfSF2 = new Shelf(2, scienceFictionSection);
+	    Shelf shelfSF3 = new Shelf(3, scienceFictionSection);
 
-		// Create a genre and media type for media items
-		// Create and save the genre and media type
-		Genre scienceFictionGenre = new Genre();
-		scienceFictionGenre.setName("Science Fiction");
-		scienceFictionGenre.setPrice(10.0);
-		scienceFictionGenre = genreRepository.save(scienceFictionGenre);
+	    Shelf shelfT1 = new Shelf(1, thrillerSection);
+	    Shelf shelfT2 = new Shelf(2, thrillerSection);
+	    Shelf shelfT3 = new Shelf(3, thrillerSection);
 
-		Genre fantasyGenre = new Genre();
-		fantasyGenre.setName("Fantasy Genre");
-		fantasyGenre.setPrice(12.0);
-		fantasyGenre = genreRepository.save(fantasyGenre);
+	    // Assign shelves to sections
+	    fantasySection.setShelves(List.of(shelfF1, shelfF2, shelfF3));
+	    scienceFictionSection.setShelves(List.of(shelfSF1, shelfSF2, shelfSF3));
+	    thrillerSection.setShelves(List.of(shelfT1, shelfT2, shelfT3));
 
-		Genre thrillerGenre = new Genre();
-		thrillerGenre.setName("Thriller");
-		thrillerGenre.setPrice(15.0);
-		thrillerGenre = genreRepository.save(thrillerGenre);
+	    // Create the library
+	    Library library = new Library(null, "Central Library", "123 Library St",
+	            List.of(fantasySection, scienceFictionSection, thrillerSection));
 
-		// Create media types
-		MediaType mediaTypeBook = new MediaType();
-		mediaTypeBook.setType("Book");
-		mediaTypeBook = mediaTypeRepository.save(mediaTypeBook);
+	    // Associate each section with the library
+	    fantasySection.setLibrary(library);
+	    scienceFictionSection.setLibrary(library);
+	    thrillerSection.setLibrary(library);
 
-		MediaType mediaTypeAudio = new MediaType();
-		mediaTypeAudio.setType("Audio");
-		mediaTypeAudio = mediaTypeRepository.save(mediaTypeAudio);
+	    // Save the library with its sections
+	    libraryService.save(library);
 
-		MediaType mediaTypeMovie = new MediaType();
-		mediaTypeMovie.setType("Movie");
-		mediaTypeMovie = mediaTypeRepository.save(mediaTypeMovie);
+	    // Create and save genres
+	    Genre scienceFictionGenre = new Genre();
+	    scienceFictionGenre.setName("Science Fiction");
+	    scienceFictionGenre.setPrice(10.0);
+	    scienceFictionGenre = genreRepository.save(scienceFictionGenre);
 
-		// Create and add books
-		Book dune = new Book("55231", "Dune", scienceFictionGenre, mediaTypeBook, shelfA1, 0);
-		mediaService.addMedia(dune);
+	    Genre fantasyGenre = new Genre();
+	    fantasyGenre.setName("Fantasy Genre");
+	    fantasyGenre.setPrice(12.0);
+	    fantasyGenre = genreRepository.save(fantasyGenre);
 
-		Book harryPotter = new Book("234234", "Harry Potter", fantasyGenre, mediaTypeBook, shelfB1, 0);
-		mediaService.addMedia(harryPotter);
+	    Genre thrillerGenre = new Genre();
+	    thrillerGenre.setName("Thriller");
+	    thrillerGenre.setPrice(15.0);
+	    thrillerGenre = genreRepository.save(thrillerGenre);
 
-		Book goneGirl = new Book("9780307588371", "Gone Girl", thrillerGenre, mediaTypeBook, shelfA1, 18);
-		mediaService.addMedia(goneGirl);
+	    // Create and save media types
+	    MediaType mediaTypeBook = mediaTypeRepository.save(new MediaType("Book"));
+	    MediaType mediaTypeAudio = mediaTypeRepository.save(new MediaType("Audio"));
+	    MediaType mediaTypeMovie = mediaTypeRepository.save(new MediaType("Movie"));
 
-		
-		// Create and add audios
-		Audio duneAudio = new Audio("AAC", "Dune Audiobook", scienceFictionGenre, mediaTypeAudio, shelfA1, 0);
-		mediaService.addMedia(duneAudio);
+	    // Create and add books
+	    mediaService.addMedia(new Book("55231", "Dune", scienceFictionGenre, mediaTypeBook, shelfF1, 0));
+	    mediaService.addMedia(new Book("23423", "Harry Potter", fantasyGenre, mediaTypeBook, shelfF2, 0));
+	    mediaService.addMedia(new Book("97802", "Gone Girl", thrillerGenre, mediaTypeBook, shelfT1, 18));
+	    mediaService.addMedia(new Book("83729", "The Hobbit", fantasyGenre, mediaTypeBook, shelfF3, 0));
+	    mediaService.addMedia(new Book("45231", "1984", scienceFictionGenre, mediaTypeBook, shelfSF2, 0));
+	    mediaService.addMedia(new Book("98321", "The Da Vinci Code", thrillerGenre, mediaTypeBook, shelfT2, 18));
 
-		Audio harryPotterAudio = new Audio("MP3", "Harry Potter Audiobook", fantasyGenre, mediaTypeAudio, shelfB1, 0);
-		mediaService.addMedia(harryPotterAudio);
+	    // Create and add audios
+	    mediaService.addMedia(new Audio("AAC", "Dune Audiobook", scienceFictionGenre, mediaTypeAudio, shelfF1, 0));
+	    mediaService.addMedia(new Audio("MP3", "Harry Potter Audiobook", fantasyGenre, mediaTypeAudio, shelfF2, 0));
+	    mediaService.addMedia(new Audio("WAV", "Gone Girl Audiobook", thrillerGenre, mediaTypeAudio, shelfT1, 18));
+	    mediaService.addMedia(new Audio("FLAC", "The Hobbit Audiobook", fantasyGenre, mediaTypeAudio, shelfF3, 0));
+	    mediaService.addMedia(new Audio("MP3", "World Audiobook", scienceFictionGenre, mediaTypeAudio, shelfSF3, 0));
+	    mediaService.addMedia(new Audio("ALAC", "The Shining Audiobook", thrillerGenre, mediaTypeAudio, shelfT3, 18));
 
-		Audio goneGirlAudio = new Audio("WAV", "Gone Girl Audiobook", thrillerGenre, mediaTypeAudio, shelfA1, 18);
-		mediaService.addMedia(goneGirlAudio);
-
-		
-		// Create and add movies
-		Movie duneMovie = new Movie("tt0816692", "Dune Movie", scienceFictionGenre, mediaTypeMovie, shelfA1, 0);
-		mediaService.addMedia(duneMovie);
-
-		Movie harryPotterMovie = new Movie("tt0241527", "Harry Potter Movie", fantasyGenre, mediaTypeMovie, shelfB1, 0);
-		mediaService.addMedia(harryPotterMovie);
-
-		Movie goneGirlMovie = new Movie("tt2267998", "Gone Girl Movie", thrillerGenre, mediaTypeMovie, shelfA1, 18);
-		mediaService.addMedia(goneGirlMovie);
-
-		System.out.println("Library with media created successfully.");
-
+	    // Create and add movies
+	    mediaService.addMedia(new Movie("tt0816692", "Dune Movie", scienceFictionGenre, mediaTypeMovie, shelfF1, 0));
+	    mediaService.addMedia(new Movie("tt0241527", "Harry Potter Movie", fantasyGenre, mediaTypeMovie, shelfF2, 0));
+	    mediaService.addMedia(new Movie("tt2267998", "Gone Girl Movie", thrillerGenre, mediaTypeMovie, shelfT1, 18));
+	    mediaService.addMedia(new Movie("tt0120737", "The Hobbit Movie", fantasyGenre, mediaTypeMovie, shelfF3, 0));
+	    mediaService.addMedia(new Movie("tt0078748", "Alien", scienceFictionGenre, mediaTypeMovie, shelfSF1, 0));
+	    mediaService.addMedia(new Movie("tt0102926", "The Silence", thrillerGenre, mediaTypeMovie, shelfT3, 18));
 	}
 
 }

@@ -41,6 +41,14 @@ public class Section {
 		return name;
 	}
 
+	public Library getLibrary() {
+		return library;
+	}
+
+	public void setLibrary(Library library) {
+		this.library = library;
+	}
+
 	public void setName(String name) {
 		this.name = name;
 	}
