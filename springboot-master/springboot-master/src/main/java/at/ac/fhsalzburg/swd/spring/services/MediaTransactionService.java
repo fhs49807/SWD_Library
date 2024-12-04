@@ -117,45 +117,39 @@ public class MediaTransactionService implements MediaTransactionServiceInterface
 	// InvoiceService calculatePenalty()
 	@Override
 	public void returnMedia(Long transactionId) {
-		// sucht die transaktion anhand der id
-		MediaTransaction transaction = mediaTransactionRepository.findById(transactionId)
-				.orElseThrow(() -> new IllegalArgumentException("transaction not found"));
+	    // Fetch the transaction by ID or throw an exception
+	    MediaTransaction transaction = mediaTransactionRepository.findById(transactionId)
+	            .orElseThrow(() -> new IllegalArgumentException("Transaction not found"));
 
-		// setzt das rückgabedatum auf das aktuelle datum
-		transaction.setReturnDate(new Date());
-		// ändert den status der transaktion auf "completed"
-		transaction.setStatus(MediaTransaction.TransactionStatus.COMPLETED);
+	    // Set return date and update transaction status
+	    transaction.setReturnDate(new Date());
+	    transaction.setStatus(MediaTransaction.TransactionStatus.COMPLETED);
 
-		// holt die edition, die mit der transaktion verknüpft ist
-		Edition edition = transaction.getEdition();
-		if (edition != null) {
-			edition.setAvailable(true); // markiert die edition als verfügbar
-			edition.setDueDate(null); // setzt das rückgabedatum der edition zurück
-			editionRepository.save(edition); // speichert die aktualisierte edition in der datenbank ->
-												// MediaTransactionRepo findByID()
-		}
+	    // Update the associated edition
+	    Edition edition = transaction.getEdition();
+	    if (edition != null) {
+	        edition.setAvailable(true);
+	        edition.setDueDate(null);
+	        editionRepository.save(edition);
+	    }
 
-		// berechnet die mahngebühren für die transaktion
-		double penaltyAmount = invoiceService.calculatePenalty(transaction);
+	    // Calculate penalty
+	    double penaltyAmount = invoiceService.calculatePenalty(transaction);
 
-		User user = transaction.getUser(); // holt den benutzer, der die transaktion durchgeführt hat zur guthaben
-		// aktualisierung -> user.setCredit(user.getCredit() - (long) penaltyAmount)
-		if (user.getCredit() < penaltyAmount) {
-			// prüft, ob der benutzer genug guthaben hat, um die mahngebühren zu zahlen
-			throw new IllegalStateException("nicht genügend guthaben auf dem konto, um die mahngebühren zu bezahlen.");
-		}
+	    // Validate user credit and deduct penalty
+	    User user = transaction.getUser();
+	    if (user.getCredit() < penaltyAmount) {
+	        throw new IllegalStateException("Insufficient credit to pay the penalty.");
+	    }
+	    user.setCredit(user.getCredit() - (long) penaltyAmount);
+	    userService.updateUser(user);
 
-		user.setCredit(user.getCredit() - (long) penaltyAmount); // wenn rückgabe gebührenpflichtig, prüfung ob genug
-																	// guthaben & zieht
-		// die mahngebühr vom guthaben des benutzers ab -> userService.updateUser(user);
-		userService.updateUser(user); // aktualisiert die benutzerdaten in der datenbank -> TemplateController
-										// postmedia
+	    // Save transaction updates
+	    mediaTransactionRepository.save(transaction);
 
-		mediaTransactionRepository.save(transaction); // aktualisiert die transaktion nach der rückgabe -> User user =
-														// transaction.getUser()
-
-		// erstellt und speichert eine rechnung für den benutzer
-		invoiceService.deductAmount(user, transaction);
+	    // Deduct penalty amount and generate an invoice
+	    invoiceService.deductAmount(user, transaction);
 	}
+
 
 }

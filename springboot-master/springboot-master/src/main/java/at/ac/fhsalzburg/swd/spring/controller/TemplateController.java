@@ -26,6 +26,7 @@ import javax.persistence.EntityManager;
 import javax.servlet.http.HttpSession;
 import java.time.LocalDate;
 import java.util.Collection;
+import java.util.Date;
 import java.util.List;
 import java.util.stream.Collectors;
 import java.util.stream.StreamSupport;
@@ -269,24 +270,22 @@ public class TemplateController {
 		return "redirect:/";
 	}
 
-	@GetMapping("/returnMedia") // definiert die http get-anforderung, um die seite zur medienrückgabe
-								// anzuzeigen
+	@GetMapping("/returnMedia")
 	public String showReturnMediaPage(Model model,
-			@CurrentSecurityContext(expression = "authentication") Authentication authentication) {
-		if (!(authentication instanceof AnonymousAuthenticationToken)) { // prüft, ob der benutzer authentifiziert ist
-			String username = authentication.getName(); // holt den benutzernamen des aktuell angemeldeten benutzers
-			User user = userService.getByUsername(username); // holt den benutzer anhand des benutzernamens aus der
-																// datenbank
-			Collection<MediaTransaction> loans = mediaTransactionService.findLoansByUser(user); // holt alle ausleihen
-																								// des benutzers
-			if (loans == null) { // prüft, ob loans null ist
-				loans = List.of(); // setzt loans auf eine leere liste, falls keine ausleihen vorhanden sind
-			}
-			model.addAttribute("loans", loans); // fügt die ausleihen zum modell hinzu, um sie in der view darzustellen
-		}
-		return "returnMedia"; // gibt den namen der html-seite zurück, die angezeigt werden soll
-								// ("returnMedia.html")
+	        @CurrentSecurityContext(expression = "authentication") Authentication authentication) {
+	    if (!(authentication instanceof AnonymousAuthenticationToken)) { // check if user is authenticated
+	        String username = authentication.getName(); // get the authenticated user's username
+	        User user = userService.getByUsername(username); // fetch user by username
+	        Collection<MediaTransaction> loans = mediaTransactionService.findLoansByUser(user); // fetch user's loans
+	        if (loans == null) {
+	            loans = List.of(); // set loans to empty list if no loans exist
+	        }
+	        model.addAttribute("loans", loans);
+	        model.addAttribute("currentDate", new Date()); // pass current date for Thymeleaf formatting
+	    }
+	    return "returnMedia";
 	}
+
 
 	// startet HTTP-anfrage für rückgabeprozess
 	@PostMapping("/returnMedia") // definiert die http post-anforderung zur verarbeitung der medienrückgabe
