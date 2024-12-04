@@ -72,19 +72,19 @@ public class CommandLineAppStartupRunner implements CommandLineRunner {
 		// Child/Youth Student customer (Age 15)
 		// username: John
 		// password: pw
-		userService.addUser("John", "Student-15", "john@email.com", "111111111", getBirthDate(-15), "pw", "Customer",
-				User.CustomerType.STUDENT, loanLimitRegular);
+		userService.addUser("john", "TestStudent", "john@email.com", "111", getBirthDate(-15), "pw", "Student",
+				User.CustomerType.STUDENT, loanLimitStudent);
 
 		// Adult customer (Age 30)
 		// username: Jane
 		// password: pw
-		userService.addUser("Jane", "Regular-30", "jane@email.com", "222222222", getBirthDate(-30), "pw", "Customer",
+		userService.addUser("jane", "TestRegular", "jane@email.com", "222", getBirthDate(-30), "pw", "Regular Customer",
 				User.CustomerType.REGULAR, loanLimitRegular);
 
 		// Student customer (Age 22)
 		// username: Joe
 		// password: pw
-		userService.addUser("Joe", "Student-22", "joe@email.com", "333333333", getBirthDate(-22), "pw", "Customer",
+		userService.addUser("joe", "TestStudent", "joe@email.com", "333", getBirthDate(-22), "pw", "Student",
 				User.CustomerType.STUDENT, loanLimitStudent);
 
 		productService.addProduct("first product", 3.30f);
