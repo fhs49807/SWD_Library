@@ -62,4 +62,10 @@ public class ReserveMediaTransactionService implements ReserveMediaTransactionSe
 		return reserveMediaTransactionRepository.findByUser(user);
 	}
 
+	@Override
+	public void cancelReservation(Long reservationId) {
+		reserveMediaTransactionRepository.deleteById(reservationId);
+		System.out.println("reservation " + reservationId + " was canceled");
+	}
+
 }

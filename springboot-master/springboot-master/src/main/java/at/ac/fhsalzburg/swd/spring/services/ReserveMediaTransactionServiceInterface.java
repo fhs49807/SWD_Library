@@ -15,4 +15,6 @@ public interface ReserveMediaTransactionServiceInterface {
     ReserveMediaTransaction getLatestReservation(Long mediaId, String username);
 
     Collection<ReserveMediaTransaction> findReservationsForUser(User username);
+
+	void cancelReservation(Long reservationId);
 }

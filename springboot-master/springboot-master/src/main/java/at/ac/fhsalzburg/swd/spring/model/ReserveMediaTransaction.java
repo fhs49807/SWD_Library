@@ -45,4 +45,6 @@ public class ReserveMediaTransaction {
 	public Date getReserveEndDate() { return reserveEndDate; }
 
 	public Long getId() { return id; }
+
+	public Date getReserveStartDate() { return reserveStartDate; }
 }

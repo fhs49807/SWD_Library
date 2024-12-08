@@ -106,13 +106,22 @@ public class MediaController extends BaseController {
 		try {
 			// aufruf der service-methode, um die rückgabe zu verarbeiten
 			mediaTransactionService.returnMedia(transactionId);
+
 			// fügt eine erfolgsmeldung zum modell hinzu
-			model.addAttribute("successMessage", "Media returned successfully.");
+			addSuccessMessage("Media returned successfully.", model);
 		} catch (Exception e) { // behandelt fehler, falls die rückgabe fehlschlägt
 			// fügt eine fehlermeldung zum modell hinzu
 			addErrorMessage("Error returning media: " + e.getMessage(), model);
 		}
 		return "redirect:/returnMedia"; // leitet zur rückgabeseite um, um die aktualisierte ansicht anzuzeigen
+	}
+
+	@PostMapping("/cancelReservation")
+	public String cancelReservation(@RequestParam Long reservationId, Model model) {
+		reserveMediaTransactionService.cancelReservation(reservationId);
+		addSuccessMessage("Media returned successfully.", model);
+
+		return "redirect:/returnMedia";
 	}
 
 	// populate reservation success page
@@ -199,6 +208,7 @@ public class MediaController extends BaseController {
 		for (ReserveMediaTransaction transaction : reserveMediaTransactionService.findReservationsForUser(user)) {
 			MediaTransactionDTO dto =
 				new MediaTransactionDTO(transaction.getId(), transaction.getEdition().getMediaName(),
+					DateUtils.getLocalDateFromDate(transaction.getReserveStartDate()),
 					DateUtils.getLocalDateFromDate(transaction.getReserveEndDate()));
 			mediaTransactionDTOs.add(dto);
 		}
