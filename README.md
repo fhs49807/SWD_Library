@@ -32,7 +32,8 @@
 - on LoanSuccess html --> rename header to reserve/loan success depending on method run✅
 - Return Media Page --> completed transactions are not removed from view
 - add returnMediaSuccess html page with details (return date✅, etc.) and fee calculations❌
-- add sections and shelf to successLoan page
+- add sections and shelf to successLoan page✅
+- add "must login first" error when accessing return media before logging in
 
 ## Database
 
