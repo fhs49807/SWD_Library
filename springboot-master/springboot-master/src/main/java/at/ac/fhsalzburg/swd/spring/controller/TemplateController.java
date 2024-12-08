@@ -147,7 +147,7 @@ public class TemplateController {
 		if (!(authentication instanceof AnonymousAuthenticationToken)) {
 			String username = authentication.getName();
 			User user = userService.getByUsername(username);
- 
+
 			LocalDate todayDate = LocalDate.now();
 			LocalDate endDate = todayDate.plusDays(1);
 
@@ -268,38 +268,6 @@ public class TemplateController {
 			userService.addUser(user);
 
 		return "redirect:/";
-	}
-
-	@GetMapping("/returnMedia")
-	public String showReturnMediaPage(Model model,
-	        @CurrentSecurityContext(expression = "authentication") Authentication authentication) {
-	    if (!(authentication instanceof AnonymousAuthenticationToken)) { // check if user is authenticated
-	        String username = authentication.getName(); // get the authenticated user's username
-	        User user = userService.getByUsername(username); // fetch user by username
-	        Collection<MediaTransaction> loans = mediaTransactionService.findLoansByUser(user); // fetch user's loans
-	        if (loans == null) {
-	            loans = List.of(); // set loans to empty list if no loans exist
-	        }
-	        model.addAttribute("loans", loans);
-	        model.addAttribute("currentDate", new Date()); // pass current date for Thymeleaf formatting
-	    }
-	    return "returnMedia";
-	}
-
-
-	// startet HTTP-anfrage für rückgabeprozess
-	@PostMapping("/returnMedia") // definiert die http post-anforderung zur verarbeitung der medienrückgabe
-	public String returnMedia(@RequestParam Long transactionId, Model model) { // methode zur rückgabe eines mediums
-		try {
-			mediaTransactionService.returnMedia(transactionId); // aufruf der service-methode, um die rückgabe zu
-																// verarbeiten
-			model.addAttribute("successMessage", "Media returned successfully."); // fügt eine erfolgsmeldung zum modell
-																					// hinzu
-		} catch (Exception e) { // behandelt fehler, falls die rückgabe fehlschlägt
-			model.addAttribute("errorMessage", "Error returning media: " + e.getMessage()); // fügt eine fehlermeldung
-																							// zum modell hinzu
-		}
-		return "redirect:/returnMedia"; // leitet zur rückgabeseite um, um die aktualisierte ansicht anzuzeigen
 	}
 
 }

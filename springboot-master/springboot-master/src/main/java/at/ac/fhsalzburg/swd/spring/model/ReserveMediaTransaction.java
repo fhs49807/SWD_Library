@@ -15,30 +15,34 @@ import java.util.Date;
 @Table(name = "RESERVEMEDIATRANSACTION")
 public class ReserveMediaTransaction {
 
-    @Id
-    @GeneratedValue(strategy = GenerationType.IDENTITY)
-    private Long id;
+	@Id
+	@GeneratedValue(strategy = GenerationType.IDENTITY)
+	private Long id;
 
-    @ManyToOne
-    private User user;
+	@ManyToOne
+	private User user;
 
-    @ManyToOne
-    private Edition edition;
+	@ManyToOne
+	private Edition edition;
 
-    @DateTimeFormat(pattern = "yyyy-MM-dd")
-    private Date reserveStartDate;
+	@DateTimeFormat(pattern = "yyyy-MM-dd")
+	private Date reserveStartDate;
 
-    @DateTimeFormat(pattern = "yyyy-MM-dd")
-    private Date reserveEndDate;
+	@DateTimeFormat(pattern = "yyyy-MM-dd")
+	private Date reserveEndDate;
 
-    public ReserveMediaTransaction(User user, Edition edition, Date reserveStartDate, Date reserveEndDate) {
-        this.user = user;
-        this.edition = edition;
-        this.reserveStartDate = reserveStartDate;
-        this.reserveEndDate = reserveEndDate;
-    }
-    
-    public Edition getEdition() {
-        return edition;
-    }
+	public ReserveMediaTransaction(User user, Edition edition, Date reserveStartDate, Date reserveEndDate) {
+		this.user = user;
+		this.edition = edition;
+		this.reserveStartDate = reserveStartDate;
+		this.reserveEndDate = reserveEndDate;
+	}
+
+	public Edition getEdition() {
+		return edition;
+	}
+
+	public Date getReserveEndDate() { return reserveEndDate; }
+
+	public Long getId() { return id; }
 }
