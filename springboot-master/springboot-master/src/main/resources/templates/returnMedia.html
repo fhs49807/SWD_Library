@@ -19,9 +19,8 @@
 
         <!-- Display User Loans -->
         <div>
-            <h3>Your Current Loans</h3>
-
-            <div th:if="${loans != null && !loans.isEmpty()}">
+            <div th:if="${!loans.isEmpty()}">
+				<h3>Your Current Loans</h3>
                 <table class="table table-hover mt-4">
                     <thead>
                         <tr>
@@ -46,9 +45,35 @@
                 </table>
             </div>
 
-            <!-- Display Message If No Loans -->
-            <div th:if="${loans == null || loans.isEmpty()}" class="alert alert-info">
-                <p>No loans available to return.</p>
+			<div th:if="${!reservations.isEmpty()}">
+				<h3>Your Current Reservations</h3>
+				<table class="table table-hover mt-4">
+					<thead>
+					<tr>
+						<th>Media Name</th>
+						<th>Due Date</th>
+						<th>Action</th>
+					</tr>
+					</thead>
+					<tbody>
+					<tr th:each="transaction : ${reservations}">
+						<td th:text="${transaction.mediaName}">Media Name</td>
+						<td th:text="${transaction.startDate}">Start Date</td>
+						<td th:text="${transaction.expirationDate}">Due Date</td>
+						<td>
+							<form th:action="@{/cancelReservation}" method="post">
+								<input type="hidden" name="reservationId" th:value="${transaction.id}" />
+								<button type="submit" class="btn btn-danger">Cancel Reservation</button>
+							</form>
+						</td>
+					</tr>
+					</tbody>
+				</table>
+			</div>
+
+            <!-- Display Message If No Loans and Reservations -->
+            <div th:if="${loans.isEmpty() && reservations.isEmpty()}" class="alert alert-info">
+                <p>No loans and reservations available to return.</p>
             </div>
         </div>
 
