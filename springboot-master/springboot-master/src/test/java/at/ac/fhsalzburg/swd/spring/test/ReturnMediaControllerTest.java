@@ -4,7 +4,6 @@ import static org.mockito.Mockito.verify;
 import static org.mockito.Mockito.doNothing;
 import static org.mockito.Mockito.times;
 
-
 import at.ac.fhsalzburg.swd.spring.controller.TemplateController;
 import at.ac.fhsalzburg.swd.spring.model.MediaTransaction;
 import at.ac.fhsalzburg.swd.spring.model.User;
@@ -119,6 +118,15 @@ public class ReturnMediaControllerTest {
 
         verify(invoiceService, times(1)).deductAmount(mockUser, transaction); // stelle sicher, dass deductAmount genau einmal aufgerufen wurde
     }
-
-
+    
+    // Test for access restriction when not logged in
+    @Test
+    public void givenNoAuth_whenAccessReturnMedia_thenShowLoginPage() throws Exception {
+        // Perform GET request for /returnMedia with no authentication
+        mockMvc.perform(get("/returnMedia"))
+                .andExpect(status().isOk()) // should return status 200
+                .andExpect(view().name("login")) // should show the login page
+                .andExpect(model().attributeExists("errorMessage")) // check if the errorMessage is set
+                .andExpect(model().attribute("errorMessage", "You must log in to access this page.")); // check for the correct error message
+    }
 }

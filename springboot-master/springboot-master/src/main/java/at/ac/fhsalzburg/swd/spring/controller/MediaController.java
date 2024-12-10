@@ -15,6 +15,7 @@ import org.springframework.stereotype.Controller;
 import org.springframework.ui.Model;
 import org.springframework.web.bind.annotation.*;
 
+import java.security.Principal;
 import java.util.ArrayList;
 import java.util.Collection;
 import java.util.Date;
@@ -81,24 +82,20 @@ public class MediaController extends BaseController {
 		return "login";
 	}
 
-	@GetMapping("/returnMedia")
-	public String showReturnMediaPage(Model model,
-		@CurrentSecurityContext(expression = "authentication") Authentication authentication) {
-		if (!(authentication instanceof AnonymousAuthenticationToken)) { // check if user is authenticated
-			String username = authentication.getName(); // get the authenticated user's username
-			User user = userService.getByUsername(username); // fetch user by username
-			Collection<MediaTransaction> loans = mediaTransactionService.findLoansByUser(user); // fetch user's loans
-			if (loans == null) {
-				loans = List.of(); // set loans to empty list if no loans exist
-			}
-			model.addAttribute("loans", loans);
-			model.addAttribute("currentDate", new Date()); // pass current date for Thymeleaf formatting
+	// Endpoint für die Rückgabeseite (wird nur für eingeloggte Benutzer angezeigt)
+    @GetMapping("/returnMedia")
+    public String returnMediaPage(Model model, Principal principal) {
+        if (principal == null) {
+            model.addAttribute("errorMessage", "You must log in to access this page.");
+            return "login"; // Zeigt die Login-Seite an, wenn der Benutzer nicht eingeloggt ist
+        }
 
-			fetchUserReservations(model, user);
-		}
-
-		return "returnMedia";
-	}
+        // Weiterverarbeitung für eingeloggte Benutzer
+        User user = userService.getByUsername(principal.getName());
+        Collection<MediaTransaction> loans = mediaTransactionService.findLoansByUser(user);
+        model.addAttribute("loans", loans);
+        return "returnMedia"; // Zeigt die Rückgabeseite an, wenn der Benutzer eingeloggt ist
+    }
 
 	// startet HTTP-anfrage für rückgabeprozess
 	@PostMapping("/returnMedia") // definiert die http post-anforderung zur verarbeitung der medienrückgabe

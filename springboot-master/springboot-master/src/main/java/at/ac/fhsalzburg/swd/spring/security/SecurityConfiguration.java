@@ -9,42 +9,36 @@ import org.springframework.security.web.authentication.UsernamePasswordAuthentic
 
 @EnableGlobalMethodSecurity(prePostEnabled = true, securedEnabled = true, jsr250Enabled = true)
 public class SecurityConfiguration {
-	
-	
-	@Autowired
-	private TokenService tokenService;
-	
-	@Bean
-	public SecurityFilterChain filterChain(HttpSecurity http) throws Exception {
-		// order is important, start with most specific
-		http.csrf().and().cors().and()
-		// JWT Authentication
-		.addFilterBefore(new JwtAuthenticationFilter(tokenService),
-				UsernamePasswordAuthenticationFilter.class)
-	    .authorizeRequests()
-	    	.antMatchers("/api/**") 
-			.hasAnyRole("USER", "ADMIN") // everything under /api needs either user or admin role
-	    	.antMatchers("/admin/**")
-			.hasAnyRole("ADMIN") // everything under /admin needs admin role
-			.antMatchers("/user/**")
-			.hasAnyRole("USER", "ADMIN") // everything under /user needs either user or admin role		
-	    .and().csrf().disable().formLogin() // add form based authentication
-	    	.loginPage("/login") // our login page
-	    	.defaultSuccessUrl("/", true) // where to go when login was successful
-	    	.failureUrl("/login-error")
-	    .and().csrf().disable().logout()    	
-    		.logoutSuccessUrl("/") // where to go after logout
-    		.invalidateHttpSession(true) // at logout invalidate session
-    		.deleteCookies("JSESSIONID") // and delete session cookie
-      	;
-		
-		http.headers().frameOptions().disable(); // h2-console would not work otherwise
-		
-	    return http.build();		
-		
-	}
-	
-	
-	
-	
+
+    @Autowired
+    private TokenService tokenService;
+
+    @Bean
+    public SecurityFilterChain filterChain(HttpSecurity http) throws Exception {
+        http.csrf().and().cors().and()
+            .addFilterBefore(new JwtAuthenticationFilter(tokenService),
+                    UsernamePasswordAuthenticationFilter.class)
+            .authorizeRequests()
+                .antMatchers("/api/**") 
+                    .hasAnyRole("USER", "ADMIN") // alles unter /api benötigt entweder Benutzer- oder Admin-Rolle
+                .antMatchers("/admin/**")
+                    .hasAnyRole("ADMIN") // alles unter /admin benötigt Admin-Rolle
+                .antMatchers("/user/**")
+                    .hasAnyRole("USER", "ADMIN") // alles unter /user benötigt entweder Benutzer- oder Admin-Rolle
+                .antMatchers("/returnMedia") 
+                    .authenticated() // alles unter /returnMedia benötigt eine Authentifizierung
+                .anyRequest().permitAll() // andere Seiten sind für alle zugänglich
+            .and().csrf().disable().formLogin() 
+                .loginPage("/login") // Die Login-Seite
+                .defaultSuccessUrl("/", true) // Weiterleitung nach erfolgreichem Login
+                .failureUrl("/login-error")
+            .and().csrf().disable().logout()     
+                .logoutSuccessUrl("/") // Weiterleitung nach Logout
+                .invalidateHttpSession(true) // Logout führt zur Invalidierung der Session
+                .deleteCookies("JSESSIONID"); // Löscht das Session-Cookie
+
+        http.headers().frameOptions().disable(); // h2-console würde sonst nicht funktionieren
+
+        return http.build();      
+    }
 }
