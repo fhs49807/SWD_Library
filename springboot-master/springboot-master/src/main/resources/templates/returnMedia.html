@@ -31,6 +31,7 @@
                     </thead>
                     <tbody>
                         <tr th:each="transaction : ${loans}">
+                            <!-- Only show ACTIVE loans (status != COMPLETED) -->
                             <td th:text="${transaction.edition.media.name}">Media Name</td>
                             <td th:text="${#dates.format(transaction.last_possible_return_date, 'yyyy-MM-dd')}">
                                 Due Date</td>

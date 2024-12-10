@@ -91,16 +91,24 @@ public class MediaController extends BaseController {
 
 	    // Weiterverarbeitung für eingeloggte Benutzer
 	    User user = userService.getByUsername(principal.getName());
-	    Collection<MediaTransaction> loans = mediaTransactionService.findLoansByUser(user);
-	    if (loans == null) {
-	        loans = new ArrayList<>(); // Falls loans null ist, initialisiere es als leere Liste
-	    }
+	    
+	    // Nur aktive Transaktionen anzeigen (status != COMPLETED)
+	    Collection<MediaTransaction> loans = mediaTransactionService.findLoansByUser(user).stream()
+	            .filter(transaction -> transaction.getStatus() != MediaTransaction.TransactionStatus.COMPLETED)
+	            .collect(Collectors.toList());
 	    model.addAttribute("loans", loans);
+
+	    // Reservierungen einfügen, falls vorhanden
+	    fetchUserReservations(model, user);
+
 	    return "returnMedia"; // Zeigt die Rückgabeseite an, wenn der Benutzer eingeloggt ist
 	}
 
-	@PostMapping("/returnMedia") // definiert die http post-anforderung zur verarbeitung der medienrückgabe
-	public String returnMedia(@RequestParam Long transactionId, Model model) { // methode zur rückgabe eines mediums
+
+
+
+	@PostMapping("/returnMedia")
+	public String returnMedia(@RequestParam Long transactionId, Model model) {
 	    try {
 	        // Aufruf der Service-Methode, um die Rückgabe zu verarbeiten
 	        mediaTransactionService.returnMedia(transactionId);
@@ -108,14 +116,16 @@ public class MediaController extends BaseController {
 	        // Erfolgreiche Rückgabe: Erfolgsmeldung hinzufügen
 	        addSuccessMessage("Media returned successfully.", model);
 
-	        // Zurück zur Rückgabeseite mit aktualisierten Transaktionen
-	        return "redirect:/returnMedia"; // Leitet zur Rückgabeseite um, um die aktualisierte Ansicht anzuzeigen
+	        // Weiterleitung zur Erfolgsseite
+	        return "redirect:/returnMediaSuccess";  // Weiterleitung zur returnMediaSuccess-Seite
 	    } catch (Exception e) {
 	        // Fehler beim Rückgabeverfahren: Fehlermeldung hinzufügen
 	        addErrorMessage("Error returning media: " + e.getMessage(), model);
-	        return "redirect:/returnMedia"; // Fehler und Weiterleitung zur gleichen Seite
+	        return "redirect:/returnMedia"; // Fehlerbehandlung und Weiterleitung zur gleichen Seite
 	    }
 	}
+
+
 
 	@PostMapping("/cancelReservation")
 	public String cancelReservation(@RequestParam Long reservationId, Model model) {

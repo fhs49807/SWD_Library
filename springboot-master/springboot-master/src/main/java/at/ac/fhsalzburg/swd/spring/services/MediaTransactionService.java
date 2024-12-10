@@ -119,39 +119,38 @@ public class MediaTransactionService implements MediaTransactionServiceInterface
 		return transaction;
 	}
 
-	// Methode zur Rückgabe eines Mediums
-    @Override
-    public void returnMedia(Long transactionId) {
-        // 1. Hole die Transaktion basierend auf der ID
-        MediaTransaction transaction = mediaTransactionRepository.findById(transactionId)
-                .orElseThrow(() -> new IllegalArgumentException("Transaction not found"));
+	@Override
+	public void returnMedia(Long transactionId) {
+	    // Hole die Transaktion basierend auf der ID
+	    MediaTransaction transaction = mediaTransactionRepository.findById(transactionId)
+	            .orElseThrow(() -> new IllegalArgumentException("Transaction not found"));
 
-        // 2. Setze das Rückgabedatum auf das aktuelle Datum
-        transaction.setReturnDate(new Date());
+	    // Setze das Rückgabedatum auf das aktuelle Datum
+	    transaction.setReturnDate(new Date());
 
-        // 3. Berechne die Strafe, falls vorhanden
-        double penalty = calculatePenalty(transaction);
+	    // Berechne die Strafe, falls vorhanden
+	    double penalty = calculatePenalty(transaction);
 
-        // 4. Berechne die Gebühren und aktualisiere das Guthaben des Benutzers
-        User user = transaction.getUser();
-        if (user.getCredit() < penalty) {
-            throw new IllegalStateException("User does not have enough credit to pay the penalty");
-        }
-        user.setCredit(user.getCredit() - (long) penalty);
-        invoiceService.deductAmount(user, transaction);
+	    // Berechne die Gebühren und aktualisiere das Guthaben des Benutzers
+	    User user = transaction.getUser();
+	    if (user.getCredit() < penalty) {
+	        throw new IllegalStateException("User does not have enough credit to pay the penalty");
+	    }
+	    user.setCredit(user.getCredit() - (long) penalty);
+	    invoiceService.deductAmount(user, transaction);
 
-        // 5. Setze den Transaktionsstatus auf 'COMPLETED'
-        transaction.setStatus(MediaTransaction.TransactionStatus.COMPLETED);
+	    // Setze den Transaktionsstatus auf 'COMPLETED'
+	    transaction.setStatus(MediaTransaction.TransactionStatus.COMPLETED);
 
-        // 6. Update der Transaktion in der Datenbank
-        mediaTransactionRepository.save(transaction);
+	    // Update der Transaktion in der Datenbank
+	    mediaTransactionRepository.save(transaction);
 
-        // 7. Update der Edition, die jetzt wieder verfügbar ist
-        Edition edition = transaction.getEdition();
-        edition.setAvailable(true);
-        edition.setDueDate(null); // Setze das Fälligkeitsdatum auf null
-        // Hier wird davon ausgegangen, dass du die Edition ebenfalls aktualisieren möchtest
-    }
+	    // Update der Edition, die jetzt wieder verfügbar ist
+	    Edition edition = transaction.getEdition();
+	    edition.setAvailable(true);
+	    edition.setDueDate(null); // Setze das Fälligkeitsdatum auf null
+	    editionRepository.save(edition);
+	}
 
     // Berechnet die Strafe für verspätete Rückgaben
     private double calculatePenalty(MediaTransaction transaction) {
