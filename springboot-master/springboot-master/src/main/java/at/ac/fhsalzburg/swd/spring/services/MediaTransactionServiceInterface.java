@@ -24,4 +24,5 @@ public interface MediaTransactionServiceInterface {
 	// Thomas Clermont
 	MediaTransaction loanMedia(String username, Long mediaId, Date dueDate);
 
+	MediaTransaction findById(Long transactionId);
 }

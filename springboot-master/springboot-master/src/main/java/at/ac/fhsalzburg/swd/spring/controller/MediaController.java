@@ -82,35 +82,39 @@ public class MediaController extends BaseController {
 		return "login";
 	}
 
-	// Endpoint für die Rückgabeseite (wird nur für eingeloggte Benutzer angezeigt)
-    @GetMapping("/returnMedia")
-    public String returnMediaPage(Model model, Principal principal) {
-        if (principal == null) {
-            model.addAttribute("errorMessage", "You must log in to access this page.");
-            return "login"; // Zeigt die Login-Seite an, wenn der Benutzer nicht eingeloggt ist
-        }
+	@GetMapping("/returnMedia")
+	public String returnMediaPage(Model model, Principal principal) {
+	    if (principal == null) {
+	        model.addAttribute("errorMessage", "You must log in to access this page.");
+	        return "login"; // Zeigt die Login-Seite an, wenn der Benutzer nicht eingeloggt ist
+	    }
 
-        // Weiterverarbeitung für eingeloggte Benutzer
-        User user = userService.getByUsername(principal.getName());
-        Collection<MediaTransaction> loans = mediaTransactionService.findLoansByUser(user);
-        model.addAttribute("loans", loans);
-        return "returnMedia"; // Zeigt die Rückgabeseite an, wenn der Benutzer eingeloggt ist
-    }
+	    // Weiterverarbeitung für eingeloggte Benutzer
+	    User user = userService.getByUsername(principal.getName());
+	    Collection<MediaTransaction> loans = mediaTransactionService.findLoansByUser(user);
+	    if (loans == null) {
+	        loans = new ArrayList<>(); // Falls loans null ist, initialisiere es als leere Liste
+	    }
+	    model.addAttribute("loans", loans);
+	    return "returnMedia"; // Zeigt die Rückgabeseite an, wenn der Benutzer eingeloggt ist
+	}
 
-	// startet HTTP-anfrage für rückgabeprozess
 	@PostMapping("/returnMedia") // definiert die http post-anforderung zur verarbeitung der medienrückgabe
 	public String returnMedia(@RequestParam Long transactionId, Model model) { // methode zur rückgabe eines mediums
-		try {
-			// aufruf der service-methode, um die rückgabe zu verarbeiten
-			mediaTransactionService.returnMedia(transactionId);
+	    try {
+	        // Aufruf der Service-Methode, um die Rückgabe zu verarbeiten
+	        mediaTransactionService.returnMedia(transactionId);
 
-			// fügt eine erfolgsmeldung zum modell hinzu
-			addSuccessMessage("Media returned successfully.", model);
-		} catch (Exception e) { // behandelt fehler, falls die rückgabe fehlschlägt
-			// fügt eine fehlermeldung zum modell hinzu
-			addErrorMessage("Error returning media: " + e.getMessage(), model);
-		}
-		return "redirect:/returnMedia"; // leitet zur rückgabeseite um, um die aktualisierte ansicht anzuzeigen
+	        // Erfolgreiche Rückgabe: Erfolgsmeldung hinzufügen
+	        addSuccessMessage("Media returned successfully.", model);
+
+	        // Zurück zur Rückgabeseite mit aktualisierten Transaktionen
+	        return "redirect:/returnMedia"; // Leitet zur Rückgabeseite um, um die aktualisierte Ansicht anzuzeigen
+	    } catch (Exception e) {
+	        // Fehler beim Rückgabeverfahren: Fehlermeldung hinzufügen
+	        addErrorMessage("Error returning media: " + e.getMessage(), model);
+	        return "redirect:/returnMedia"; // Fehler und Weiterleitung zur gleichen Seite
+	    }
 	}
 
 	@PostMapping("/cancelReservation")
@@ -211,4 +215,45 @@ public class MediaController extends BaseController {
 		}
 		model.addAttribute("reservations", mediaTransactionDTOs);
 	}
+	
+	@PostMapping("/returnMediaSuccess")
+	public String returnMediaSuccess(@RequestParam Long transactionId, Model model) {
+	    try {
+	        // Holen Sie die Transaktion basierend auf der Transaktions-ID
+	        MediaTransaction transaction = mediaTransactionService.findById(transactionId);
+
+	        if (transaction == null) {
+	            addErrorMessage("Media transaction not found.", model);
+	            return "redirect:/returnMedia";
+	        }
+
+	        // Berechne die verspätete Gebühr
+	        double penaltyAmount = calculatePenalty(transaction);
+
+	        // Setze das Rückgabedatum
+	        Date returnDate = new Date(); // Rückgabedatum ist das aktuelle Datum
+
+	        // Fülle das Modell mit den benötigten Details
+	        model.addAttribute("username", transaction.getUser().getUsername());
+	        model.addAttribute("transaction_date", transaction.getStart_date());
+	        model.addAttribute("mediaTitle", transaction.getEdition().getMedia().getName());
+	        model.addAttribute("mediaGenre", transaction.getEdition().getMedia().getGenre().getName());
+	        model.addAttribute("mediaType", transaction.getEdition().getMedia().getMediaType().getType());
+	        model.addAttribute("returnDate", returnDate);
+	        model.addAttribute("penaltyAmount", penaltyAmount);
+
+	        // Erfolgreiche Rückgabe abgeschlossen
+	        return "returnMediaSuccess";
+	    } catch (Exception e) {
+	        addErrorMessage("Error processing media return: " + e.getMessage(), model);
+	        return "redirect:/returnMedia";
+	    }
+	}
+
+	// Hilfsmethode zur Berechnung der Mahngebühr
+	private double calculatePenalty(MediaTransaction transaction) {
+	    long overdueDays = (transaction.getReturnDate().getTime() - transaction.getLast_possible_return_date().getTime()) / (1000 * 60 * 60 * 24);
+	    return overdueDays > 0 ? overdueDays * 1.0 : 0.0; // Gebühr von 1€ pro verspätetem Tag
+	}
+
 }

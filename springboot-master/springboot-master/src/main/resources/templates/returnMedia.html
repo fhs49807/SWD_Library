@@ -19,7 +19,7 @@
 
         <!-- Display User Loans -->
         <div>
-            <div th:if="${!loans.isEmpty()}">
+            <div th:if="${loans != null && !loans.isEmpty()}">
                 <h3>Your Current Loans</h3>
                 <table class="table table-hover mt-4">
                     <thead>
@@ -35,7 +35,7 @@
                             <td th:text="${#dates.format(transaction.last_possible_return_date, 'yyyy-MM-dd')}">
                                 Due Date</td>
                             <td>
-                                <form th:action="@{/returnMedia}" method="post">
+                                <form th:action="@{/returnMediaSuccess}" method="post">
                                     <input type="hidden" name="transactionId" th:value="${transaction.id}" />
                                     <button type="submit" class="btn btn-danger">Return</button>
                                 </form>
@@ -45,7 +45,15 @@
                 </table>
             </div>
 
-            <div th:if="${!reservations.isEmpty()}">
+            <!-- Display Message If No Loans -->
+            <div th:if="${loans != null && loans.isEmpty()}">
+                <div class="alert alert-info">
+                    <p>No loans available to return.</p>
+                </div>
+            </div>
+
+            <!-- Display User Reservations -->
+            <div th:if="${reservations != null && !reservations.isEmpty()}">
                 <h3>Your Current Reservations</h3>
                 <table class="table table-hover mt-4">
                     <thead>
@@ -71,9 +79,11 @@
                 </table>
             </div>
 
-            <!-- Display Message If No Loans and Reservations -->
-            <div th:if="${loans.isEmpty() && reservations.isEmpty()}" class="alert alert-info">
-                <p>No loans and reservations available to return.</p>
+            <!-- Display Message If No Reservations -->
+            <div th:if="${reservations != null && reservations.isEmpty()}">
+                <div class="alert alert-info">
+                    <p>No reservations available to cancel.</p>
+                </div>
             </div>
         </div>
 

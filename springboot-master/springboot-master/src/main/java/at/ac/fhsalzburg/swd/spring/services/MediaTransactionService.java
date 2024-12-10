@@ -56,6 +56,12 @@ public class MediaTransactionService implements MediaTransactionServiceInterface
 	public Collection<MediaTransaction> findLoansByUser(User user) {
 		return mediaTransactionRepository.findByUser(user);
 	}
+	
+	@Override
+    public MediaTransaction findById(Long transactionId) {
+        return mediaTransactionRepository.findById(transactionId)
+                .orElseThrow(() -> new IllegalArgumentException("Transaction not found"));
+    }
 
 	// get all loans currently entered in the system
 	@Override
@@ -113,43 +119,49 @@ public class MediaTransactionService implements MediaTransactionServiceInterface
 		return transaction;
 	}
 
-	// ruft die transaktion auf, aktualisiert den status & berechnet gebühren ->
-	// InvoiceService calculatePenalty()
-	@Override
-	public void returnMedia(Long transactionId) {
-	    // Fetch the transaction by ID or throw an exception
-	    MediaTransaction transaction = mediaTransactionRepository.findById(transactionId)
-	            .orElseThrow(() -> new IllegalArgumentException("Transaction not found"));
+	// Methode zur Rückgabe eines Mediums
+    @Override
+    public void returnMedia(Long transactionId) {
+        // 1. Hole die Transaktion basierend auf der ID
+        MediaTransaction transaction = mediaTransactionRepository.findById(transactionId)
+                .orElseThrow(() -> new IllegalArgumentException("Transaction not found"));
 
-	    // Set return date and update transaction status
-	    transaction.setReturnDate(new Date());
-	    transaction.setStatus(MediaTransaction.TransactionStatus.COMPLETED);
+        // 2. Setze das Rückgabedatum auf das aktuelle Datum
+        transaction.setReturnDate(new Date());
 
-	    // Update the associated edition
-	    Edition edition = transaction.getEdition();
-	    if (edition != null) {
-	        edition.setAvailable(true);
-	        edition.setDueDate(null);
-	        editionRepository.save(edition);
-	    }
+        // 3. Berechne die Strafe, falls vorhanden
+        double penalty = calculatePenalty(transaction);
 
-	    // Calculate penalty
-	    double penaltyAmount = invoiceService.calculatePenalty(transaction);
+        // 4. Berechne die Gebühren und aktualisiere das Guthaben des Benutzers
+        User user = transaction.getUser();
+        if (user.getCredit() < penalty) {
+            throw new IllegalStateException("User does not have enough credit to pay the penalty");
+        }
+        user.setCredit(user.getCredit() - (long) penalty);
+        invoiceService.deductAmount(user, transaction);
 
-	    // Validate user credit and deduct penalty
-	    User user = transaction.getUser();
-	    if (user.getCredit() < penaltyAmount) {
-	        throw new IllegalStateException("Insufficient credit to pay the penalty.");
-	    }
-	    user.setCredit(user.getCredit() - (long) penaltyAmount);
-	    userService.updateUser(user);
+        // 5. Setze den Transaktionsstatus auf 'COMPLETED'
+        transaction.setStatus(MediaTransaction.TransactionStatus.COMPLETED);
 
-	    // Save transaction updates
-	    mediaTransactionRepository.save(transaction);
+        // 6. Update der Transaktion in der Datenbank
+        mediaTransactionRepository.save(transaction);
 
-	    // Deduct penalty amount and generate an invoice
-	    invoiceService.deductAmount(user, transaction);
-	}
+        // 7. Update der Edition, die jetzt wieder verfügbar ist
+        Edition edition = transaction.getEdition();
+        edition.setAvailable(true);
+        edition.setDueDate(null); // Setze das Fälligkeitsdatum auf null
+        // Hier wird davon ausgegangen, dass du die Edition ebenfalls aktualisieren möchtest
+    }
 
+    // Berechnet die Strafe für verspätete Rückgaben
+    private double calculatePenalty(MediaTransaction transaction) {
+        // Wenn das Rückgabedatum nach dem Fälligkeitsdatum liegt, berechne die Strafe
+        if (transaction.getReturnDate() != null && transaction.getReturnDate().after(transaction.getLast_possible_return_date())) {
+            long diffInMillies = transaction.getReturnDate().getTime() - transaction.getLast_possible_return_date().getTime();
+            long diffInDays = diffInMillies / (1000 * 60 * 60 * 24); // Differenz in Tagen
+            return diffInDays * 1.0; // Angenommene Gebühr von 1 Euro pro verspätetem Tag
+        }
+        return 0; // Keine Strafe, wenn die Rückgabe pünktlich ist
+    }
 
 }

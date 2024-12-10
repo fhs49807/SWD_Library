@@ -1,0 +1,34 @@
+<!DOCTYPE html>
+<html xmlns:layout="http://www.ultraq.net.nz/thymeleaf/layout"
+      xmlns:th="http://www.thymeleaf.org"
+      layout:decorate="~{layouts/main-layout}">
+
+<head>
+    <title>Return Media Success</title>
+</head>
+
+<body>
+    <main layout:fragment="content" th:remove="tag">
+
+        <h2>Return Media Success</h2>
+
+        <div class="alert alert-success" role="alert">
+            <h4>Media returned successfully!</h4>
+            <p>Thank you for returning the media. Here are the details:</p>
+        </div>
+
+        <ul>
+            <li><strong>Username:</strong> <span th:text="${username}"></span></li>
+            <li><strong>Transaction Date:</strong> <span th:text="${transaction_date}"></span></li>
+            <li><strong>Media Title:</strong> <span th:text="${mediaTitle}"></span></li>
+            <li><strong>Media Genre:</strong> <span th:text="${mediaGenre}"></span></li>
+            <li><strong>Media Type:</strong> <span th:text="${mediaType}"></span></li>
+            <li><strong>Return Date:</strong> <span th:text="${returnDate}"></span></li>
+            <li><strong>Penalty Amount:</strong> <span th:text="${penaltyAmount}">...</span></li>
+        </ul>
+
+        <a th:href="@{/returnMedia}" class="btn btn-primary">Back to Return Media</a>
+    </main>
+</body>
+
+</html>
