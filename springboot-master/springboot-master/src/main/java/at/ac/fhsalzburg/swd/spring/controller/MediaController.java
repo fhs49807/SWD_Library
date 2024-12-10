@@ -110,20 +110,16 @@ public class MediaController extends BaseController {
 	@PostMapping("/returnMedia")
 	public String returnMedia(@RequestParam Long transactionId, Model model) {
 	    try {
-	        // Aufruf der Service-Methode, um die Rückgabe zu verarbeiten
 	        mediaTransactionService.returnMedia(transactionId);
 
-	        // Erfolgreiche Rückgabe: Erfolgsmeldung hinzufügen
-	        addSuccessMessage("Media returned successfully.", model);
-
-	        // Weiterleitung zur Erfolgsseite
-	        return "redirect:/returnMediaSuccess";  // Weiterleitung zur returnMediaSuccess-Seite
+	        // Redirect with transactionId
+	        return "redirect:/returnMediaSuccess?transactionId=" + transactionId;
 	    } catch (Exception e) {
-	        // Fehler beim Rückgabeverfahren: Fehlermeldung hinzufügen
 	        addErrorMessage("Error returning media: " + e.getMessage(), model);
-	        return "redirect:/returnMedia"; // Fehlerbehandlung und Weiterleitung zur gleichen Seite
+	        return "redirect:/returnMedia";
 	    }
 	}
+
 
 
 
@@ -226,10 +222,10 @@ public class MediaController extends BaseController {
 		model.addAttribute("reservations", mediaTransactionDTOs);
 	}
 	
-	@PostMapping("/returnMediaSuccess")
+	@GetMapping("/returnMediaSuccess")
 	public String returnMediaSuccess(@RequestParam Long transactionId, Model model) {
+	    // Handle success view logic here
 	    try {
-	        // Holen Sie die Transaktion basierend auf der Transaktions-ID
 	        MediaTransaction transaction = mediaTransactionService.findById(transactionId);
 
 	        if (transaction == null) {
@@ -237,28 +233,20 @@ public class MediaController extends BaseController {
 	            return "redirect:/returnMedia";
 	        }
 
-	        // Berechne die verspätete Gebühr
+	        // Fill the model with success details
 	        double penaltyAmount = calculatePenalty(transaction);
-
-	        // Setze das Rückgabedatum
-	        Date returnDate = new Date(); // Rückgabedatum ist das aktuelle Datum
-
-	        // Fülle das Modell mit den benötigten Details
 	        model.addAttribute("username", transaction.getUser().getUsername());
-	        model.addAttribute("transaction_date", transaction.getStart_date());
 	        model.addAttribute("mediaTitle", transaction.getEdition().getMedia().getName());
-	        model.addAttribute("mediaGenre", transaction.getEdition().getMedia().getGenre().getName());
-	        model.addAttribute("mediaType", transaction.getEdition().getMedia().getMediaType().getType());
-	        model.addAttribute("returnDate", returnDate);
+	        model.addAttribute("returnDate", new Date());
 	        model.addAttribute("penaltyAmount", penaltyAmount);
 
-	        // Erfolgreiche Rückgabe abgeschlossen
 	        return "returnMediaSuccess";
 	    } catch (Exception e) {
 	        addErrorMessage("Error processing media return: " + e.getMessage(), model);
 	        return "redirect:/returnMedia";
 	    }
 	}
+
 
 	// Hilfsmethode zur Berechnung der Mahngebühr
 	private double calculatePenalty(MediaTransaction transaction) {

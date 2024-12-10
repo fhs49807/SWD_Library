@@ -36,10 +36,10 @@
                             <td th:text="${#dates.format(transaction.last_possible_return_date, 'yyyy-MM-dd')}">
                                 Due Date</td>
                             <td>
-                                <form th:action="@{/returnMediaSuccess}" method="post">
-                                    <input type="hidden" name="transactionId" th:value="${transaction.id}" />
-                                    <button type="submit" class="btn btn-danger">Return</button>
-                                </form>
+									<form th:action="@{/returnMedia}" method="post">
+									    <input type="hidden" name="transactionId" th:value="${transaction.id}" />
+									    <button type="submit" class="btn btn-danger">Return</button>
+									</form>
                             </td>
                         </tr>
                     </tbody>

@@ -37,6 +37,10 @@ public class ReserveMediaTransaction {
 		this.reserveStartDate = reserveStartDate;
 		this.reserveEndDate = reserveEndDate;
 	}
+	
+	public ReserveMediaTransaction() {
+		
+	}
 
 	public Edition getEdition() {
 		return edition;
