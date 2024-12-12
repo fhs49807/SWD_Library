@@ -11,7 +11,6 @@ import java.util.Date;
 @Entity
 @Getter
 @Setter
-@NoArgsConstructor
 @Table(name = "RESERVEMEDIATRANSACTION")
 public class ReserveMediaTransaction {
 
