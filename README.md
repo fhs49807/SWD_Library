@@ -1,5 +1,40 @@
 # TODO
 
+## Feedback Danninger (Code)
+
+- Define prices at the level of `MediaType` and `Genre` (e.g., Blu-rays likely cost more than magazines).
+- Represent `Section` and `Shelf` in the database using a composite primary key (e.g., `@EmbeddedId`) if time allows.
+- Clarify `MediaTransaction`: it refers to multiple media but only one exemplar. Is `Media` even needed here if only exemplars are loaned?
+- Fix inconsistency: `ReserveMediaTransaction` seems to reference an exemplar, but reservations should be for media, not exemplars.
+- Ensure unit tests verify that associations (e.g., exemplar to media) are correct.
+- Simplify management of `Media` and `Edition`: manage both with a single service (`MediaService`).
+- Services must not directly use repositories from other services. Use service interfaces instead.
+- Address loan durations as discussed in class.
+- Implement reservation logic: ensure media isn't reserved by someone else before a loan is made.
+- Add `FSK` (age restriction) checks.
+- Support multi-user operation (Mehrbenutzerbetrieb).
+- Fix `returnMedia` logic: ORM should automatically handle managed objects without requiring `save()` calls.
+- Handle cases where the user's account doesn't have sufficient credit for late fees.
+- Improve `ReserveMediaTransaction.reserveMediaForCustomer`: avoid passing `Media` as a string and handle cases where no media is found.
+- Consolidate `ReserveMediaTransaction` and `MediaTransaction` if reservations and loans use similar logic.
+- Address edge cases: loans should honor reservations (e.g., if an item is reserved for tomorrow, it shouldn't be loaned today).
+- Eliminate hard-coded fees and externalize them for configuration.
+- Fix `MediaTransactionService.createLoanRecord`: ensure it is used and isn't dead code.
+- Add optional arguments to loan methods for handling reservations (e.g., a reservation number).
+- Avoid hard-coded values for fees and credits.
+- Fix failing service tests for loans and reservations.
+- Consolidate controller logic to avoid duplication (e.g., `showLoanPage` and `searchMedia` show the same page but have separate methods).
+- Move loan vs. reservation logic from controllers to services.
+- Ensure all services use only their own repositories.
+- Address duplication between `TemplateController` and `MediaController`.
+
+
+## Feedback
+
+- Feedback von Activity Diagramm
+- Feedback von Context Diagram übernehmen
+- Context Diagram aufräumen
+
 ## Gegeben
 
 - Simple books (These are normal books like novels etc.)✅
@@ -19,12 +54,6 @@
 - Customers should be possible to ask for the availability of a specific media
 - Customers should be possible to ask for the physical position of a specific media✅
 - If a customer has exceed the max. loan time (4 weeks), the customer has to pay a penalty fee for every additional day
-
-## Feedback
-
-- Feedback von Activity Diagramm
-- Feedback von Context Diagram übernehmen
-- Context Diagram aufräumen
 
 ## UI
 
