@@ -2,31 +2,49 @@
 
 ## Feedback Danninger (Code)
 
-- Define prices at the level of `MediaType` and `Genre` (e.g., Blu-rays likely cost more than magazines).
-- Represent `Section` and `Shelf` in the database using a composite primary key (e.g., `@EmbeddedId`) if time allows.
-- Clarify `MediaTransaction`: it refers to multiple media but only one exemplar. Is `Media` even needed here if only exemplars are loaned?
-- Fix inconsistency: `ReserveMediaTransaction` seems to reference an exemplar, but reservations should be for media, not exemplars.
-- Ensure unit tests verify that associations (e.g., exemplar to media) are correct.
-- Simplify management of `Media` and `Edition`: manage both with a single service (`MediaService`).
-- Services must not directly use repositories from other services. Use service interfaces instead.
-- Address loan durations as discussed in class.
-- Implement reservation logic: ensure media isn't reserved by someone else before a loan is made.
-- Add `FSK` (age restriction) checks.
-- Support multi-user operation (Mehrbenutzerbetrieb).
-- Fix `returnMedia` logic: ORM should automatically handle managed objects without requiring `save()` calls.
-- Handle cases where the user's account doesn't have sufficient credit for late fees.
-- Improve `ReserveMediaTransaction.reserveMediaForCustomer`: avoid passing `Media` as a string and handle cases where no media is found.
-- Consolidate `ReserveMediaTransaction` and `MediaTransaction` if reservations and loans use similar logic.
-- Address edge cases: loans should honor reservations (e.g., if an item is reserved for tomorrow, it shouldn't be loaned today).
-- Eliminate hard-coded fees and externalize them for configuration.
-- Fix `MediaTransactionService.createLoanRecord`: ensure it is used and isn't dead code.
-- Add optional arguments to loan methods for handling reservations (e.g., a reservation number).
-- Avoid hard-coded values for fees and credits.
-- Fix failing service tests for loans and reservations.
-- Consolidate controller logic to avoid duplication (e.g., `showLoanPage` and `searchMedia` show the same page but have separate methods).
-- Move loan vs. reservation logic from controllers to services.
-- Ensure all services use only their own repositories.
-- Address duplication between `TemplateController` and `MediaController`.
+- Optimal wäre, wenn die Preise auf Ebene `MedienTyp` und `Genre` definiert würden; vermutlich kostet eine Blu-ray mehr als eine Zeitschrift.
+- Section und Shelf wären DB-seitig besser als identifizierende Beziehung umgesetzt (zusammengesetzter PK --> `@EmbeddedId`). Sollte am Ende noch Zeit bleiben.
+- `MediaTransaction` unklar: Es verweist auf viele Medien, aber nur auf ein Exemplar!? Wird das Medium hier überhaupt benötigt, wenn ohnehin nur ein Exemplar ausgeliehen werden kann?
+- Ich wäre davon ausgegangen, dass Sie unter `ReserveMediaTransaction` die Reservierungen haben – kann aber nicht sein, da hier ein Exemplar referenziert wird. Irgendetwas passt hier nicht zusammen.
+- Prüfen Sie bei den Unit-Tests, ob auch die Assoziationen korrekt sind (z.B. ob Sie vom Exemplar zum Medium kommen).
+- Lt. Komponentendiagramm werden die Exemplare vom `MediaManagement` verwaltet, im Klassendiagramm und in der Umsetzung gibt es jetzt aber auch einen `EditionService`. Ich würde davon ausgehen, dass ein sehr enger Zusammenhang zwischen Medium und Exemplar existiert und diese daher gemeinsam von einem Service verwaltet werden sollten.
+- Verantwortlichkeiten sind teilweise nicht korrekt, da Services direkt die Repositories anderer Services nutzen (sie müssten über die Service-Schnittstelle gehen). Beispiel: `LibraryService` nutzt `mediaRepository`, `editionRepository` und `mediaTransactionRepository`.
+- Das Thema Ausleihdauer haben wir im Labor besprochen.
+- Bei der Ausleihe scheint nicht berücksichtigt zu sein, dass das Medium eventuell von jemand anderem bereits reserviert sein könnte.
+- `FSK`-Prüfung fehlt.
+- Mehrbenutzerbetrieb müsste noch adressiert werden.
+- `MediaTransactionService.returnMedia`: Edition sollte nicht erneut gespeichert werden müssen, da das ORM bei Objekten, die bereits gemanaged sind, automatisch Änderungen verfolgt (gilt auch für `Transaction`).
+- Kann es beim Return auch passieren, dass der entsprechende Betrag nicht vom Benutzerkonto abgezogen werden kann?
+- `ReserveMediaTransaction.reserveMediaForCustomer`: Medium als `String` übergeben ist nicht optimal; es würde auch gar nicht darauf reagiert werden, falls kein Medium gefunden werden kann. Die Textausgabe bei `editions.isEmpty` scheint mir nicht korrekt.
+- Reserviert wird am Ende doch ein Exemplar und kein Medium? Was, wenn das Medium bereits von jemand anderem reserviert ist? Wird aktuell nicht berücksichtigt. Ebenfalls fehlen Mehrbenutzerbetrieb und `FSK`-Prüfung.
+- Unit-Test Rückgabe: Hier wäre es wichtig zu testen, dass bei einer verspäteten Rückgabe entsprechend die `Invoice` erstellt wird.
+- `UnitTest ReserveMediaTransactionServiceTest`: `reserveMediaForCustomer` schlägt fehl.
+- Unit-Tests dürfen keine Benutzereingaben abfragen; sie müssen automatisch und ohne Benutzer laufen.
+- Ich kann das UI nicht testen, da ich mich nicht einloggen kann. Bitte um Info. `john:pw` hat nicht funktioniert. Damit tue ich mich aktuell bei der Punktevergabe etwas schwer. Für Loan und Rückgabe scheint etwas da zu sein, Reserve scheint noch zu fehlen.
+- UI-Tests der Rückgabe laufen aktuell noch auf Fehler; UI-Tests der anderen Use-Cases fehlen noch.
+- Immer noch unklar, warum `MediaTransaction` eine Liste von `Media` und eine Assoziation zu `Edition` aufweist. Es scheint, als würden Sie die Liste der Medien im Programm nicht nutzen.
+- `Shelf` hat `id` und `number`?
+- Da aktuell `ReserveMediaTransaction` ebenfalls eine Edition referenziert, wäre es vermutlich einfacher gewesen, diese mit `MediaTransaction` zu verschmelzen.
+- Abbildung der Preise nur auf Genre-Ebene ist nicht optimal (siehe Vorfeedback).
+- `testUserCRUDOperations` testet zu viel. Würde in der Praxis dafür drei getrennte Unit-Tests erstellen. Dieser Unit-Test schlägt aktuell fehl – unklar, warum ein Benutzer, der schon in der DB ist, nochmals mit `addUser` hinzugefügt wird.
+- Warum hat die Edition einen `mediaName`? Edition ist einem Medium zugeordnet, und das Medium hat bereits einen Namen.
+- Services sind sehr kleinteilig und die Zuständigkeiten unklar: Hätte Editionen vom `MediaService` verwalten lassen; aktuell nutzen sowohl der `MediaService` als auch der `EditionService` das Repository der Editionen. Wer ist zuständig? (es kann nur einen geben). Außerdem beinhaltet der `LibraryService` Repositories, die eigentlich zu anderen Services gehören (das Problem zieht sich generell durch).
+- Theoretisch könnten alle Medientypen in einem Repository verwaltet werden (muss aber nicht geändert werden).
+- Wenn ein Objekt aus der DB geladen wurde und etwas verändert wird, muss die `repo.save`-Methode nicht mehr aufgerufen werden, da das ORM die Änderungen automatisch nachzieht. Wann die SQL-Statements tatsächlich ausgeführt werden, könnte unter anderem über `@Transactional` gesteuert werden (z.B. `createLoanRecord`).
+- `MediaTransactionService.createLoanRecord` scheint nicht verwendet zu werden; toter Code erschwert die Lesbarkeit.
+- `loanMedia`: `FSK`-Prüfung fehlt. Methode nicht für den Mehrbenutzerbetrieb abgesichert. Die Verfügbarkeit über einen Status auf der Edition abzubilden ist unzureichend. Es kann aktuell ein Exemplar ausgeliehen werden, obwohl es eigentlich für morgen reserviert ist. Eine Ausleihe sollte auch auf Basis einer Reservierung stattfinden können. Es wäre sinnvoll, in `loanMedia` ein optionales Argument wie eine "Reservierungsnummer" hinzuzufügen (falls das nicht schon woanders berücksichtigt wurde).
+- `returnMedia`: Mehrbenutzerbetrieb nicht adressiert (insbesondere Logik hinsichtlich Credit); Gebühren sind aktuell hardcoded mit € 1.
+- `ReserveMedia` berücksichtigt nicht, ob das Medium in diesem Zeitraum gerade ausgeliehen ist (und `loanMedia` berücksichtigt nicht, ob es reserviert ist). Keine `FSK`-Prüfung bei der Reservierung. Mehrbenutzerbetrieb noch nicht adressiert.
+- `MediaTransactionServiceTest` läuft auf Fehler. Service-Tests für Ausleihe und Reservierung fehlen.
+- Infos, wie das UI getestet werden kann, fehlen (User und Passwort).
+- Zwei Controller verwirrend: `TemplateController` hat `/loan`, und `MediaController` hat `/loanReserveMedia`.
+- Code-Duplizierung durch die Methoden `showLoanPage` und `searchMedia`. Da danach dieselbe Seite angezeigt wird, könnte die Logik in einer Methode zusammengeführt werden.
+- Aktuell unterscheidet der Controller abhängig vom Datum, ob eine Reservierung oder Ausleihe erstellt wird. Besser wäre, diese Logik in den Services zu haben, da ansonsten jemand `createLoan` einfach mit einem zukünftigen Datum aufrufen könnte.
+- `LoanMediaControllerTests` laufen nicht.
+- `ReturnMediaControllerTests` laufen auf Fehler.
+- Services überarbeiten. Sicherstellen, dass ein Repository nur in einem Service verwendet wird. Mehrbenutzerbetrieb adressieren und Logik für Ausleihe vs. Reservierung konsolidieren.
+
+
 
 
 ## Feedback
