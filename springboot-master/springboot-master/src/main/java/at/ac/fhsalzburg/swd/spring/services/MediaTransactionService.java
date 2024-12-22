@@ -32,30 +32,13 @@ public class MediaTransactionService implements MediaTransactionServiceInterface
 	private UserRepository userRepository;
 
 	@Autowired
-	private UserServiceInterface userService;
-
-	@Autowired
 	private MediaRepository mediaRepository;
-
-	// creates loan record for a customer
-	// marks each loaned item as unavailable
-	// saves transaction to repository
-	@Override
-	public Collection<MediaTransaction> createLoanRecord(User user, Date dueDate, Collection<Edition> editions) {
-		Collection<MediaTransaction> transactions = editions.stream().map(edition -> {
-			MediaTransaction loan = new MediaTransaction(new Date(), dueDate, Collections.emptyList(), edition, user);
-			edition.setAvailable(false); // Mark the edition as unavailable
-			editionRepository.save(edition); // Persist availability change
-			return mediaTransactionRepository.save(loan);
-		}).collect(Collectors.toList());
-		return transactions;
-	}
 
 	// finds all loan transactions for specific customer
 	@Override
 	public Collection<MediaTransaction> findLoansByUser(User user) {
 		return mediaTransactionRepository.findByUser(user);
-	}
+	} 
 	
 	@Override
     public MediaTransaction findById(Long transactionId) {

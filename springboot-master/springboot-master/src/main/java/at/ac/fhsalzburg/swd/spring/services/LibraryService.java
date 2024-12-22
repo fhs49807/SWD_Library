@@ -88,14 +88,6 @@ public class LibraryService implements LibraryServiceInterface {
 		return editionRepository.existsByIdAndAvailable(edition.getId(), true);
 	}
 
-	// handles media reservations by checking for availability in specific date range
-	// returns if number of reservations exceeds available editions --> unavailable
-	@Override
-	public boolean handleReservations(Media media, Date dueDate) {
-		Collection<MediaTransaction> reservations = mediaTransactionRepository.findReservationsByDateRange(media,
-				new Date(), dueDate);
-		Collection<Edition> editions = checkForAvailableEditions(media);
-		return reservations.size() >= editions.size();
-	}
+	
 
 }

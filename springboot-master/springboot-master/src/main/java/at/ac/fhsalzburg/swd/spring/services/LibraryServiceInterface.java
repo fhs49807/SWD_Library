@@ -34,6 +34,5 @@ public interface LibraryServiceInterface {
 	// verify if edition is available
 	public abstract boolean isEditionAvailable(Edition edition);
 
-	// check reservations of specific medium to see availability for loan period
-	public abstract boolean handleReservations(Media media, Date dueDate);
+	
 }

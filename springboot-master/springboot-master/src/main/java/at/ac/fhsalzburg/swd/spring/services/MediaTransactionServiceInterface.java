@@ -9,9 +9,6 @@ import at.ac.fhsalzburg.swd.spring.model.User;
 
 public interface MediaTransactionServiceInterface {
 
-	// create loan record
-	public Collection<MediaTransaction> createLoanRecord(User user, Date dueDate, Collection<Edition> editions);
-
 	// retrieve all loans associated to custmer
 	public abstract Collection<MediaTransaction> findLoansByUser(User user);
 
