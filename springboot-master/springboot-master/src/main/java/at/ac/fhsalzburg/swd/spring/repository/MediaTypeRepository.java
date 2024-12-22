@@ -9,10 +9,6 @@ import at.ac.fhsalzburg.swd.spring.model.MediaType;
 @Repository
 public interface MediaTypeRepository extends CrudRepository<MediaType, Long> {
 
-    @Transactional(timeout = 10)
-    MediaType findById(int id);
-	
 	@Transactional(timeout = 10)
 	MediaType findByTypeName(String typeName);
-
 }

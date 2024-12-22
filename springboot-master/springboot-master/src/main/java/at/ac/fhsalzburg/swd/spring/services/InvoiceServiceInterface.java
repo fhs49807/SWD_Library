@@ -5,12 +5,12 @@ import at.ac.fhsalzburg.swd.spring.model.User;
 
 public interface InvoiceServiceInterface {
 
-	// deduct outstanding amount
-	public abstract void deductAmount(User user, MediaTransaction transaction);
-	
-	// get outstanding balance from customer
-	public abstract double getOutstandingBalance(User user);
-	
-	double calculatePenalty(MediaTransaction transaction); // berechnung der mahngebühren methode
+	// Deduct outstanding amount from user's account
+	void deductAmount(User user, MediaTransaction transaction);
 
+	// Get the outstanding balance for a user
+	double getOutstandingBalance(User user);
+
+	// Calculate the penalty for a media transaction
+	double calculatePenalty(MediaTransaction transaction);
 }

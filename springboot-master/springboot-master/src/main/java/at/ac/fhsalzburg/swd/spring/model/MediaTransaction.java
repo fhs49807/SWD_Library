@@ -44,8 +44,8 @@ public class MediaTransaction {
 	private Date return_date; // date when item was actually returned
 
 	// TODO: add to class diagram
-	@ManyToMany
-	private Collection<Media> media;// one transaction can reserve multiple media items
+//	@ManyToMany
+//	private Collection<Media> media;// one transaction can reserve multiple media items
 
 	@ManyToOne
 	@JoinColumn(name = "edition_id", nullable = false)
@@ -56,16 +56,6 @@ public class MediaTransaction {
 
 	public MediaTransaction() {
 
-	}
-
-	public MediaTransaction(Date transactionDate, Date expirationDate, Collection<Media> media, Edition edition,
-			User user) {
-		this.start_date = transactionDate;
-		this.last_possible_return_date = expirationDate;
-		this.media = media;
-		this.edition = edition;
-		this.user = user;
-		this.status = TransactionStatus.ACTIVE; // default status: ACTIVE
 	}
 
 	//constructor used to create transaction in MediaTransactionService.java

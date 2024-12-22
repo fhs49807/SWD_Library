@@ -9,12 +9,12 @@ import java.util.Date;
 
 public interface ReserveMediaTransactionServiceInterface {
 
-    void reserveMediaForCustomer(String userName, Long mediaId, Date reserveStartDate,
-        Date reserveEndDate) throws NotFoundException;
+	void reserveMediaForCustomer(String userName, Long mediaId, Date reserveStartDate, Date reserveEndDate)
+			throws NotFoundException;
 
-    ReserveMediaTransaction getLatestReservation(Long mediaId, String username);
+	ReserveMediaTransaction getLatestReservation(Long mediaId, String username);
 
-    Collection<ReserveMediaTransaction> findReservationsForUser(User username);
+	Collection<ReserveMediaTransaction> findReservationsForUser(User user);
 
 	void cancelReservation(Long reservationId);
 }
