@@ -3,8 +3,8 @@ package at.ac.fhsalzburg.swd.spring.controller;
 import at.ac.fhsalzburg.swd.spring.TestBean;
 import at.ac.fhsalzburg.swd.spring.dto.UserDTO;
 import at.ac.fhsalzburg.swd.spring.model.Media;
-import at.ac.fhsalzburg.swd.spring.model.MediaTransaction;
 import at.ac.fhsalzburg.swd.spring.model.User;
+import at.ac.fhsalzburg.swd.spring.services.LibraryService;
 import at.ac.fhsalzburg.swd.spring.services.MediaService;
 import at.ac.fhsalzburg.swd.spring.services.MediaTransactionService;
 import at.ac.fhsalzburg.swd.spring.services.UserServiceInterface;
@@ -25,52 +25,39 @@ import javax.annotation.Resource;
 import javax.persistence.EntityManager;
 import javax.servlet.http.HttpSession;
 import java.time.LocalDate;
-import java.util.Collection;
-import java.util.Date;
 import java.util.List;
 import java.util.stream.Collectors;
 import java.util.stream.StreamSupport;
 
-@Controller // marks the class as a web controller, capable of handling the HTTP requests.
-// Spring
-// will look at the methods of the class marked with the @Controller annotation
-// and
-// establish the routing table to know which methods serve which endpoints.
+@Controller
 public class TemplateController {
 
 	Logger logger = LoggerFactory.getLogger(TemplateController.class);
 
 	// Dependency Injection
-	// ----------------------------------------------------------------------
-
-	@Autowired // To wire the application parts together, use @Autowired on the fields,
-	// constructors, or methods in a component. Spring's dependency injection
-	// mechanism
-	// wires appropriate beans into the class members marked with @Autowired.
+	@Autowired
 	private ApplicationContext context;
 
 	@Autowired
 	private EntityManager entityManager;
 
 	@Autowired
-	UserServiceInterface userService;
+	private UserServiceInterface userService;
 
 	@Autowired
-	MediaService mediaService;
+	private MediaService mediaService;
 
 	@Autowired
-	MediaTransactionService mediaTransactionService;
-
-	@Resource(name = "sessionBean") // The @Resource annotation is part of the JSR-250 annotation
-	// collection and is packaged with Jakarta EE. This annotation
-	// has the following execution paths, listed by Match by Name,
-	// Match by Type, Match by Qualifier. These execution paths are
-	// applicable to both setter and field injection.
-	// https://www.baeldung.com/spring-annotations-resource-inject-autowire
-	TestBean sessionBean;
+	private LibraryService libraryService;
 
 	@Autowired
-	TestBean singletonBean;
+	private MediaTransactionService mediaTransactionService;
+
+	@Resource(name = "sessionBean")
+	private TestBean sessionBean;
+
+	@Autowired
+	private TestBean singletonBean;
 
 	// HTTP Request Mappings GET/POST/... and URL Paths
 	// ----------------------------------------------------------------------
@@ -133,12 +120,6 @@ public class TemplateController {
 
 	}
 
-	// Add an empty/default option to the list of genres and media types
-	private List<String> addDefaultOption(List<String> options, String defaultLabel) {
-		options.add(0, defaultLabel); // Add an empty option at the beginning
-		return options;
-	}
-
 	@RequestMapping(value = "/loan", method = RequestMethod.GET)
 	public String showLoanPage(
 			@RequestParam(value = "selectedGenre", required = false, defaultValue = "") String selectedGenre,
@@ -148,26 +129,21 @@ public class TemplateController {
 			String username = authentication.getName();
 			User user = userService.getByUsername(username);
 
-			LocalDate todayDate = LocalDate.now();
-			LocalDate endDate = todayDate.plusDays(1);
-
-			// Fetch genres and media types with "All" as default
-			List<String> genres = addDefaultOption(
-					StreamSupport.stream(mediaService.getAllGenres().spliterator(), false).collect(Collectors.toList()),
-					"All Genres");
-			List<String> mediaTypes = addDefaultOption(StreamSupport
-					.stream(mediaService.getAllMediaTypes().spliterator(), false).collect(Collectors.toList()),
-					"All Media Types");
+			List<String> genres = addDefaultOption(libraryService.getAllGenres(), "All Genres");
+			List<String> mediaTypes = addDefaultOption(libraryService.getAllMediaTypes(), "All Media Types");
 
 			model.addAttribute("genres", genres);
 			model.addAttribute("mediaTypes", mediaTypes);
 			model.addAttribute("selectedGenre", selectedGenre);
 			model.addAttribute("selectedType", selectedType);
-			model.addAttribute("todayDate", todayDate);
-			model.addAttribute("endDate", endDate);
-
-			Iterable<Media> mediaList = mediaService.searchMediaByGenreAndType(selectedGenre, selectedType, user);
-			if (!mediaList.iterator().hasNext()) {
+			model.addAttribute("todayDate", LocalDate.now());
+			model.addAttribute("endDate", LocalDate.now().plusDays(1));
+ 
+			List<Media> mediaList = StreamSupport
+					.stream(mediaService.searchMediaByGenreAndType(selectedGenre, selectedType, user).spliterator(),
+							false)
+					.collect(Collectors.toList());
+			if (mediaList.isEmpty()) {
 				model.addAttribute("errorMessage", "No media found for the selected Genre and Media Type.");
 			}
 			model.addAttribute("mediaList", mediaList);
@@ -183,39 +159,12 @@ public class TemplateController {
 	public String searchMedia(@RequestParam(value = "genre", required = true) String genre,
 			@RequestParam(value = "type", required = true) String type, Model model,
 			@CurrentSecurityContext(expression = "authentication") Authentication authentication) {
-		if (!(authentication instanceof AnonymousAuthenticationToken)) {
-			String username = authentication.getName();
-			User user = userService.getByUsername(username);
+		return showLoanPage(genre, type, model, authentication);
+	}
 
-			LocalDate todayDate = LocalDate.now();
-			LocalDate endDate = todayDate.plusDays(1);
-
-			// Fetch genres and media types with "All" as default
-			List<String> genres = addDefaultOption(
-					StreamSupport.stream(mediaService.getAllGenres().spliterator(), false).collect(Collectors.toList()),
-					"All Genres");
-			List<String> mediaTypes = addDefaultOption(StreamSupport
-					.stream(mediaService.getAllMediaTypes().spliterator(), false).collect(Collectors.toList()),
-					"All Media Types");
-
-			Iterable<Media> mediaList = mediaService.searchMediaByGenreAndType(genre, type, user);
-			model.addAttribute("genres", genres);
-			model.addAttribute("mediaTypes", mediaTypes);
-			model.addAttribute("selectedGenre", genre);
-			model.addAttribute("selectedType", type);
-			model.addAttribute("todayDate", todayDate);
-			model.addAttribute("endDate", endDate);
-
-			if (!mediaList.iterator().hasNext()) {
-				model.addAttribute("errorMessage", "No media found for the selected Genre and Media Type.");
-			}
-			model.addAttribute("mediaList", mediaList);
-
-			return "loan";
-		}
-
-		model.addAttribute("errorMessage", "You must be logged in to search for media.");
-		return "login";
+	private List<String> addDefaultOption(List<String> options, String defaultLabel) {
+		options.add(0, defaultLabel);
+		return options;
 	}
 
 	@RequestMapping(value = { "/login-error" })

@@ -1,93 +1,92 @@
 package at.ac.fhsalzburg.swd.spring.services;
 
+import at.ac.fhsalzburg.swd.spring.model.Edition;
+import at.ac.fhsalzburg.swd.spring.model.Genre;
+import at.ac.fhsalzburg.swd.spring.model.Library;
+import at.ac.fhsalzburg.swd.spring.model.Media;
+import at.ac.fhsalzburg.swd.spring.model.MediaType;
+
+import org.springframework.stereotype.Service;
+
+import at.ac.fhsalzburg.swd.spring.repository.GenreRepository;
+import at.ac.fhsalzburg.swd.spring.repository.LibraryRepository;
+import at.ac.fhsalzburg.swd.spring.repository.MediaTypeRepository;
+
 import java.util.Collection;
 import java.util.Date;
 import java.util.List;
-
-import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.stereotype.Service;
-
-import at.ac.fhsalzburg.swd.spring.model.Edition;
-import at.ac.fhsalzburg.swd.spring.model.Library;
-import at.ac.fhsalzburg.swd.spring.model.Media;
-import at.ac.fhsalzburg.swd.spring.model.MediaTransaction;
-import at.ac.fhsalzburg.swd.spring.repository.EditionRepository;
-import at.ac.fhsalzburg.swd.spring.repository.LibraryRepository;
-import at.ac.fhsalzburg.swd.spring.repository.MediaRepository;
-import at.ac.fhsalzburg.swd.spring.repository.MediaTransactionRepository;
+import java.util.stream.Collectors;
+import java.util.stream.StreamSupport;
 
 @Service
 public class LibraryService implements LibraryServiceInterface {
 
-	@Autowired
-	private LibraryRepository libraryRepository;
+	private final LibraryRepository libraryRepository;
+	private final MediaServiceInterface mediaService;
+	private final EditionServiceInterface editionService;
+	private final GenreRepository genreRepository;
+	private final MediaTypeRepository mediaTypeRepository;
 
-	@Autowired
-	private MediaRepository mediaRepository; //besser in MediaService
+	public LibraryService(LibraryRepository libraryRepository, MediaServiceInterface mediaService,
+			EditionServiceInterface editionService, GenreRepository genreRepository,
+			MediaTypeRepository mediaTypeRepository) {
+		this.libraryRepository = libraryRepository;
+		this.mediaService = mediaService;
+		this.editionService = editionService;
+		this.genreRepository = genreRepository;
+		this.mediaTypeRepository = mediaTypeRepository;
+	}
 
-    //add MediaService @Autowired
-
-	@Autowired
-	private EditionRepository editionRepository;
-
-	@Autowired
-	private MediaTransactionRepository mediaTransactionRepository;
-
-	// save library to repository
 	@Override
 	public Library save(Library library) {
 		return libraryRepository.save(library);
 	}
 
-	// find library by id
+	@Override
+	public List<String> getAllGenres() {
+		return StreamSupport.stream(genreRepository.findAll().spliterator(), false).map(Genre::getName)
+				.collect(Collectors.toList());
+	}
+
+	@Override
+	public List<String> getAllMediaTypes() {
+		return StreamSupport.stream(mediaTypeRepository.findAll().spliterator(), false).map(MediaType::getType)
+				.collect(Collectors.toList());
+	}
+
 	@Override
 	public Library findById(Long id) {
 		return libraryRepository.findById(id).orElse(null);
 	}
 
-	//find library by name
 	@Override
 	public List<Library> findByName(String name) {
 		return libraryRepository.findByName(name);
 	}
 
-	// delete library by id
 	@Override
 	public void deleteById(Long id) {
 		libraryRepository.deleteById(id);
-
 	}
 
-	// checks if media with specific id exists
 	@Override
 	public Collection<Media> validateMedia(String mediaId) {
-		return mediaRepository.findById(Long.parseLong(mediaId)).map(List::of).orElseGet(List::of);
+		return mediaService.findMediaById(Long.parseLong(mediaId));
 	}
 
-	// checks if editions for specific media are available
 	@Override
 	public Collection<Edition> checkForAvailableEditions(Media media) {
-		return editionRepository.findByMediaAndAvailable(media);
-
+		return editionService.findByMediaAndAvailable(media);
 	}
 
-	// finds first available edition from collection of editions
 	@Override
 	public Edition findAvailableEdition(Collection<Edition> editions) {
-		for (Edition edition : editions) {
-			if (isEditionAvailable(edition)) {
-				return edition;
-			}
-		}
-		return null;
+		return editionService.findFirstAvailableEdition(editions);
 	}
 
-	// checks if a specific edition is available
 	@Override
 	public boolean isEditionAvailable(Edition edition) {
-		return editionRepository.existsByIdAndAvailable(edition.getId(), true);
+		return editionService.isEditionAvailable(edition);
 	}
-
-	
 
 }

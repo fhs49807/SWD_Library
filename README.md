@@ -4,11 +4,11 @@
 
 - Optimal wäre, wenn die Preise auf Ebene `MedienTyp` und `Genre` definiert würden; vermutlich kostet eine Blu-ray mehr als eine Zeitschrift.
 - Section und Shelf wären DB-seitig besser als identifizierende Beziehung umgesetzt (zusammengesetzter PK --> `@EmbeddedId`). Sollte am Ende noch Zeit bleiben.
-- `MediaTransaction` unklar: Es verweist auf viele Medien, aber nur auf ein Exemplar!? Wird das Medium hier überhaupt benötigt, wenn ohnehin nur ein Exemplar ausgeliehen werden kann?
+- ✅`MediaTransaction` unklar: Es verweist auf viele Medien, aber nur auf ein Exemplar!? Wird das Medium hier überhaupt benötigt, wenn ohnehin nur ein Exemplar ausgeliehen werden kann?
 - Ich wäre davon ausgegangen, dass Sie unter `ReserveMediaTransaction` die Reservierungen haben – kann aber nicht sein, da hier ein Exemplar referenziert wird. Irgendetwas passt hier nicht zusammen.
 - Prüfen Sie bei den Unit-Tests, ob auch die Assoziationen korrekt sind (z.B. ob Sie vom Exemplar zum Medium kommen).
 - Lt. Komponentendiagramm werden die Exemplare vom `MediaManagement` verwaltet, im Klassendiagramm und in der Umsetzung gibt es jetzt aber auch einen `EditionService`. Ich würde davon ausgehen, dass ein sehr enger Zusammenhang zwischen Medium und Exemplar existiert und diese daher gemeinsam von einem Service verwaltet werden sollten.
-- Verantwortlichkeiten sind teilweise nicht korrekt, da Services direkt die Repositories anderer Services nutzen (sie müssten über die Service-Schnittstelle gehen). Beispiel: `LibraryService` nutzt `mediaRepository`, `editionRepository` und `mediaTransactionRepository`.
+- ✅Verantwortlichkeiten sind teilweise nicht korrekt, da Services direkt die Repositories anderer Services nutzen (sie müssten über die Service-Schnittstelle gehen). Beispiel: `LibraryService` nutzt `mediaRepository`, `editionRepository` und `mediaTransactionRepository`.
 - Das Thema Ausleihdauer haben wir im Labor besprochen.
 - Bei der Ausleihe scheint nicht berücksichtigt zu sein, dass das Medium eventuell von jemand anderem bereits reserviert sein könnte.
 - `FSK`-Prüfung fehlt.
@@ -38,14 +38,11 @@
 - `MediaTransactionServiceTest` läuft auf Fehler. Service-Tests für Ausleihe und Reservierung fehlen.
 - Infos, wie das UI getestet werden kann, fehlen (User und Passwort).
 - Zwei Controller verwirrend: `TemplateController` hat `/loan`, und `MediaController` hat `/loanReserveMedia`.
-- Code-Duplizierung durch die Methoden `showLoanPage` und `searchMedia`. Da danach dieselbe Seite angezeigt wird, könnte die Logik in einer Methode zusammengeführt werden.
+- ✅Code-Duplizierung durch die Methoden `showLoanPage` und `searchMedia`. Da danach dieselbe Seite angezeigt wird, könnte die Logik in einer Methode zusammengeführt werden.
 - Aktuell unterscheidet der Controller abhängig vom Datum, ob eine Reservierung oder Ausleihe erstellt wird. Besser wäre, diese Logik in den Services zu haben, da ansonsten jemand `createLoan` einfach mit einem zukünftigen Datum aufrufen könnte.
 - `LoanMediaControllerTests` laufen nicht.
 - `ReturnMediaControllerTests` laufen auf Fehler.
 - Services überarbeiten. Sicherstellen, dass ein Repository nur in einem Service verwendet wird. Mehrbenutzerbetrieb adressieren und Logik für Ausleihe vs. Reservierung konsolidieren.
-
-
-
 
 ## Feedback
 
@@ -78,7 +75,7 @@
 - on LoanSuccess html --> Add start_date and end_date instead of loan_date✅
 - on LoanSuccess html --> rename header to reserve/loan success depending on method run✅
 - Return Media Page --> completed transactions are not removed from view✅
-- add returnMediaSuccess html page with details with return date, fee calculation ✅ 
+- add returnMediaSuccess html page with details with return date, fee calculation ✅
 - add sections and shelf to successLoan page✅
 - add "must login first" error when accessing return media before logging in✅
 
