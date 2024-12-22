@@ -169,7 +169,7 @@ public class MediaController extends BaseController {
 		model.addAttribute("editionIds", List.of(transaction.getEdition().getId()));
 
 		// Add physical location details
-		model.addAttribute("shelfNumber", shelf.getNumber());
+		model.addAttribute("shelfNumber", shelf.getId());
 		model.addAttribute("sectionName", section.getName());
 		model.addAttribute("libraryName", library.getName());
 	}
