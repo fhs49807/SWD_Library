@@ -47,7 +47,7 @@ public class MediaTransactionService implements MediaTransactionServiceInterface
 	@Override
 	public Collection<MediaTransaction> getAllLoans() {
 		return StreamSupport.stream(mediaTransactionRepository.findAll().spliterator(), false)
-		        .collect(Collectors.toList());
+				.collect(Collectors.toList());
 	}
 
 	@Override
@@ -65,7 +65,12 @@ public class MediaTransactionService implements MediaTransactionServiceInterface
 		Collection<Edition> availableEditions = editionService.findByMediaAndAvailable(media);
 		Edition selectedEdition = editionService.findFirstAvailableEdition(availableEditions);
 
-		// Calculate return dates 
+		// Add a check for no available editions
+		if (selectedEdition == null) {
+			throw new IllegalStateException("No available editions.");
+		}
+
+		// Calculate return dates
 		int maxLoanDays = user.getCustomerType() == User.CustomerType.STUDENT ? 42 : 28;
 		LocalDate lastPossibleReturnDateLocal = todayDate.plusDays(maxLoanDays);
 		Date lastPossibleReturnDate = Date
