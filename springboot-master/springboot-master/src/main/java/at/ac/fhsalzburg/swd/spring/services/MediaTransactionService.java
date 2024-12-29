@@ -85,23 +85,32 @@ public class MediaTransactionService implements MediaTransactionServiceInterface
 
 	@Override
 	public void returnMedia(Long transactionId) {
-		MediaTransaction transaction = findById(transactionId);
-		transaction.setReturnDate(new Date());
+	    MediaTransaction transaction = mediaTransactionRepository.findById(transactionId)
+	        .orElseThrow(() -> new IllegalArgumentException("Transaction not found"));
 
-		double penalty = calculatePenalty(transaction);
-		User user = transaction.getUser();
-		if (user.getCredit() < penalty) {
-			throw new IllegalStateException("User does not have enough credit to pay the penalty");
-		}
+	    // 1. Setze das Rückgabedatum
+	    transaction.setReturnDate(new Date());
 
-		// Deduct amount and finalize transaction
-		user.setCredit(user.getCredit() - (long) penalty);
-		invoiceService.deductAmount(user, transaction);
+	    // 2. Berechne das Strafgeld, wenn die Rückgabe verspätet ist
+	    double penalty = calculatePenalty(transaction);
+	    User user = transaction.getUser();
+	    if (user.getCredit() < penalty) {
+	        throw new IllegalStateException("User does not have enough credit to pay the penalty");
+	    }
 
-		transaction.setStatus(MediaTransaction.TransactionStatus.COMPLETED);
-		mediaTransactionRepository.save(transaction);
+	    // 3. Deduktion der Kosten
+	    user.setCredit(user.getCredit() - (long) penalty);
+	    invoiceService.deductAmount(user, transaction); // Update invoice and credit deduction
 
-		editionService.markEditionAsAvailable(transaction.getEdition());
+	    // 4. Setze den Status der Transaktion auf "COMPLETED"
+	    transaction.setStatus(MediaTransaction.TransactionStatus.COMPLETED);
+
+	    // 5. Stelle sicher, dass die Edition wieder verfügbar ist
+	    Edition edition = transaction.getEdition();
+	    edition.setAvailable(true); // Die Edition wird wieder verfügbar
+
+	    // 6. Keine Notwendigkeit für `editionRepository.save(edition)` oder `mediaTransactionRepository.save(transaction)`
+	    // Das ORM kümmert sich um die Persistenz, weil die Entitäten bereits im Kontext des EntityManagers sind.
 	}
 
 	private double calculatePenalty(MediaTransaction transaction) {
