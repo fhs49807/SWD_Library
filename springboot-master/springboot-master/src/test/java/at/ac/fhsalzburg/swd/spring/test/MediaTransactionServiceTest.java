@@ -16,10 +16,13 @@ import at.ac.fhsalzburg.swd.spring.model.Edition;
 import at.ac.fhsalzburg.swd.spring.model.MediaTransaction;
 import at.ac.fhsalzburg.swd.spring.repository.EditionRepository;
 import at.ac.fhsalzburg.swd.spring.repository.MediaTransactionRepository;
+import at.ac.fhsalzburg.swd.spring.services.InvoiceService;
 import at.ac.fhsalzburg.swd.spring.services.MediaTransactionService;
 
 import static org.junit.jupiter.api.Assertions.assertTrue;
 import static org.junit.jupiter.api.Assertions.assertEquals;
+import static org.mockito.Mockito.times;
+import static org.mockito.Mockito.verify;
 
 @SpringBootTest
 @ExtendWith(MockitoExtension.class)
@@ -31,36 +34,43 @@ public class MediaTransactionServiceTest {
     @Mock
     private EditionRepository editionRepository;
 
+    @Mock
+    private InvoiceService invoiceService; // Mock für InvoiceService hinzufügen
+
     @InjectMocks
     private MediaTransactionService mediaTransactionService;
 
     @Test
-    public void testReturnMedia() {
-        // Create a mock Edition
+    public void testReturnMediaWithLateReturn() {
+        // Erstelle eine verspätete Rückgabe-Edition
         Edition edition = new Edition();
         edition.setAvailable(false);
 
-        // Create a mock transaction
+        // Erstelle eine Mock-Transaktion
         MediaTransaction transaction = new MediaTransaction(
                 new Date(),                     // transactionDate
-                new Date(),                     // expirationDate 
+                new Date(System.currentTimeMillis() - 1000 * 60 * 60 * 24),  // expirationDate (vor 1 Tag abgelaufen)
                 edition,                        // edition
                 null                            // customer
         );
 
         transaction.setStatus(MediaTransaction.TransactionStatus.ACTIVE);
 
-        // Mock repository behavior
+        // Mock Repository Verhalten
         Mockito.<Optional<MediaTransaction>>when(mediaTransactionRepository.findById(1L))
                 .thenReturn(Optional.of(transaction));
 
-        // Perform the return operation
+        // Führe Rückgabeoperation aus
         mediaTransactionService.returnMedia(1L);
 
-        // Validate that the edition is marked as available
+        // Überprüfe, dass die Edition als verfügbar markiert wurde
         assertTrue(transaction.getEdition().isAvailable());
 
-        // Validate that the transaction status is updated to COMPLETED
+        // Überprüfe, dass der Transaktionsstatus auf "COMPLETED" gesetzt wurde
         assertEquals(MediaTransaction.TransactionStatus.COMPLETED, transaction.getStatus());
+
+        // Überprüfe, dass die Deduktionsmethode des InvoiceService aufgerufen wurde
+        // (d.h. eine Rechnung für das Strafgeld wurde erstellt)
+        verify(invoiceService, times(1)).deductAmount(Mockito.any(), Mockito.any());
     }
 }

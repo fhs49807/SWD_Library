@@ -17,7 +17,7 @@
 - ✅Kann es beim Return auch passieren, dass der entsprechende Betrag nicht vom Benutzerkonto abgezogen werden kann?
 - `ReserveMediaTransaction.reserveMediaForCustomer`: Medium als `String` übergeben ist nicht optimal; es würde auch gar nicht darauf reagiert werden, falls kein Medium gefunden werden kann. Die Textausgabe bei `editions.isEmpty` scheint mir nicht korrekt.
 - Reserviert wird am Ende doch ein Exemplar und kein Medium? Was, wenn das Medium bereits von jemand anderem reserviert ist? Wird aktuell nicht berücksichtigt. Ebenfalls fehlen Mehrbenutzerbetrieb und `FSK`-Prüfung.
-- Unit-Test Rückgabe: Hier wäre es wichtig zu testen, dass bei einer verspäteten Rückgabe entsprechend die `Invoice` erstellt wird.
+- ✅Unit-Test Rückgabe: Hier wäre es wichtig zu testen, dass bei einer verspäteten Rückgabe entsprechend die `Invoice` erstellt wird.
 - `UnitTest ReserveMediaTransactionServiceTest`: `reserveMediaForCustomer` schlägt fehl.
 - Unit-Tests dürfen keine Benutzereingaben abfragen; sie müssen automatisch und ohne Benutzer laufen.
 - UI-Tests der Rückgabe laufen aktuell noch auf Fehler; UI-Tests der anderen Use-Cases fehlen noch.
