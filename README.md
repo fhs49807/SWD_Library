@@ -14,7 +14,7 @@
 - ✅`FSK`-Prüfung fehlt.
 - Mehrbenutzerbetrieb müsste noch adressiert werden.
 - ✅`MediaTransactionService.returnMedia`: Edition sollte nicht erneut gespeichert werden müssen, da das ORM bei Objekten, die bereits gemanaged sind, automatisch Änderungen verfolgt (gilt auch für `Transaction`).
-- Kann es beim Return auch passieren, dass der entsprechende Betrag nicht vom Benutzerkonto abgezogen werden kann?
+- ✅Kann es beim Return auch passieren, dass der entsprechende Betrag nicht vom Benutzerkonto abgezogen werden kann?
 - `ReserveMediaTransaction.reserveMediaForCustomer`: Medium als `String` übergeben ist nicht optimal; es würde auch gar nicht darauf reagiert werden, falls kein Medium gefunden werden kann. Die Textausgabe bei `editions.isEmpty` scheint mir nicht korrekt.
 - Reserviert wird am Ende doch ein Exemplar und kein Medium? Was, wenn das Medium bereits von jemand anderem reserviert ist? Wird aktuell nicht berücksichtigt. Ebenfalls fehlen Mehrbenutzerbetrieb und `FSK`-Prüfung.
 - Unit-Test Rückgabe: Hier wäre es wichtig zu testen, dass bei einer verspäteten Rückgabe entsprechend die `Invoice` erstellt wird.

@@ -85,42 +85,46 @@ public class MediaTransactionService implements MediaTransactionServiceInterface
 
 	@Override
 	public void returnMedia(Long transactionId) {
+	    // Schritt 1: Transaktion aus der Datenbank holen
 	    MediaTransaction transaction = mediaTransactionRepository.findById(transactionId)
 	        .orElseThrow(() -> new IllegalArgumentException("Transaction not found"));
 
-	    // 1. Setze das Rückgabedatum
+	    // Schritt 2: Rückgabedatum setzen
 	    transaction.setReturnDate(new Date());
 
-	    // 2. Berechne das Strafgeld, wenn die Rückgabe verspätet ist
+	    // Schritt 3: Berechnung des Strafgelds bei verspäteter Rückgabe
 	    double penalty = calculatePenalty(transaction);
 	    User user = transaction.getUser();
+
+	    // Schritt 4: Überprüfung, ob der Benutzer genug Guthaben hat
 	    if (user.getCredit() < penalty) {
-	        throw new IllegalStateException("User does not have enough credit to pay the penalty");
+	        // Es gibt nicht genug Guthaben, Rückgabe wird abgelehnt und eine entsprechende Nachricht wird gesetzt
+	        throw new IllegalStateException("Benutzer hat nicht genug Guthaben, um die Strafe zu zahlen. Bitte laden Sie Ihr Konto auf.");
 	    }
 
-	    // 3. Deduktion der Kosten
+	    // Schritt 5: Abziehen des Strafgelds vom Benutzerkonto
 	    user.setCredit(user.getCredit() - (long) penalty);
-	    invoiceService.deductAmount(user, transaction); // Update invoice and credit deduction
+	    invoiceService.deductAmount(user, transaction); // Rechnungsbeträge aktualisieren und abziehen
 
-	    // 4. Setze den Status der Transaktion auf "COMPLETED"
+	    // Schritt 6: Transaktionsstatus auf "COMPLETED" setzen
 	    transaction.setStatus(MediaTransaction.TransactionStatus.COMPLETED);
 
-	    // 5. Stelle sicher, dass die Edition wieder verfügbar ist
+	    // Schritt 7: Edition wieder verfügbar machen
 	    Edition edition = transaction.getEdition();
 	    edition.setAvailable(true); // Die Edition wird wieder verfügbar
 
-	    // 6. Keine Notwendigkeit für `editionRepository.save(edition)` oder `mediaTransactionRepository.save(transaction)`
-	    // Das ORM kümmert sich um die Persistenz, weil die Entitäten bereits im Kontext des EntityManagers sind.
+	    // Schritt 8: Persistenz für die geänderten Entitäten
+	    // Das ORM kümmert sich automatisch um die Speicherung von Änderungen, keine Notwendigkeit für `editionRepository.save(edition)` oder `mediaTransactionRepository.save(transaction)`
 	}
 
 	private double calculatePenalty(MediaTransaction transaction) {
-		if (transaction.getReturnDate() != null
-				&& transaction.getReturnDate().after(transaction.getLast_possible_return_date())) {
-			long diffInMillis = transaction.getReturnDate().getTime()
-					- transaction.getLast_possible_return_date().getTime();
-			long diffInDays = diffInMillis / (1000 * 60 * 60 * 24);
-			return diffInDays > 0 ? diffInDays * 1.0 : 0.0; // €1 per overdue day
-		}
-		return 0.0;
+	    if (transaction.getReturnDate() != null
+	            && transaction.getReturnDate().after(transaction.getLast_possible_return_date())) {
+	        long diffInMillis = transaction.getReturnDate().getTime()
+	                - transaction.getLast_possible_return_date().getTime();
+	        long diffInDays = diffInMillis / (1000 * 60 * 60 * 24);
+	        return diffInDays > 0 ? diffInDays * 1.0 : 0.0; // 1€ pro verspätetem Tag
+	    }
+	    return 0.0;
 	}
 }
