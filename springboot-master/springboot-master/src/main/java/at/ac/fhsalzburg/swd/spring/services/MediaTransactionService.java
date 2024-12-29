@@ -5,6 +5,8 @@ import at.ac.fhsalzburg.swd.spring.model.Media;
 import at.ac.fhsalzburg.swd.spring.model.MediaTransaction;
 import at.ac.fhsalzburg.swd.spring.model.User;
 import at.ac.fhsalzburg.swd.spring.repository.MediaTransactionRepository;
+
+import org.springframework.beans.factory.annotation.Value;
 import org.springframework.stereotype.Service;
 
 import java.time.LocalDate;
@@ -32,6 +34,9 @@ public class MediaTransactionService implements MediaTransactionServiceInterface
 		this.invoiceService = invoiceService;
 		this.userService = userService;
 	}
+	
+	@Value("${penalty.per.day:1.0}") // Standardwert von 1.0 falls nicht gesetzt
+	private double penaltyPerDay;
 
 	@Override
 	public Collection<MediaTransaction> findLoansByUser(User user) {
@@ -84,47 +89,47 @@ public class MediaTransactionService implements MediaTransactionServiceInterface
 	}
 
 	@Override
-	public void returnMedia(Long transactionId) {
-	    // Schritt 1: Transaktion aus der Datenbank holen
-	    MediaTransaction transaction = mediaTransactionRepository.findById(transactionId)
-	        .orElseThrow(() -> new IllegalArgumentException("Transaction not found"));
+    public void returnMedia(Long transactionId) {
+        MediaTransaction transaction = mediaTransactionRepository.findById(transactionId)
+            .orElseThrow(() -> new IllegalArgumentException("Transaction not found"));
 
-	    // Schritt 2: Rückgabedatum setzen
-	    transaction.setReturnDate(new Date());
+        // Setze das Rückgabedatum
+        transaction.setReturnDate(new Date());
 
-	    // Schritt 3: Berechnung des Strafgelds bei verspäteter Rückgabe
-	    double penalty = calculatePenalty(transaction);
-	    User user = transaction.getUser();
+        // Berechne die Strafe (falls verspätet)
+        double penalty = calculatePenalty(transaction);
 
-	    // Schritt 4: Überprüfung, ob der Benutzer genug Guthaben hat
-	    if (user.getCredit() < penalty) {
-	        // Es gibt nicht genug Guthaben, Rückgabe wird abgelehnt und eine entsprechende Nachricht wird gesetzt
-	        throw new IllegalStateException("Benutzer hat nicht genug Guthaben, um die Strafe zu zahlen. Bitte laden Sie Ihr Konto auf.");
-	    }
+        // Hole den Benutzer
+        User user = transaction.getUser();
 
-	    // Schritt 5: Abziehen des Strafgelds vom Benutzerkonto
-	    user.setCredit(user.getCredit() - (long) penalty);
-	    invoiceService.deductAmount(user, transaction); // Rechnungsbeträge aktualisieren und abziehen
+        // Überprüfe, ob der Benutzer genügend Kredit hat
+        if (user.getCredit() < penalty) {
+            throw new IllegalStateException("User does not have enough credit to pay the penalty");
+        }
 
-	    // Schritt 6: Transaktionsstatus auf "COMPLETED" setzen
-	    transaction.setStatus(MediaTransaction.TransactionStatus.COMPLETED);
+        // Ziehe das Strafgeld vom Benutzerkonto ab
+        user.setCredit(user.getCredit() - (long) penalty);
 
-	    // Schritt 7: Edition wieder verfügbar machen
-	    Edition edition = transaction.getEdition();
-	    edition.setAvailable(true); // Die Edition wird wieder verfügbar
+        // Erstelle die Rechnung
+        invoiceService.deductAmount(user, transaction);
 
-	    // Schritt 8: Persistenz für die geänderten Entitäten
-	    // Das ORM kümmert sich automatisch um die Speicherung von Änderungen, keine Notwendigkeit für `editionRepository.save(edition)` oder `mediaTransactionRepository.save(transaction)`
-	}
+        // Setze den Status der Transaktion auf "COMPLETED"
+        transaction.setStatus(MediaTransaction.TransactionStatus.COMPLETED);
 
-	private double calculatePenalty(MediaTransaction transaction) {
-	    if (transaction.getReturnDate() != null
-	            && transaction.getReturnDate().after(transaction.getLast_possible_return_date())) {
-	        long diffInMillis = transaction.getReturnDate().getTime()
-	                - transaction.getLast_possible_return_date().getTime();
-	        long diffInDays = diffInMillis / (1000 * 60 * 60 * 24);
-	        return diffInDays > 0 ? diffInDays * 1.0 : 0.0; // 1€ pro verspätetem Tag
-	    }
-	    return 0.0;
-	}
+        // Mache die Edition wieder verfügbar
+        Edition edition = transaction.getEdition();
+        edition.setAvailable(true); // Die Edition wird wieder verfügbar
+
+        // Das ORM kümmert sich um das Speichern der Änderungen
+    }
+
+    private double calculatePenalty(MediaTransaction transaction) {
+        // Wenn das Rückgabedatum nach dem fälligen Rückgabedatum liegt, berechne die Strafe
+        if (transaction.getReturnDate() != null && transaction.getReturnDate().after(transaction.getLast_possible_return_date())) {
+            long diffInMillis = transaction.getReturnDate().getTime() - transaction.getLast_possible_return_date().getTime();
+            long diffInDays = diffInMillis / (1000 * 60 * 60 * 24);
+            return diffInDays > 0 ? diffInDays * penaltyPerDay : 0.0; // Dynamische Gebühr pro Tag
+        }
+        return 0.0;
+    }
 }

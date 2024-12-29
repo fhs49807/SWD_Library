@@ -33,7 +33,7 @@
 - Wenn ein Objekt aus der DB geladen wurde und etwas verändert wird, muss die `repo.save`-Methode nicht mehr aufgerufen werden, da das ORM die Änderungen automatisch nachzieht. Wann die SQL-Statements tatsächlich ausgeführt werden, könnte unter anderem über `@Transactional` gesteuert werden (z.B. `createLoanRecord`).
 - `MediaTransactionService.createLoanRecord` scheint nicht verwendet zu werden; toter Code erschwert die Lesbarkeit.
 - `loanMedia`: `FSK`-Prüfung fehlt. Methode nicht für den Mehrbenutzerbetrieb abgesichert. Die Verfügbarkeit über einen Status auf der Edition abzubilden ist unzureichend. Es kann aktuell ein Exemplar ausgeliehen werden, obwohl es eigentlich für morgen reserviert ist. Eine Ausleihe sollte auch auf Basis einer Reservierung stattfinden können. Es wäre sinnvoll, in `loanMedia` ein optionales Argument wie eine "Reservierungsnummer" hinzuzufügen (falls das nicht schon woanders berücksichtigt wurde).
-- `returnMedia`: Mehrbenutzerbetrieb nicht adressiert (insbesondere Logik hinsichtlich Credit); Gebühren sind aktuell hardcoded mit € 1.
+- ✅`returnMedia`: Mehrbenutzerbetrieb nicht adressiert (insbesondere Logik hinsichtlich Credit); Gebühren sind aktuell hardcoded mit € 1.
 - `ReserveMedia` berücksichtigt nicht, ob das Medium in diesem Zeitraum gerade ausgeliehen ist (und `loanMedia` berücksichtigt nicht, ob es reserviert ist). Keine `FSK`-Prüfung bei der Reservierung. Mehrbenutzerbetrieb noch nicht adressiert.
 - `MediaTransactionServiceTest` läuft auf Fehler. Service-Tests für Ausleihe und Reservierung fehlen.
 - Infos, wie das UI getestet werden kann, fehlen (User und Passwort).

@@ -46,7 +46,7 @@ public class MediaTransactionServiceTest {
         Edition edition = new Edition();
         edition.setAvailable(false);
 
-        // Erstelle eine Mock-Transaktion
+        // Erstelle eine Mock-Transaktion mit einer verspäteten Rückgabe
         MediaTransaction transaction = new MediaTransaction(
                 new Date(),                     // transactionDate
                 new Date(System.currentTimeMillis() - 1000 * 60 * 60 * 24),  // expirationDate (vor 1 Tag abgelaufen)
@@ -60,6 +60,9 @@ public class MediaTransactionServiceTest {
         Mockito.<Optional<MediaTransaction>>when(mediaTransactionRepository.findById(1L))
                 .thenReturn(Optional.of(transaction));
 
+        // Mock Invoice Service
+        Mockito.doNothing().when(invoiceService).deductAmount(Mockito.any(), Mockito.any());
+
         // Führe Rückgabeoperation aus
         mediaTransactionService.returnMedia(1L);
 
@@ -70,7 +73,7 @@ public class MediaTransactionServiceTest {
         assertEquals(MediaTransaction.TransactionStatus.COMPLETED, transaction.getStatus());
 
         // Überprüfe, dass die Deduktionsmethode des InvoiceService aufgerufen wurde
-        // (d.h. eine Rechnung für das Strafgeld wurde erstellt)
         verify(invoiceService, times(1)).deductAmount(Mockito.any(), Mockito.any());
     }
+
 }
