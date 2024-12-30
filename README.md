@@ -78,7 +78,7 @@
 - ✅add returnMediaSuccess html page with details with return date, fee calculation
 - ✅add sections and shelf to successLoan page
 - ✅add "must login first" error when accessing return media before logging in
-- returnMediaSuccess page not showing genre and MediaType
+- ✅returnMediaSuccess page not showing genre and MediaType
 
 ## Database
 

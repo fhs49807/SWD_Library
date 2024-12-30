@@ -226,7 +226,10 @@ public class MediaController extends BaseController {
 			// Fill the model with success details
 			double penaltyAmount = calculatePenalty(transaction);
 			model.addAttribute("username", transaction.getUser().getUsername());
+			model.addAttribute("transaction_date", transaction.getStart_date());
 			model.addAttribute("mediaTitle", transaction.getEdition().getMedia().getName());
+		    model.addAttribute("mediaGenre", transaction.getEdition().getMedia().getGenre().getName());
+		    model.addAttribute("mediaType", transaction.getEdition().getMedia().getMediaType().getType());
 			model.addAttribute("returnDate", new Date());
 			model.addAttribute("penaltyAmount", penaltyAmount);
 
