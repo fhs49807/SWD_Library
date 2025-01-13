@@ -3,8 +3,8 @@ package at.ac.fhsalzburg.swd.spring.controller;
 import at.ac.fhsalzburg.swd.spring.dto.MediaTransactionDTO;
 import at.ac.fhsalzburg.swd.spring.model.*;
 import at.ac.fhsalzburg.swd.spring.services.*;
-import at.ac.fhsalzburg.swd.spring.util.DateUtils;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.format.annotation.DateTimeFormat;
 import org.springframework.security.authentication.AnonymousAuthenticationToken;
 import org.springframework.security.core.Authentication;
 import org.springframework.security.core.annotation.CurrentSecurityContext;
@@ -14,7 +14,10 @@ import org.springframework.web.bind.annotation.*;
 
 import java.security.Principal;
 import java.time.LocalDate;
-import java.util.*;
+import java.util.ArrayList;
+import java.util.Collection;
+import java.util.Date;
+import java.util.List;
 import java.util.stream.Collectors;
 
 @Controller
@@ -37,7 +40,8 @@ public class MediaController extends BaseController {
 
 	@RequestMapping(value = "/loanReserveMedia", method = RequestMethod.POST)
 	public String loanReserveMedia(@RequestParam(required = false) Long mediaId,
-		@RequestParam(required = false) Date start_date, @RequestParam(required = false) Date end_date,
+		@RequestParam(required = false) @DateTimeFormat(iso = DateTimeFormat.ISO.DATE) LocalDate start_date,
+		@RequestParam(required = false) @DateTimeFormat(iso = DateTimeFormat.ISO.DATE) LocalDate end_date,
 		@RequestParam(required = false) String selectedGenre, @RequestParam(required = false) String selectedType,
 		@CurrentSecurityContext(expression = "authentication") Authentication authentication, Model model) {
 
@@ -51,14 +55,14 @@ public class MediaController extends BaseController {
 			}
 
 			// Ensure start_date is before or equal to end_date
-			if (start_date.after(end_date)) {
+			if (start_date.isAfter(end_date)) {
 				return handleError("Start date must be on or before the end date.", selectedGenre, selectedType,
 					username, model);
 			}
 
 			try {
 				// If start_date is after today, process reservation
-				if (start_date.after(new Date())) {
+				if (start_date.isAfter(LocalDate.now())) {
 					reserveMediaTransactionService.reserveMediaForCustomer(username, mediaId, start_date, end_date);
 					populateReservationSuccessModel(username, mediaId, start_date, end_date, model);
 					return "reservationSuccess"; // Prevent loan creation during reservation
@@ -123,14 +127,15 @@ public class MediaController extends BaseController {
 	}
 
 	// populate reservation success page
-	private void populateReservationSuccessModel(String username, Long mediaId, Date start_date, Date end_date,
-		Model model) {
-		Media media = mediaService.findById(mediaId);
+	private void populateReservationSuccessModel(String username, Long mediaId, LocalDate start_date,
+		LocalDate end_date, Model model) {
 		model.addAttribute("username", username);
 		model.addAttribute("reservation_date", new Date()); // Current date as reservation processing date
 		model.addAttribute("start_date", start_date);
 		model.addAttribute("end_date", end_date);
-		model.addAttribute("mediaId", media.getId());
+
+		Media media = mediaService.findById(mediaId);
+		model.addAttribute("mediaId", mediaId);
 		model.addAttribute("mediaTitle", media.getName());
 		model.addAttribute("mediaGenre", media.getGenre().getName());
 		model.addAttribute("mediaType", media.getMediaType().getType());
@@ -200,9 +205,8 @@ public class MediaController extends BaseController {
 		Collection<MediaTransactionDTO> mediaTransactionDTOs = new ArrayList<>();
 		for (ReserveMediaTransaction transaction : reserveMediaTransactionService.findReservationsForUser(user)) {
 			MediaTransactionDTO dto = new MediaTransactionDTO(transaction.getId(),
-				transaction.getEdition().getMediaName(),
-				DateUtils.getLocalDateFromDate(transaction.getReserveStartDate()),
-				DateUtils.getLocalDateFromDate(transaction.getReserveEndDate()));
+				transaction.getEdition().getMediaName(), transaction.getReserveStartDate(),
+				transaction.getReserveEndDate());
 			mediaTransactionDTOs.add(dto);
 		}
 		model.addAttribute("reservations", mediaTransactionDTOs);

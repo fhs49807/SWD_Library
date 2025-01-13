@@ -1,12 +1,11 @@
 package at.ac.fhsalzburg.swd.spring.model;
 
 import lombok.Getter;
-import lombok.NoArgsConstructor;
 import lombok.Setter;
 import org.springframework.format.annotation.DateTimeFormat;
 
 import javax.persistence.*;
-import java.util.Date;
+import java.time.LocalDate;
 
 @Entity
 @Getter
@@ -24,30 +23,28 @@ public class ReserveMediaTransaction {
 	@ManyToOne
 	private Edition edition;
 
-	@DateTimeFormat(pattern = "yyyy-MM-dd")
-	private Date reserveStartDate;
+	private LocalDate reserveStartDate;
 
-	@DateTimeFormat(pattern = "yyyy-MM-dd")
-	private Date reserveEndDate;
+	private LocalDate reserveEndDate;
 
-	public ReserveMediaTransaction(User user, Edition edition, Date reserveStartDate, Date reserveEndDate) {
+	public ReserveMediaTransaction(User user, Edition edition, LocalDate reserveStartDate, LocalDate reserveEndDate) {
 		this.user = user;
 		this.edition = edition;
 		this.reserveStartDate = reserveStartDate;
 		this.reserveEndDate = reserveEndDate;
 	}
-	
+
 	public ReserveMediaTransaction() {
-		
+
 	}
 
 	public Edition getEdition() {
 		return edition;
 	}
 
-	public Date getReserveEndDate() { return reserveEndDate; }
+	public LocalDate getReserveEndDate() { return reserveEndDate; }
 
 	public Long getId() { return id; }
 
-	public Date getReserveStartDate() { return reserveStartDate; }
+	public LocalDate getReserveStartDate() { return reserveStartDate; }
 }

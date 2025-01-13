@@ -4,13 +4,13 @@ import at.ac.fhsalzburg.swd.spring.model.ReserveMediaTransaction;
 import at.ac.fhsalzburg.swd.spring.model.User;
 import javassist.NotFoundException;
 
+import java.time.LocalDate;
 import java.util.Collection;
-import java.util.Date;
 
 public interface ReserveMediaTransactionServiceInterface {
 
-	void reserveMediaForCustomer(String userName, Long mediaId, Date reserveStartDate, Date reserveEndDate)
-			throws NotFoundException;
+	void reserveMediaForCustomer(String userName, Long mediaId, LocalDate reserveStartDate, LocalDate reserveEndDate)
+		throws NotFoundException;
 
 	ReserveMediaTransaction getLatestReservation(Long mediaId, String username);
 

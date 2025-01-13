@@ -5,6 +5,8 @@ import at.ac.fhsalzburg.swd.spring.model.Media;
 import at.ac.fhsalzburg.swd.spring.model.MediaTransaction;
 import at.ac.fhsalzburg.swd.spring.model.User;
 import at.ac.fhsalzburg.swd.spring.repository.MediaTransactionRepository;
+import at.ac.fhsalzburg.swd.spring.util.DateUtils;
+import javassist.NotFoundException;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.stereotype.Service;
 
@@ -12,7 +14,6 @@ import java.time.LocalDate;
 import java.time.ZoneId;
 import java.util.Collection;
 import java.util.Date;
-import java.util.NoSuchElementException;
 import java.util.stream.Collectors;
 import java.util.stream.StreamSupport;
 
@@ -24,15 +25,18 @@ public class MediaTransactionService implements MediaTransactionServiceInterface
 	private final EditionServiceInterface editionService;
 	private final InvoiceServiceInterface invoiceService;
 	private final UserServiceInterface userService;
+	private final ReserveMediaTransactionServiceInterface reserveMediaTransactionService;
 
 	public MediaTransactionService(MediaTransactionRepository mediaTransactionRepository,
 		MediaServiceInterface mediaService, EditionServiceInterface editionService,
-		InvoiceServiceInterface invoiceService, UserServiceInterface userService) {
+		InvoiceServiceInterface invoiceService, UserServiceInterface userService,
+		ReserveMediaTransactionServiceInterface reserveMediaTransactionService) {
 		this.mediaTransactionRepository = mediaTransactionRepository;
 		this.mediaService = mediaService;
 		this.editionService = editionService;
 		this.invoiceService = invoiceService;
 		this.userService = userService;
+		this.reserveMediaTransactionService = reserveMediaTransactionService;
 	}
 
 	@Value("${penalty.per.day:1.0}") // Standardwert von 1.0 falls nicht gesetzt
@@ -56,11 +60,10 @@ public class MediaTransactionService implements MediaTransactionServiceInterface
 	}
 
 	@Override
-	public MediaTransaction loanMedia(String username, Long mediaId, Date endDate) {
+	public MediaTransaction loanMedia(String username, Long mediaId, LocalDate endDate) throws NotFoundException {
 		// Validate end date
 		LocalDate todayDate = LocalDate.now();
-		LocalDate endDateLocal = endDate.toInstant().atZone(ZoneId.systemDefault()).toLocalDate();
-		if (endDateLocal.isBefore(todayDate)) {
+		if (endDate.isBefore(todayDate)) {
 			throw new IllegalArgumentException("End date cannot be in the past.");
 		}
 
@@ -71,7 +74,7 @@ public class MediaTransactionService implements MediaTransactionServiceInterface
 
 		if (selectedEdition == null) {
 			// no more available editions left
-			throw new NoSuchElementException("No more editions available for loan");
+			reserveMediaTransactionService.reserveMediaForCustomer(username, mediaId, LocalDate.now(), endDate);
 		}
 
 		// Calculate return dates
@@ -83,7 +86,7 @@ public class MediaTransactionService implements MediaTransactionServiceInterface
 
 		// Create and save transaction
 		MediaTransaction transaction = new MediaTransaction(new Date(), lastPossibleReturnDate, selectedEdition, user);
-		transaction.setEnd_date(Date.from(endDateLocal.atStartOfDay(ZoneId.systemDefault()).toInstant()));
+		transaction.setEnd_date(DateUtils.getDateFromString(endDate.toString()));
 		transaction.setStatus(MediaTransaction.TransactionStatus.ACTIVE);
 		mediaTransactionRepository.save(transaction);
 
