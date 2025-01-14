@@ -29,9 +29,10 @@ public interface EditionRepository extends CrudRepository<Edition, Long> {
 	List<Edition> findByMediaAndAvailable(@Param("media") Media media);
 
     @Query("SELECT e " +
-           "FROM Edition e left join ReserveMediaTransaction t on t.edition = e " +
+           "FROM Edition e left join MediaTransaction t on t.edition = e " +
            "WHERE e.media = :media " +
-           "AND (t is null OR t.reserveStartDate > :endDate or t.reserveEndDate < :startDate)")
+           "AND (t is null OR t.reserveStartDate > :endDate or t.reserveEndDate < :startDate" +
+           "    or t.end_date < :startDate)")
     List<Edition> findAvailableForReserve(Media media, LocalDate startDate, LocalDate endDate);
 
     @Query("SELECT e.id FROM Media m JOIN m.editions e WHERE m.id = :mediaId")
