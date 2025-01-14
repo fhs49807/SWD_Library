@@ -6,7 +6,7 @@ import javassist.NotFoundException;
 
 import java.time.LocalDate;
 import java.util.Collection;
-import java.util.Date;
+import java.util.List;
 
 public interface MediaTransactionServiceInterface {
 
@@ -19,4 +19,13 @@ public interface MediaTransactionServiceInterface {
 	MediaTransaction loanMedia(String username, Long mediaId, LocalDate dueDate) throws NotFoundException;
 
 	MediaTransaction findById(Long transactionId);
+
+	void reserveMediaForCustomer(String userName, Long mediaId, LocalDate reserveStartDate, LocalDate reserveEndDate)
+		throws IllegalStateException, NotFoundException;
+
+	MediaTransaction getLatestReservation(Long mediaId, String username);
+
+	List<MediaTransaction> findReservationsForUser(User user);
+
+	void cancelReservation(Long reservationId);
 }

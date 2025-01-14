@@ -14,6 +14,8 @@ import java.time.LocalDate;
 import java.time.ZoneId;
 import java.util.Collection;
 import java.util.Date;
+import java.util.List;
+import java.util.NoSuchElementException;
 import java.util.stream.Collectors;
 import java.util.stream.StreamSupport;
 
@@ -25,18 +27,15 @@ public class MediaTransactionService implements MediaTransactionServiceInterface
 	private final EditionServiceInterface editionService;
 	private final InvoiceServiceInterface invoiceService;
 	private final UserServiceInterface userService;
-	private final ReserveMediaTransactionServiceInterface reserveMediaTransactionService;
 
 	public MediaTransactionService(MediaTransactionRepository mediaTransactionRepository,
 		MediaServiceInterface mediaService, EditionServiceInterface editionService,
-		InvoiceServiceInterface invoiceService, UserServiceInterface userService,
-		ReserveMediaTransactionServiceInterface reserveMediaTransactionService) {
+		InvoiceServiceInterface invoiceService, UserServiceInterface userService) {
 		this.mediaTransactionRepository = mediaTransactionRepository;
 		this.mediaService = mediaService;
 		this.editionService = editionService;
 		this.invoiceService = invoiceService;
 		this.userService = userService;
-		this.reserveMediaTransactionService = reserveMediaTransactionService;
 	}
 
 	@Value("${penalty.per.day:1.0}") // Standardwert von 1.0 falls nicht gesetzt
@@ -74,7 +73,7 @@ public class MediaTransactionService implements MediaTransactionServiceInterface
 
 		if (selectedEdition == null) {
 			// no more available editions left
-			reserveMediaTransactionService.reserveMediaForCustomer(username, mediaId, LocalDate.now(), endDate);
+			reserveMediaForCustomer(username, mediaId, LocalDate.now(), endDate);
 		}
 
 		// Calculate return dates
@@ -85,7 +84,8 @@ public class MediaTransactionService implements MediaTransactionServiceInterface
 			.from(lastPossibleReturnDateLocal.atStartOfDay(ZoneId.systemDefault()).toInstant());
 
 		// Create and save transaction
-		MediaTransaction transaction = new MediaTransaction(new Date(), lastPossibleReturnDate, selectedEdition, user);
+		MediaTransaction transaction =
+			new MediaTransaction(new Date(), lastPossibleReturnDate, selectedEdition, user, null, null);
 		transaction.setEnd_date(DateUtils.getDateFromString(endDate.toString()));
 		transaction.setStatus(MediaTransaction.TransactionStatus.ACTIVE);
 		mediaTransactionRepository.save(transaction);
@@ -129,6 +129,69 @@ public class MediaTransactionService implements MediaTransactionServiceInterface
 		edition.setAvailable(true); // Die Edition wird wieder verfügbar
 
 		// Das ORM kümmert sich um das Speichern der Änderungen
+	}
+
+	@Override
+	public MediaTransaction getLatestReservation(Long mediaId, String username) {
+		return mediaTransactionRepository.findTopByEdition_Media_IdAndUser_UsernameOrderByIdDesc(mediaId, username)
+			.orElseThrow(() -> new IllegalArgumentException("No reservation found for the given user and media."));
+	}
+
+	@Override
+	public void reserveMediaForCustomer(String userName, Long mediaId, LocalDate reserveStartDate,
+		LocalDate reserveEndDate) throws IllegalStateException, NoSuchElementException {
+		User user = userService.getByUsername(userName);
+		Media media = mediaService.findById(mediaId);
+
+		// Check if editions are available for reservation
+		List<Edition> availableEditions = editionService.findAvailableForReserve(media, reserveStartDate,
+			reserveEndDate);
+
+		if (availableEditions.isEmpty()) {
+			// find first available date for given period, so that an edition of the given media can be reserved
+			List<MediaTransaction> reservedEditions =
+				mediaTransactionRepository.findReservedEditionsInPeriod(media, reserveStartDate,
+					reserveEndDate);
+			MediaTransaction transaction = reservedEditions.get(0);
+			LocalDate endDateOfEdition;
+			if (MediaTransaction.TransactionStatus.ACTIVE == transaction.getStatus()) {
+				endDateOfEdition = DateUtils.getLocalDateFromDate(transaction.getEnd_date());
+			} else if (MediaTransaction.TransactionStatus.RESERVED == transaction.getStatus()) {
+				endDateOfEdition = transaction.getReserveEndDate();
+			} else {
+				throw new IllegalStateException(
+					String.format("Transaction %d has undefined status %s", transaction.getId(),
+						transaction.getStatus()));
+			}
+
+			throw new NoSuchElementException(
+				String.format(
+					"No available editions for media: %s (%s). Please select another time period. The first possible" +
+					" start date would be on %s", media.getName(), media.getMediaType().getType(),
+					endDateOfEdition.plusDays(1)));
+		}
+
+		// Reserve the first available edition
+		MediaTransaction reservation = new MediaTransaction(null, null, availableEditions.get(0), user,
+			reserveStartDate, reserveEndDate);
+		reservation.setStatus(MediaTransaction.TransactionStatus.RESERVED);
+		mediaTransactionRepository.save(reservation);
+
+		System.out.printf("Media %s reserved for customer %s%n", media.getId(), user.getUsername());
+	}
+
+	@Override
+	public List<MediaTransaction> findReservationsForUser(User user) {
+		return mediaTransactionRepository.findByUserAndStatus(user, MediaTransaction.TransactionStatus.RESERVED);
+	}
+
+	@Override
+	public void cancelReservation(Long reservationId) {
+		if (!mediaTransactionRepository.existsById(reservationId)) {
+			throw new IllegalArgumentException(String.format("Reservation with ID %d does not exist.", reservationId));
+		}
+		mediaTransactionRepository.deleteById(reservationId);
+		System.out.printf("Reservation %d was canceled.%n", reservationId);
 	}
 
 	private double calculatePenalty(MediaTransaction transaction) {

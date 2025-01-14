@@ -1,24 +1,16 @@
 package at.ac.fhsalzburg.swd.spring.model;
 
-import java.util.Collection;
-import java.util.Date;
-
-import javax.persistence.Entity;
-import javax.persistence.EnumType;
-import javax.persistence.Enumerated;
-import javax.persistence.GeneratedValue;
-import javax.persistence.GenerationType;
-import javax.persistence.Id;
-import javax.persistence.JoinColumn;
-import javax.persistence.ManyToMany;
-import javax.persistence.ManyToOne;
-import javax.persistence.Table;
-
+import lombok.Getter;
+import lombok.Setter;
 import org.springframework.format.annotation.DateTimeFormat;
 
-import lombok.NoArgsConstructor;
+import javax.persistence.*;
+import java.time.LocalDate;
+import java.util.Date;
 
 @Entity
+@Getter
+@Setter
 @Table(name = "TRANSACTIONS")
 public class MediaTransaction {
 
@@ -36,16 +28,16 @@ public class MediaTransaction {
 	@DateTimeFormat(pattern = "yyyy-MM-dd")
 	private Date end_date;// start_date + days Loaned for (selected end_date)
 
+	// date when loan expires and penalties apply (depends on customer type --> student/regular)
 	@DateTimeFormat(pattern = "yyyy-MM-dd")
-	private Date last_possible_return_date;// date when loan expires and penalties apply (depends on customer type -->
-											// student/regular)
+	private Date last_possible_return_date;
 
 	@DateTimeFormat(pattern = "yyyy-MM-dd")
 	private Date return_date; // date when item was actually returned
 
 	// TODO: add to class diagram
-//	@ManyToMany
-//	private Collection<Media> media;// one transaction can reserve multiple media items
+	//	@ManyToMany
+	//	private Collection<Media> media;// one transaction can reserve multiple media items
 
 	@ManyToOne
 	@JoinColumn(name = "edition_id", nullable = false)
@@ -54,17 +46,25 @@ public class MediaTransaction {
 	@ManyToOne
 	private User user;
 
+	private LocalDate reserveStartDate;
+
+	private LocalDate reserveEndDate;
+
 	public MediaTransaction() {
 
 	}
 
 	//constructor used to create transaction in MediaTransactionService.java
-	public MediaTransaction(Date transactionDate, Date expirationDate, Edition edition, User user) {
-	    this.start_date = transactionDate;
-	    this.last_possible_return_date = expirationDate;
-	    this.edition = edition;
-	    this.user = user;
-	    this.status = TransactionStatus.ACTIVE; // Default status
+	public MediaTransaction(Date start_date, Date last_possible_return_date, Edition edition, User user,
+		LocalDate reserveStartDate, LocalDate reserveEndDate) {
+		this.start_date = start_date;
+		this.last_possible_return_date = last_possible_return_date;
+		this.edition = edition;
+		this.user = user;
+		this.reserveStartDate = reserveStartDate;
+		this.reserveEndDate = reserveEndDate;
+
+		this.status = TransactionStatus.ACTIVE; // Default status
 	}
 
 
@@ -74,14 +74,6 @@ public class MediaTransaction {
 
 	public void setStatus(TransactionStatus status) {
 		this.status = status;
-	}
-
-	public ReturnCondition getCondition() {
-		return condition;
-	}
-
-	public void setCondition(ReturnCondition condition) {
-		this.condition = condition;
 	}
 
 	public Date getEnd_date() {
@@ -141,8 +133,12 @@ public class MediaTransaction {
 		this.id = id;
 	}
 
+	public LocalDate getReserveEndDate() { return reserveEndDate; }
+
+	public LocalDate getReserveStartDate() { return reserveStartDate; }
+
 	public enum TransactionStatus {
-		ACTIVE, COMPLETED, OVERDUE
+		ACTIVE, COMPLETED, OVERDUE, RESERVED
 	}
 
 	public enum ReturnCondition {

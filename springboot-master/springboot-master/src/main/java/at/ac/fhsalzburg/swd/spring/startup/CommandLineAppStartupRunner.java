@@ -1,7 +1,6 @@
 package at.ac.fhsalzburg.swd.spring.startup;
 
 import at.ac.fhsalzburg.swd.spring.model.*;
-import at.ac.fhsalzburg.swd.spring.repository.EditionRepository;
 import at.ac.fhsalzburg.swd.spring.repository.GenreRepository;
 import at.ac.fhsalzburg.swd.spring.repository.MediaTypeRepository;
 import at.ac.fhsalzburg.swd.spring.services.*;
@@ -11,8 +10,10 @@ import org.springframework.context.annotation.Profile;
 import org.springframework.stereotype.Component;
 import org.springframework.transaction.annotation.Transactional;
 
-import java.util.*;
-import java.util.stream.Collectors;
+import java.util.Calendar;
+import java.util.Date;
+import java.util.List;
+import java.util.Scanner;
 
 @Profile("!test")
 @Component
@@ -35,19 +36,10 @@ public class CommandLineAppStartupRunner implements CommandLineRunner {
 	private MediaTypeRepository mediaTypeRepository;
 
 	@Autowired
-	private EditionRepository editionRepository;
-
-	@Autowired
 	private LibraryService libraryService;
 
 	@Autowired
 	private MediaService mediaService;
-
-	@Autowired
-	private MediaTransactionServiceInterface mediaTransactionService;
-
-	@Autowired
-	private ReserveMediaTransactionServiceInterface reserveMediaTransactionService;
 
 	private final Scanner scanner = new Scanner(System.in);
 
@@ -67,25 +59,26 @@ public class CommandLineAppStartupRunner implements CommandLineRunner {
 		// username: admin
 		// password: admin
 		userService.addUser("admin", "Administrator", "admin@work.org", "123", new Date(), "admin", "ADMIN",
-				User.CustomerType.REGULAR, loanLimitRegular);
+			User.CustomerType.REGULAR, loanLimitRegular);
 
 		// Child/Youth Student customer (Age 15)
 		// username: John
 		// password: pw
 		userService.addUser("john", "TestStudent", "john@email.com", "111", getBirthDate(-15), "pw", "Student",
-				User.CustomerType.STUDENT, loanLimitStudent);
+			User.CustomerType.STUDENT, loanLimitStudent);
 
 		// Adult customer (Age 30)
 		// username: Jane
 		// password: pw
-		userService.addUser("jane", "TestRegular", "jane@email.com", "222", getBirthDate(-30), "pw", "Regular Customer",
-				User.CustomerType.REGULAR, loanLimitRegular);
+		userService.addUser("jane", "TestRegular", "jane@email.com", "222", getBirthDate(-30), "pw", "Regular " +
+		                                                                                             "Customer",
+			User.CustomerType.REGULAR, loanLimitRegular);
 
 		// Student customer (Age 22)
 		// username: Joe
 		// password: pw
 		userService.addUser("joe", "TestStudent", "joe@email.com", "333", getBirthDate(-22), "pw", "Student",
-				User.CustomerType.STUDENT, loanLimitStudent);
+			User.CustomerType.STUDENT, loanLimitStudent);
 
 		productService.addProduct("first product", 3.30f);
 		User user = userService.getAll().iterator().next();
@@ -130,7 +123,7 @@ public class CommandLineAppStartupRunner implements CommandLineRunner {
 
 		// Create the library
 		Library library = new Library(null, "Central Library", "123 Library St",
-				List.of(fantasySection, scienceFictionSection, thrillerSection));
+			List.of(fantasySection, scienceFictionSection, thrillerSection));
 
 		// Associate each section with the library
 		fantasySection.setLibrary(library);

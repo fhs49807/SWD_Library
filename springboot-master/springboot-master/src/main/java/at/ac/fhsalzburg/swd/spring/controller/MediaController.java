@@ -2,7 +2,10 @@ package at.ac.fhsalzburg.swd.spring.controller;
 
 import at.ac.fhsalzburg.swd.spring.dto.MediaTransactionDTO;
 import at.ac.fhsalzburg.swd.spring.model.*;
-import at.ac.fhsalzburg.swd.spring.services.*;
+import at.ac.fhsalzburg.swd.spring.services.LibraryService;
+import at.ac.fhsalzburg.swd.spring.services.MediaServiceInterface;
+import at.ac.fhsalzburg.swd.spring.services.MediaTransactionServiceInterface;
+import at.ac.fhsalzburg.swd.spring.services.UserServiceInterface;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.format.annotation.DateTimeFormat;
 import org.springframework.security.authentication.AnonymousAuthenticationToken;
@@ -35,9 +38,6 @@ public class MediaController extends BaseController {
 	@Autowired
 	private LibraryService libraryService;
 
-	@Autowired
-	private ReserveMediaTransactionService reserveMediaTransactionService;
-
 	@RequestMapping(value = "/loanReserveMedia", method = RequestMethod.POST)
 	public String loanReserveMedia(@RequestParam(required = false) Long mediaId,
 		@RequestParam(required = false) @DateTimeFormat(iso = DateTimeFormat.ISO.DATE) LocalDate start_date,
@@ -63,7 +63,7 @@ public class MediaController extends BaseController {
 			try {
 				// If start_date is after today, process reservation
 				if (start_date.isAfter(LocalDate.now())) {
-					reserveMediaTransactionService.reserveMediaForCustomer(username, mediaId, start_date, end_date);
+					mediaTransactionService.reserveMediaForCustomer(username, mediaId, start_date, end_date);
 					populateReservationSuccessModel(username, mediaId, start_date, end_date, model);
 					return "reservationSuccess"; // Prevent loan creation during reservation
 				} else {
@@ -120,7 +120,7 @@ public class MediaController extends BaseController {
 
 	@PostMapping("/cancelReservation")
 	public String cancelReservation(@RequestParam Long reservationId, Model model) {
-		reserveMediaTransactionService.cancelReservation(reservationId);
+		mediaTransactionService.cancelReservation(reservationId);
 		addSuccessMessage("Media returned successfully.", model);
 
 		return "redirect:/returnMedia";
@@ -141,7 +141,7 @@ public class MediaController extends BaseController {
 		model.addAttribute("mediaType", media.getMediaType().getType());
 
 		// Retrieve the edition ID for reservation
-		ReserveMediaTransaction reservation = reserveMediaTransactionService.getLatestReservation(mediaId, username);
+		MediaTransaction reservation = mediaTransactionService.getLatestReservation(mediaId, username);
 		model.addAttribute("editionId", reservation.getEdition().getId());
 	}
 
@@ -203,7 +203,7 @@ public class MediaController extends BaseController {
 
 	private void fetchUserReservations(Model model, User user) {
 		Collection<MediaTransactionDTO> mediaTransactionDTOs = new ArrayList<>();
-		for (ReserveMediaTransaction transaction : reserveMediaTransactionService.findReservationsForUser(user)) {
+		for (MediaTransaction transaction : mediaTransactionService.findReservationsForUser(user)) {
 			MediaTransactionDTO dto = new MediaTransactionDTO(transaction.getId(),
 				transaction.getEdition().getMediaName(), transaction.getReserveStartDate(),
 				transaction.getReserveEndDate());
