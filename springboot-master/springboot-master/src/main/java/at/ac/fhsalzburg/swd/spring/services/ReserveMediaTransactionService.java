@@ -5,12 +5,12 @@ import at.ac.fhsalzburg.swd.spring.model.Media;
 import at.ac.fhsalzburg.swd.spring.model.ReserveMediaTransaction;
 import at.ac.fhsalzburg.swd.spring.model.User;
 import at.ac.fhsalzburg.swd.spring.repository.ReserveMediaTransactionRepository;
-import javassist.NotFoundException;
 import org.springframework.stereotype.Service;
 
 import java.time.LocalDate;
 import java.util.Collection;
 import java.util.List;
+import java.util.NoSuchElementException;
 
 @Service
 public class ReserveMediaTransactionService implements ReserveMediaTransactionServiceInterface {
@@ -38,16 +38,26 @@ public class ReserveMediaTransactionService implements ReserveMediaTransactionSe
 
 	@Override
 	public void reserveMediaForCustomer(String userName, Long mediaId, LocalDate reserveStartDate,
-		LocalDate reserveEndDate) throws NotFoundException {
+		LocalDate reserveEndDate) throws NoSuchElementException {
 		User user = userService.getByUsername(userName);
 		Media media = mediaService.findById(mediaId);
 
 		// Check if editions are available for reservation
 		List<Edition> availableEditions = editionService.findAvailableForReserve(media, reserveStartDate,
 			reserveEndDate);
+
 		if (availableEditions.isEmpty()) {
-			throw new NotFoundException(String.format("No available editions for media: %s (%s) [%s]", media.getName(),
-				media.getMediaType().getType(), media.getId()));
+			// find first available date for given period, so that an edition of the given media can be reserved
+			List<ReserveMediaTransaction> reservedEditions =
+				reserveMediaTransactionRepository.findReservedEditionsInPeriod(media, reserveStartDate,
+					reserveEndDate);
+			ReserveMediaTransaction firstAvailableEdition = reservedEditions.get(0);
+
+			throw new NoSuchElementException(
+				String.format(
+					"No available editions for media: %s (%s). Please select another time period. The first possible" +
+					" start date would be on %s", media.getName(), media.getMediaType().getType(),
+					firstAvailableEdition.getReserveEndDate().plusDays(1)));
 		}
 
 		// Reserve the first available edition
