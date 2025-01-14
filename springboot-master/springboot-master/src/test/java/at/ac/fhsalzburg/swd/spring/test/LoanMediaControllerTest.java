@@ -9,6 +9,7 @@ import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.model;
 
 
+import java.time.LocalDate;
 import java.util.Date;
 
 import org.junit.Test;
@@ -57,7 +58,7 @@ class LoanMediaControllerTest {
 
         when(userService.getByUsername("john")).thenReturn(mockUser);
         when(mediaService.findById(7L)).thenReturn(mockMedia);
-        when(mediaTransactionService.loanMedia(eq("john"), eq(7L), any(Date.class)))
+        when(mediaTransactionService.loanMedia(eq("john"), eq(7L), any(LocalDate.class)))
                 .thenReturn(mockTransaction);
 
         // Perform request

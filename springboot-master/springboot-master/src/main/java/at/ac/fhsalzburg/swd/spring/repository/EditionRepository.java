@@ -1,5 +1,6 @@
 package at.ac.fhsalzburg.swd.spring.repository;
 
+import java.time.LocalDate;
 import java.util.Collection;
 import java.util.Date;
 import java.util.List;
@@ -31,8 +32,8 @@ public interface EditionRepository extends CrudRepository<Edition, Long> {
            "FROM Edition e left join ReserveMediaTransaction t on t.edition = e " +
            "WHERE e.media = :media " +
            "AND (t is null OR t.reserveStartDate > :endDate or t.reserveEndDate < :startDate)")
-    List<Edition> findAvailableForReserve(Media media, Date startDate, Date endDate);
-    
+    List<Edition> findAvailableForReserve(Media media, LocalDate startDate, LocalDate endDate);
+
     @Query("SELECT e.id FROM Media m JOIN m.editions e WHERE m.id = :mediaId")
 	List<Long> findEditionIdsByMediaId(@Param("mediaId") Long mediaId);
 

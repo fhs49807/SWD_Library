@@ -2,13 +2,9 @@ package at.ac.fhsalzburg.swd.spring.controller;
 
 import at.ac.fhsalzburg.swd.spring.dto.MediaTransactionDTO;
 import at.ac.fhsalzburg.swd.spring.model.*;
-import at.ac.fhsalzburg.swd.spring.services.LibraryService;
-import at.ac.fhsalzburg.swd.spring.services.MediaServiceInterface;
-import at.ac.fhsalzburg.swd.spring.services.MediaTransactionServiceInterface;
-import at.ac.fhsalzburg.swd.spring.services.ReserveMediaTransactionService;
-import at.ac.fhsalzburg.swd.spring.services.UserServiceInterface;
-import at.ac.fhsalzburg.swd.spring.util.DateUtils;
+import at.ac.fhsalzburg.swd.spring.services.*;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.format.annotation.DateTimeFormat;
 import org.springframework.security.authentication.AnonymousAuthenticationToken;
 import org.springframework.security.core.Authentication;
 import org.springframework.security.core.annotation.CurrentSecurityContext;
@@ -17,12 +13,12 @@ import org.springframework.ui.Model;
 import org.springframework.web.bind.annotation.*;
 
 import java.security.Principal;
+import java.time.LocalDate;
 import java.util.ArrayList;
 import java.util.Collection;
 import java.util.Date;
 import java.util.List;
 import java.util.stream.Collectors;
-import java.util.stream.StreamSupport;
 
 @Controller
 public class MediaController extends BaseController {
@@ -44,9 +40,10 @@ public class MediaController extends BaseController {
 
 	@RequestMapping(value = "/loanReserveMedia", method = RequestMethod.POST)
 	public String loanReserveMedia(@RequestParam(required = false) Long mediaId,
-			@RequestParam(required = false) Date start_date, @RequestParam(required = false) Date end_date,
-			@RequestParam(required = false) String selectedGenre, @RequestParam(required = false) String selectedType,
-			@CurrentSecurityContext(expression = "authentication") Authentication authentication, Model model) {
+		@RequestParam(required = false) @DateTimeFormat(iso = DateTimeFormat.ISO.DATE) LocalDate start_date,
+		@RequestParam(required = false) @DateTimeFormat(iso = DateTimeFormat.ISO.DATE) LocalDate end_date,
+		@RequestParam(required = false) String selectedGenre, @RequestParam(required = false) String selectedType,
+		@CurrentSecurityContext(expression = "authentication") Authentication authentication, Model model) {
 
 		if (!(authentication instanceof AnonymousAuthenticationToken)) {
 			String username = authentication.getName();
@@ -54,18 +51,18 @@ public class MediaController extends BaseController {
 			// Validate required fields
 			if (mediaId == null || start_date == null || end_date == null) {
 				return handleError("Please select a media item and specify the reserve date period.", selectedGenre,
-						selectedType, username, model);
+					selectedType, username, model);
 			}
 
 			// Ensure start_date is before or equal to end_date
-			if (start_date.after(end_date)) {
+			if (start_date.isAfter(end_date)) {
 				return handleError("Start date must be on or before the end date.", selectedGenre, selectedType,
-						username, model);
+					username, model);
 			}
 
 			try {
 				// If start_date is after today, process reservation
-				if (start_date.after(new Date())) {
+				if (start_date.isAfter(LocalDate.now())) {
 					reserveMediaTransactionService.reserveMediaForCustomer(username, mediaId, start_date, end_date);
 					populateReservationSuccessModel(username, mediaId, start_date, end_date, model);
 					return "reservationSuccess"; // Prevent loan creation during reservation
@@ -78,7 +75,7 @@ public class MediaController extends BaseController {
 			} catch (Exception e) {
 				System.err.println("Error processing loan/reservation: " + e.getMessage());
 				return handleError("Error processing loan/reservation: " + e.getMessage(), selectedGenre, selectedType,
-						username, model);
+					username, model);
 			}
 		}
 
@@ -98,8 +95,8 @@ public class MediaController extends BaseController {
 
 		// Nur aktive Transaktionen anzeigen (status != COMPLETED)
 		Collection<MediaTransaction> loans = mediaTransactionService.findLoansByUser(user).stream()
-				.filter(transaction -> transaction.getStatus() != MediaTransaction.TransactionStatus.COMPLETED)
-				.collect(Collectors.toList());
+			.filter(transaction -> transaction.getStatus() != MediaTransaction.TransactionStatus.COMPLETED)
+			.collect(Collectors.toList());
 		model.addAttribute("loans", loans);
 
 		// Reservierungen einfügen, falls vorhanden
@@ -130,14 +127,15 @@ public class MediaController extends BaseController {
 	}
 
 	// populate reservation success page
-	private void populateReservationSuccessModel(String username, Long mediaId, Date start_date, Date end_date,
-			Model model) {
-		Media media = mediaService.findById(mediaId);
+	private void populateReservationSuccessModel(String username, Long mediaId, LocalDate start_date,
+		LocalDate end_date, Model model) {
 		model.addAttribute("username", username);
 		model.addAttribute("reservation_date", new Date()); // Current date as reservation processing date
 		model.addAttribute("start_date", start_date);
 		model.addAttribute("end_date", end_date);
-		model.addAttribute("mediaId", media.getId());
+
+		Media media = mediaService.findById(mediaId);
+		model.addAttribute("mediaId", mediaId);
 		model.addAttribute("mediaTitle", media.getName());
 		model.addAttribute("mediaGenre", media.getGenre().getName());
 		model.addAttribute("mediaType", media.getMediaType().getType());
@@ -180,7 +178,7 @@ public class MediaController extends BaseController {
 	 * @return path to loan html page
 	 */
 	private String handleError(String errorMessage, String selectedGenre, String selectedType, String username,
-			Model model) {
+		Model model) {
 		List<String> genres = addDefaultOption(libraryService.getAllGenres(), "All Genres");
 		List<String> mediaTypes = addDefaultOption(libraryService.getAllMediaTypes(), "All Media Types");
 
@@ -189,7 +187,10 @@ public class MediaController extends BaseController {
 		model.addAttribute("selectedGenre", selectedGenre);
 		model.addAttribute("selectedType", selectedType);
 		model.addAttribute("mediaList", mediaService.searchMediaByGenreAndType(selectedGenre, selectedType,
-				userService.getByUsername(username)));
+			userService.getByUsername(username)));
+		model.addAttribute("todayDate", LocalDate.now());
+		model.addAttribute("endDate", LocalDate.now().plusDays(1));
+
 		addErrorMessage(errorMessage, model);
 		return "loan";
 	}
@@ -204,9 +205,8 @@ public class MediaController extends BaseController {
 		Collection<MediaTransactionDTO> mediaTransactionDTOs = new ArrayList<>();
 		for (ReserveMediaTransaction transaction : reserveMediaTransactionService.findReservationsForUser(user)) {
 			MediaTransactionDTO dto = new MediaTransactionDTO(transaction.getId(),
-					transaction.getEdition().getMediaName(),
-					DateUtils.getLocalDateFromDate(transaction.getReserveStartDate()),
-					DateUtils.getLocalDateFromDate(transaction.getReserveEndDate()));
+				transaction.getEdition().getMediaName(), transaction.getReserveStartDate(),
+				transaction.getReserveEndDate());
 			mediaTransactionDTOs.add(dto);
 		}
 		model.addAttribute("reservations", mediaTransactionDTOs);
@@ -228,8 +228,8 @@ public class MediaController extends BaseController {
 			model.addAttribute("username", transaction.getUser().getUsername());
 			model.addAttribute("transaction_date", transaction.getStart_date());
 			model.addAttribute("mediaTitle", transaction.getEdition().getMedia().getName());
-		    model.addAttribute("mediaGenre", transaction.getEdition().getMedia().getGenre().getName());
-		    model.addAttribute("mediaType", transaction.getEdition().getMedia().getMediaType().getType());
+			model.addAttribute("mediaGenre", transaction.getEdition().getMedia().getGenre().getName());
+			model.addAttribute("mediaType", transaction.getEdition().getMedia().getMediaType().getType());
 			model.addAttribute("returnDate", new Date());
 			model.addAttribute("penaltyAmount", penaltyAmount);
 
@@ -243,7 +243,7 @@ public class MediaController extends BaseController {
 	// Hilfsmethode zur Berechnung der Mahngebühr
 	private double calculatePenalty(MediaTransaction transaction) {
 		long overdueDays = (transaction.getReturnDate().getTime()
-				- transaction.getLast_possible_return_date().getTime()) / (1000 * 60 * 60 * 24);
+		                    - transaction.getLast_possible_return_date().getTime()) / (1000 * 60 * 60 * 24);
 		return overdueDays > 0 ? overdueDays * 1.0 : 0.0; // Gebühr von 1€ pro verspätetem Tag
 	}
 
