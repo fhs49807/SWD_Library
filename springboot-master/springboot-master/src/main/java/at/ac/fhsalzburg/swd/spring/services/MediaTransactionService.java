@@ -5,19 +5,17 @@ import at.ac.fhsalzburg.swd.spring.model.Media;
 import at.ac.fhsalzburg.swd.spring.model.MediaTransaction;
 import at.ac.fhsalzburg.swd.spring.model.User;
 import at.ac.fhsalzburg.swd.spring.repository.MediaTransactionRepository;
-import at.ac.fhsalzburg.swd.spring.util.DateUtils;
-import javassist.NotFoundException;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.stereotype.Service;
 
 import java.time.LocalDate;
-import java.time.ZoneId;
 import java.util.Collection;
-import java.util.Date;
 import java.util.List;
 import java.util.NoSuchElementException;
 import java.util.stream.Collectors;
 import java.util.stream.StreamSupport;
+
+import static java.time.temporal.ChronoUnit.DAYS;
 
 @Service
 public class MediaTransactionService implements MediaTransactionServiceInterface {
@@ -79,13 +77,11 @@ public class MediaTransactionService implements MediaTransactionServiceInterface
 		// Calculate return dates
 		User user = userService.getByUsername(username);
 		int maxLoanDays = user.getCustomerType() == User.CustomerType.STUDENT ? 42 : 28;
-		LocalDate lastPossibleReturnDateLocal = todayDate.plusDays(maxLoanDays);
-		Date lastPossibleReturnDate = Date
-			.from(lastPossibleReturnDateLocal.atStartOfDay(ZoneId.systemDefault()).toInstant());
+		LocalDate lastPossibleReturnDate = todayDate.plusDays(maxLoanDays);
 
 		// Create and save transaction
 		MediaTransaction transaction =
-			new MediaTransaction(new Date(), DateUtils.getDateFromString(endDate.toString()), lastPossibleReturnDate,
+			new MediaTransaction(LocalDate.now(), endDate, lastPossibleReturnDate,
 				selectedEdition, user, null, null, MediaTransaction.TransactionStatus.ACTIVE);
 		mediaTransactionRepository.save(transaction);
 
@@ -101,7 +97,7 @@ public class MediaTransactionService implements MediaTransactionServiceInterface
 			.orElseThrow(() -> new IllegalArgumentException("Transaction not found"));
 
 		// Setze das Rückgabedatum
-		transaction.setReturnDate(new Date());
+		transaction.setReturnDate(LocalDate.now());
 
 		// Berechne die Strafe (falls verspätet)
 		double penalty = calculatePenalty(transaction);
@@ -154,7 +150,7 @@ public class MediaTransactionService implements MediaTransactionServiceInterface
 			MediaTransaction transaction = reservedEditions.get(0);
 			LocalDate endDateOfEdition;
 			if (MediaTransaction.TransactionStatus.ACTIVE == transaction.getStatus()) {
-				endDateOfEdition = DateUtils.getLocalDateFromDate(transaction.getEnd_date());
+				endDateOfEdition = transaction.getEnd_date();
 			} else if (MediaTransaction.TransactionStatus.RESERVED == transaction.getStatus()) {
 				endDateOfEdition = transaction.getReserveEndDate();
 			} else {
@@ -172,9 +168,7 @@ public class MediaTransactionService implements MediaTransactionServiceInterface
 
 		// Reserve the first available edition
 		int maxLoanDays = user.getCustomerType() == User.CustomerType.STUDENT ? 42 : 28;
-		LocalDate lastPossibleReturnDateLocal = reserveStartDate.plusDays(maxLoanDays);
-		Date lastPossibleReturnDate = Date
-			.from(lastPossibleReturnDateLocal.atStartOfDay(ZoneId.systemDefault()).toInstant());
+		LocalDate lastPossibleReturnDate = reserveStartDate.plusDays(maxLoanDays);
 
 		MediaTransaction reservation =
 			new MediaTransaction(null, null, lastPossibleReturnDate, availableEditions.get(0), user,
@@ -199,10 +193,8 @@ public class MediaTransactionService implements MediaTransactionServiceInterface
 	private double calculatePenalty(MediaTransaction transaction) {
 		// Wenn das Rückgabedatum nach dem fälligen Rückgabedatum liegt, berechne die Strafe
 		if (transaction.getReturnDate() != null &&
-		    transaction.getReturnDate().after(transaction.getLast_possible_return_date())) {
-			long diffInMillis =
-				transaction.getReturnDate().getTime() - transaction.getLast_possible_return_date().getTime();
-			long diffInDays = diffInMillis / (1000 * 60 * 60 * 24);
+		    transaction.getReturnDate().isAfter(transaction.getLast_possible_return_date())) {
+			long diffInDays = DAYS.between(transaction.getReturnDate(), transaction.getLast_possible_return_date());
 			return diffInDays > 0 ? diffInDays * penaltyPerDay : 0.0; // Dynamische Gebühr pro Tag
 		}
 		return 0.0;

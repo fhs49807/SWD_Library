@@ -1,17 +1,16 @@
 package at.ac.fhsalzburg.swd.spring.services;
 
-import java.util.List;
-import java.util.Arrays;
-
-import java.util.Date;
-
-import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.stereotype.Service;
-
 import at.ac.fhsalzburg.swd.spring.model.Invoice;
 import at.ac.fhsalzburg.swd.spring.model.MediaTransaction;
 import at.ac.fhsalzburg.swd.spring.model.User;
 import at.ac.fhsalzburg.swd.spring.repository.InvoiceRepository;
+import org.springframework.stereotype.Service;
+
+import java.util.Arrays;
+import java.util.Date;
+import java.util.List;
+
+import static java.time.temporal.ChronoUnit.DAYS;
 
 @Service
 public class InvoiceService implements InvoiceServiceInterface {
@@ -41,8 +40,7 @@ public class InvoiceService implements InvoiceServiceInterface {
 	// berechnet mahngebühr basierend auf überfälligkeit -> deductAmount()
 	public double calculatePenalty(MediaTransaction transaction) {
 		// mahngebühren calc: 1€ pro tag verspätung
-		long overdueDays = (transaction.getReturnDate().getTime()
-				- transaction.getLast_possible_return_date().getTime()) / (1000 * 60 * 60 * 24);
+		long overdueDays = DAYS.between(transaction.getReturnDate(), transaction.getLast_possible_return_date());
 		return overdueDays > 0 ? overdueDays * 1.0 : 0.0;
 	}
 
