@@ -1,5 +1,6 @@
 package at.ac.fhsalzburg.swd.spring.model;
 
+import at.ac.fhsalzburg.swd.spring.enums.ReturnCondition;
 import lombok.Getter;
 import lombok.Setter;
 import org.springframework.format.annotation.DateTimeFormat;
@@ -20,6 +21,8 @@ public class MediaTransaction {
 
 	@Enumerated(EnumType.STRING)
 	private TransactionStatus status;
+
+	@Enumerated(EnumType.STRING)
 	private ReturnCondition condition;
 
 	@DateTimeFormat(pattern = "yyyy-MM-dd")
@@ -55,18 +58,17 @@ public class MediaTransaction {
 	}
 
 	//constructor used to create transaction in MediaTransactionService.java
-	public MediaTransaction(Date start_date, Date last_possible_return_date, Edition edition, User user,
-		LocalDate reserveStartDate, LocalDate reserveEndDate) {
+	public MediaTransaction(Date start_date, Date end_date, Date last_possible_return_date, Edition edition, User user,
+		LocalDate reserveStartDate, LocalDate reserveEndDate, TransactionStatus status) {
 		this.start_date = start_date;
+		this.end_date = end_date;
 		this.last_possible_return_date = last_possible_return_date;
 		this.edition = edition;
 		this.user = user;
 		this.reserveStartDate = reserveStartDate;
 		this.reserveEndDate = reserveEndDate;
-
-		this.status = TransactionStatus.ACTIVE; // Default status
+		this.status = status;
 	}
-
 
 	public TransactionStatus getStatus() {
 		return status;
@@ -139,10 +141,6 @@ public class MediaTransaction {
 
 	public enum TransactionStatus {
 		ACTIVE, COMPLETED, OVERDUE, RESERVED
-	}
-
-	public enum ReturnCondition {
-		GOOD, DAMAGED
 	}
 
 }

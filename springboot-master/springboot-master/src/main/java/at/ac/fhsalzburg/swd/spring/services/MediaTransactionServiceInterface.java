@@ -16,12 +16,12 @@ public interface MediaTransactionServiceInterface {
 
 	void returnMedia(Long transactionId);
 
-	MediaTransaction loanMedia(String username, Long mediaId, LocalDate dueDate) throws NotFoundException;
+	MediaTransaction loanMedia(String username, Long mediaId, LocalDate dueDate);
 
 	MediaTransaction findById(Long transactionId);
 
-	void reserveMediaForCustomer(String userName, Long mediaId, LocalDate reserveStartDate, LocalDate reserveEndDate)
-		throws IllegalStateException, NotFoundException;
+	MediaTransaction reserveMediaForCustomer(String userName, Long mediaId, LocalDate reserveStartDate,
+		LocalDate reserveEndDate) throws IllegalStateException, NotFoundException;
 
 	MediaTransaction getLatestReservation(Long mediaId, String username);
 
