@@ -1,5 +1,6 @@
 package at.ac.fhsalzburg.swd.spring.model;
 
+import at.ac.fhsalzburg.swd.spring.enums.CustomerType;
 import lombok.Getter;
 import lombok.Setter;
 
@@ -21,6 +22,8 @@ public class User {
 	private Date birthDate;
 	private String password;
 	private String role;
+
+	@Column(length = 300)
 	private String jwttoken;
 
 	// customer role --> student, regular
@@ -54,10 +57,6 @@ public class User {
 
 	public void setCustomerType(CustomerType customerType) {
 		this.customerType = customerType;
-	}
-
-	public enum CustomerType {
-		STUDENT, REGULAR
 	}
 
 	public int getLoanLimit() {

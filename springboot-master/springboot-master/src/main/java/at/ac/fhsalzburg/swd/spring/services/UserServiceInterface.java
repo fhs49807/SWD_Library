@@ -4,6 +4,7 @@ import java.util.Collection;
 
 import java.util.Date;
 
+import at.ac.fhsalzburg.swd.spring.enums.CustomerType;
 import at.ac.fhsalzburg.swd.spring.model.User;
 
 public interface UserServiceInterface {
@@ -11,10 +12,10 @@ public interface UserServiceInterface {
 	public abstract String doSomething();
 
 	// create customer
-	public abstract boolean addUser(String firstName, String lastName, String eMail, String Tel, Date BirthDate,
-			String password, String role, User.CustomerType customerType, int loanLimit);
+	boolean addUser(String firstName, String lastName, String eMail, String Tel, Date BirthDate,
+			String password, String role, CustomerType customerType, int loanLimit);
 
-	public abstract boolean addUser(User user);
+	void addUser(User user);
 
 	public abstract Collection<User> getAll();
 
@@ -36,6 +37,6 @@ public interface UserServiceInterface {
 
 	// check if customer has outstanding fees
 	public abstract boolean hasOutstandingFees(User user);
-	
+
 	void updateUser(User user);
 }

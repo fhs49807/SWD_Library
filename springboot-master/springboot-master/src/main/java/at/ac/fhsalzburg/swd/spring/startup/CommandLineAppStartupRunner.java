@@ -1,5 +1,6 @@
 package at.ac.fhsalzburg.swd.spring.startup;
 
+import at.ac.fhsalzburg.swd.spring.enums.CustomerType;
 import at.ac.fhsalzburg.swd.spring.model.*;
 import at.ac.fhsalzburg.swd.spring.repository.GenreRepository;
 import at.ac.fhsalzburg.swd.spring.repository.MediaTypeRepository;
@@ -59,30 +60,29 @@ public class CommandLineAppStartupRunner implements CommandLineRunner {
 		// username: admin
 		// password: admin
 		userService.addUser("admin", "Administrator", "admin@work.org", "123", new Date(), "admin", "ADMIN",
-			User.CustomerType.REGULAR, loanLimitRegular);
+			CustomerType.REGULAR, loanLimitRegular);
 
 		// Child/Youth Student customer (Age 15)
 		// username: John
 		// password: pw
 		userService.addUser("john", "TestStudent", "john@email.com", "111", getBirthDate(-15), "pw", "Student",
-			User.CustomerType.STUDENT, loanLimitStudent);
+			CustomerType.STUDENT, loanLimitStudent);
 
 		// Adult customer (Age 30)
 		// username: Jane
 		// password: pw
-		userService.addUser("jane", "TestRegular", "jane@email.com", "222", getBirthDate(-30), "pw", "Regular " +
-		                                                                                             "Customer",
-			User.CustomerType.REGULAR, loanLimitRegular);
+		userService.addUser("jane", "TestRegular", "jane@email.com", "222", getBirthDate(-30), "pw",
+			"Regular Customer", CustomerType.REGULAR, loanLimitRegular);
 
 		// Student customer (Age 22)
 		// username: Joe
 		// password: pw
 		userService.addUser("joe", "TestStudent", "joe@email.com", "333", getBirthDate(-22), "pw", "Student",
-			User.CustomerType.STUDENT, loanLimitStudent);
+			CustomerType.STUDENT, loanLimitStudent);
 
 		productService.addProduct("first product", 3.30f);
 		User user = userService.getAll().iterator().next();
-		user.setCredit(100l);
+		user.setCredit(100L);
 		user = userService.getByUsername("admin");
 		orderService.addOrder(new Date(), user, productService.getAll());
 

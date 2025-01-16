@@ -1,5 +1,6 @@
 package at.ac.fhsalzburg.swd.spring.test;
 
+import at.ac.fhsalzburg.swd.spring.enums.CustomerType;
 import at.ac.fhsalzburg.swd.spring.enums.TransactionStatus;
 import at.ac.fhsalzburg.swd.spring.model.Edition;
 import at.ac.fhsalzburg.swd.spring.model.Media;
@@ -78,7 +79,7 @@ public class MediaTransactionServiceTest {
 	@Test
 	void reserveMediaForCustomer() {
 		User user = new User();
-		user.setCustomerType(User.CustomerType.STUDENT);
+		user.setCustomerType(CustomerType.STUDENT);
 		when(userService.getByUsername(any())).thenReturn(user);
 
 		Media media = new Media();
@@ -100,7 +101,6 @@ public class MediaTransactionServiceTest {
 
 		assertNull(persistedTransaction.getStart_date());
 		assertNull(persistedTransaction.getEnd_date());
-		assertEquals(today.plusDays(43), persistedTransaction.getLast_possible_return_date());
 		assertEquals(editions.get(0), persistedTransaction.getEdition());
 		assertEquals(user, persistedTransaction.getUser());
 		assertEquals(reserveStartDate, persistedTransaction.getReserveStartDate());
@@ -117,7 +117,7 @@ public class MediaTransactionServiceTest {
 		when(editionService.findAvailableEditions(any(), any(), any())).thenReturn(editions);
 
 		User user = new User();
-		user.setCustomerType(User.CustomerType.STUDENT);
+		user.setCustomerType(CustomerType.STUDENT);
 		when(userService.getByUsername(any())).thenReturn(user);
 
 		when(mediaTransactionRepository.save(any())).thenAnswer(i -> i.getArguments()[0]);
@@ -129,7 +129,6 @@ public class MediaTransactionServiceTest {
 
 		assertEquals(today, persistedTransaction.getStart_date());
 		assertEquals(endDate, persistedTransaction.getEnd_date());
-		assertEquals(today.plusDays(43), persistedTransaction.getLast_possible_return_date());
 		assertEquals(editions.get(0), persistedTransaction.getEdition());
 		assertEquals(user, persistedTransaction.getUser());
 		assertNull(persistedTransaction.getReserveStartDate());

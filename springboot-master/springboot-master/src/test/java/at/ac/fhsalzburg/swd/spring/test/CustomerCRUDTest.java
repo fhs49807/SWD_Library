@@ -1,12 +1,12 @@
 package at.ac.fhsalzburg.swd.spring.test;
 
+import at.ac.fhsalzburg.swd.spring.enums.CustomerType;
+import at.ac.fhsalzburg.swd.spring.model.User;
+import at.ac.fhsalzburg.swd.spring.services.UserService;
 import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.context.SpringBootTest;
 import org.springframework.transaction.annotation.Transactional;
-
-import at.ac.fhsalzburg.swd.spring.model.User;
-import at.ac.fhsalzburg.swd.spring.services.UserService;
 
 import java.util.Date;
 
@@ -23,15 +23,15 @@ public class CustomerCRUDTest {
 	public void testUserCRUDOperations() {
 		// CREATE
 		boolean created = userService.addUser("john.doe", "John Doe", "john.doe@example.com", "123456789", new Date(),
-				"securepassword", "Customer", User.CustomerType.REGULAR, 5);
-		
+			"securepassword", "Customer", CustomerType.REGULAR, 5);
+
 		// READ
 		assertTrue(created, "User should be created successfully");
 		User retrievedUser = userService.getByUsername("john.doe");
 		assertNotNull(retrievedUser, "User should be retrieved after creation");
 		assertEquals("John Doe", retrievedUser.getFullname(), "User full name should match");
 		assertEquals(5, retrievedUser.getLoanLimit(), "User loan limit should match");
-		assertEquals(User.CustomerType.REGULAR, retrievedUser.getCustomerType(), "User customer type should match");
+		assertEquals(CustomerType.REGULAR, retrievedUser.getCustomerType(), "User customer type should match");
 		System.out.println("User created: " + retrievedUser);
 
 		// UPDATE

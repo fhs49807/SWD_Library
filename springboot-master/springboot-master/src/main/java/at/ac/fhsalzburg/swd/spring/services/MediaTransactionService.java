@@ -1,5 +1,6 @@
 package at.ac.fhsalzburg.swd.spring.services;
 
+import at.ac.fhsalzburg.swd.spring.enums.CustomerType;
 import at.ac.fhsalzburg.swd.spring.enums.TransactionStatus;
 import at.ac.fhsalzburg.swd.spring.model.Edition;
 import at.ac.fhsalzburg.swd.spring.model.Media;
@@ -81,7 +82,7 @@ public class MediaTransactionService implements MediaTransactionServiceInterface
 
 		// Calculate return dates
 		User user = userService.getByUsername(username);
-		int maxLoanDays = user.getCustomerType() == User.CustomerType.STUDENT ? 42 : 28;
+		int maxLoanDays = user.getCustomerType() == CustomerType.STUDENT ? 42 : 28;
 		LocalDate lastPossibleReturnDate = todayDate.plusDays(maxLoanDays);
 
 		// Create and save transaction
@@ -148,7 +149,7 @@ public class MediaTransactionService implements MediaTransactionServiceInterface
 		}
 
 		// Reserve the first available edition
-		int maxLoanDays = user.getCustomerType() == User.CustomerType.STUDENT ? 42 : 28;
+		int maxLoanDays = user.getCustomerType() == CustomerType.STUDENT ? 42 : 28;
 		LocalDate lastPossibleReturnDate = reserveStartDate.plusDays(maxLoanDays);
 
 		MediaTransaction reservation =
