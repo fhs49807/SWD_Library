@@ -114,7 +114,7 @@ public class ReturnMediaControllerTest {
 		LocalDate expirationDate = LocalDate.now().minusDays(2);  // 2 tage verspätet
 		transaction.setLast_possible_return_date(expirationDate); // setze das fälligkeitsdatum der transaktion
 		transaction.setStatus(
-			MediaTransaction.TransactionStatus.ACTIVE); // setze den status der transaktion auf "aktiv"
+			MediaTransaction.TransactionStatus.LOANED); // setze den status der transaktion auf "aktiv"
 		transaction.setReturnDate(LocalDate.now());  // setze das rückgabedatum auf heute
 
 		User mockUser =

@@ -3,12 +3,11 @@ package at.ac.fhsalzburg.swd.spring.services;
 import at.ac.fhsalzburg.swd.spring.model.Edition;
 import at.ac.fhsalzburg.swd.spring.model.Media;
 import at.ac.fhsalzburg.swd.spring.repository.EditionRepository;
-import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
 import java.time.LocalDate;
+import java.util.ArrayList;
 import java.util.Collection;
-import java.util.Date;
 import java.util.List;
 
 @Service
@@ -72,7 +71,19 @@ public class EditionService implements EditionServiceInterface {
 	}
 
 	@Override
-	public List<Edition> findAvailableForReserve(Media media, LocalDate startDate, LocalDate endDate) {
-		return editionRepository.findAvailableForReserve(media, startDate, endDate);
+	public List<Edition> findAvailableEditions(Media media, LocalDate startDate, LocalDate endDate) {
+		List<Edition> availableEditions = new ArrayList<>();
+		List<Edition> loanedEditions = editionRepository.findLoanedEditions(media, startDate);
+		List<Edition> reservedEditions = editionRepository.findReservedEditions(media, startDate, endDate);
+
+		for (Edition edition : editionRepository.findByMedia(media)) {
+			if (loanedEditions.contains(edition) || reservedEditions.contains(edition)) {
+				continue;
+			}
+
+			availableEditions.add(edition);
+		}
+
+		return availableEditions;
 	}
 }

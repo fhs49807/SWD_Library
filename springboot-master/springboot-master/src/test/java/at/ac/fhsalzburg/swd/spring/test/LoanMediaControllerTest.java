@@ -10,7 +10,6 @@ import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.
 
 
 import java.time.LocalDate;
-import java.util.Date;
 
 import org.junit.Test;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -50,7 +49,7 @@ class LoanMediaControllerTest {
         User mockUser = new User();
         mockUser.setUsername("john");
         MediaTransaction mockTransaction = new MediaTransaction();
-        mockTransaction.setStatus(MediaTransaction.TransactionStatus.ACTIVE);
+        mockTransaction.setStatus(MediaTransaction.TransactionStatus.LOANED);
 
         Media mockMedia = new Media();
         mockMedia.setName("Dune");
