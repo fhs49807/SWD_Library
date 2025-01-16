@@ -28,6 +28,7 @@ public class EditionService implements EditionServiceInterface {
 
 	@Override
 	public void markEditionAsAvailable(Edition edition) {
+		// TODO delete this, not used
 		edition.setAvailable(true);
 		edition.setDueDate(null); // Clear due date when making available
 		editionRepository.save(edition);
@@ -65,7 +66,8 @@ public class EditionService implements EditionServiceInterface {
 	}
 
 	@Override
-	public Collection<Edition> findByMediaAndAvailable(Media media) {
+	public List<Edition> findByMediaAndAvailable(Media media) {
+		// TODO delete this
 		return editionRepository.findByMediaAndAvailable(media);
 	}
 

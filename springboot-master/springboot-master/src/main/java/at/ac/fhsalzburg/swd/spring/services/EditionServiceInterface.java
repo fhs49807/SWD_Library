@@ -10,7 +10,7 @@ import java.util.List;
 
 public interface EditionServiceInterface {
 
-	Collection<Edition> findByMediaAndAvailable(Media media);
+	List<Edition> findByMediaAndAvailable(Media media);
 
 	List<Edition> findAvailableForReserve(Media media, LocalDate startDate, LocalDate endDate);
 

@@ -59,7 +59,7 @@ public class MediaTransactionService implements MediaTransactionServiceInterface
 	}
 
 	@Override
-	public MediaTransaction loanMedia(String username, Long mediaId, LocalDate endDate) throws NotFoundException {
+	public MediaTransaction loanMedia(String username, Long mediaId, LocalDate endDate) {
 		// Validate end date
 		LocalDate todayDate = LocalDate.now();
 		if (endDate.isBefore(todayDate)) {
@@ -68,12 +68,12 @@ public class MediaTransactionService implements MediaTransactionServiceInterface
 
 		// Fetch media and edition
 		Media media = mediaService.findById(mediaId);
-		Collection<Edition> availableEditions = editionService.findByMediaAndAvailable(media);
-		Edition selectedEdition = editionService.findFirstAvailableEdition(availableEditions);
+		List<Edition> availableEditions = editionService.findByMediaAndAvailable(media);
+		Edition selectedEdition = availableEditions.get(0);
 
 		if (selectedEdition == null) {
 			// no more available editions left
-			reserveMediaForCustomer(username, mediaId, LocalDate.now(), endDate);
+			// TODO Reservierung zu einem späteren Zeitpunkt vorschlagen
 		}
 
 		// Calculate return dates
@@ -85,9 +85,8 @@ public class MediaTransactionService implements MediaTransactionServiceInterface
 
 		// Create and save transaction
 		MediaTransaction transaction =
-			new MediaTransaction(new Date(), lastPossibleReturnDate, selectedEdition, user, null, null);
-		transaction.setEnd_date(DateUtils.getDateFromString(endDate.toString()));
-		transaction.setStatus(MediaTransaction.TransactionStatus.ACTIVE);
+			new MediaTransaction(new Date(), DateUtils.getDateFromString(endDate.toString()), lastPossibleReturnDate,
+				selectedEdition, user, null, null, MediaTransaction.TransactionStatus.ACTIVE);
 		mediaTransactionRepository.save(transaction);
 
 		// Update edition
@@ -138,7 +137,7 @@ public class MediaTransactionService implements MediaTransactionServiceInterface
 	}
 
 	@Override
-	public void reserveMediaForCustomer(String userName, Long mediaId, LocalDate reserveStartDate,
+	public MediaTransaction reserveMediaForCustomer(String userName, Long mediaId, LocalDate reserveStartDate,
 		LocalDate reserveEndDate) throws IllegalStateException, NoSuchElementException {
 		User user = userService.getByUsername(userName);
 		Media media = mediaService.findById(mediaId);
@@ -172,12 +171,15 @@ public class MediaTransactionService implements MediaTransactionServiceInterface
 		}
 
 		// Reserve the first available edition
-		MediaTransaction reservation = new MediaTransaction(null, null, availableEditions.get(0), user,
-			reserveStartDate, reserveEndDate);
-		reservation.setStatus(MediaTransaction.TransactionStatus.RESERVED);
-		mediaTransactionRepository.save(reservation);
+		int maxLoanDays = user.getCustomerType() == User.CustomerType.STUDENT ? 42 : 28;
+		LocalDate lastPossibleReturnDateLocal = reserveStartDate.plusDays(maxLoanDays);
+		Date lastPossibleReturnDate = Date
+			.from(lastPossibleReturnDateLocal.atStartOfDay(ZoneId.systemDefault()).toInstant());
 
-		System.out.printf("Media %s reserved for customer %s%n", media.getId(), user.getUsername());
+		MediaTransaction reservation =
+			new MediaTransaction(null, null, lastPossibleReturnDate, availableEditions.get(0), user,
+				reserveStartDate, reserveEndDate, MediaTransaction.TransactionStatus.RESERVED);
+		return mediaTransactionRepository.save(reservation);
 	}
 
 	@Override
