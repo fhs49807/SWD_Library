@@ -1,6 +1,7 @@
 package at.ac.fhsalzburg.swd.spring.model;
 
 import at.ac.fhsalzburg.swd.spring.enums.ReturnCondition;
+import at.ac.fhsalzburg.swd.spring.enums.TransactionStatus;
 import lombok.Getter;
 import lombok.Setter;
 
@@ -128,9 +129,5 @@ public class MediaTransaction {
 	public LocalDate getReserveEndDate() { return reserveEndDate; }
 
 	public LocalDate getReserveStartDate() { return reserveStartDate; }
-
-	public enum TransactionStatus {
-		LOANED, COMPLETED, RESERVED
-	}
 
 }

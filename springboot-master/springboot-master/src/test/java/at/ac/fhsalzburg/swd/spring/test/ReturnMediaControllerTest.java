@@ -1,6 +1,7 @@
 package at.ac.fhsalzburg.swd.spring.test;
 
 import at.ac.fhsalzburg.swd.spring.controller.TemplateController;
+import at.ac.fhsalzburg.swd.spring.enums.TransactionStatus;
 import at.ac.fhsalzburg.swd.spring.model.MediaTransaction;
 import at.ac.fhsalzburg.swd.spring.model.User;
 import at.ac.fhsalzburg.swd.spring.services.InvoiceService;
@@ -113,8 +114,7 @@ public class ReturnMediaControllerTest {
 
 		LocalDate expirationDate = LocalDate.now().minusDays(2);  // 2 tage verspätet
 		transaction.setLast_possible_return_date(expirationDate); // setze das fälligkeitsdatum der transaktion
-		transaction.setStatus(
-			MediaTransaction.TransactionStatus.LOANED); // setze den status der transaktion auf "aktiv"
+		transaction.setStatus(TransactionStatus.LOANED); // setze den status der transaktion auf "aktiv"
 		transaction.setReturnDate(LocalDate.now());  // setze das rückgabedatum auf heute
 
 		User mockUser =

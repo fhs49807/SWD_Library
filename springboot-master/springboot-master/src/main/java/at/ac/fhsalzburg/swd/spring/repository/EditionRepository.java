@@ -18,13 +18,6 @@ public interface EditionRepository extends CrudRepository<Edition, Long> {
 	@Transactional(timeout = 10)
 	List<Edition> findByMedia(Media media);
 
-	// checks if edition with specific ID is available
-	boolean existsByIdAndAvailable(Long editionId, boolean available);
-
-	// finds all available editions associated with specific media item
-	@Query("SELECT e FROM Edition e WHERE e.media = :media AND e.available = true")
-	List<Edition> findByMediaAndAvailable(@Param("media") Media media);
-
 	@Query("SELECT e " +
 	       "FROM Edition e join MediaTransaction t on t.edition = e " +
 	       "WHERE e.media = :media" +
