@@ -11,7 +11,7 @@ public interface EditionServiceInterface {
 
 	List<Edition> findByMediaAndAvailable(Media media);
 
-	List<Edition> findAvailableForReserve(Media media, LocalDate startDate, LocalDate endDate);
+	List<Edition> findAvailableEditions(Media media, LocalDate startDate, LocalDate endDate);
 
 	Edition findFirstAvailableEdition(Collection<Edition> editions);
 

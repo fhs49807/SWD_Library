@@ -56,7 +56,7 @@ public class MediaTransactionServiceTest {
 			LocalDate.now(),
 			LocalDate.now().plusDays(2),
 			LocalDate.now().plusDays(1), // expirationDate (vor 1 Tag abgelaufen)
-			edition, user, null, null, MediaTransaction.TransactionStatus.ACTIVE
+			edition, user, null, null, MediaTransaction.TransactionStatus.LOANED
 		);
 
 		// Mock Repository Verhalten
@@ -90,7 +90,7 @@ public class MediaTransactionServiceTest {
 
 		List<Edition> editions = new ArrayList<>();
 		editions.add(new Edition());
-		when(editionService.findAvailableForReserve(any(), any(), any())).thenReturn(editions);
+		when(editionService.findAvailableEditions(any(), any(), any())).thenReturn(editions);
 
 		when(mediaTransactionRepository.save(any())).thenAnswer(i -> i.getArguments()[0]);
 
@@ -137,6 +137,6 @@ public class MediaTransactionServiceTest {
 		assertEquals(user, persistedTransaction.getUser());
 		assertNull(persistedTransaction.getReserveStartDate());
 		assertNull(persistedTransaction.getReserveEndDate());
-		assertEquals(MediaTransaction.TransactionStatus.ACTIVE, persistedTransaction.getStatus());
+		assertEquals(MediaTransaction.TransactionStatus.LOANED, persistedTransaction.getStatus());
 	}
 }

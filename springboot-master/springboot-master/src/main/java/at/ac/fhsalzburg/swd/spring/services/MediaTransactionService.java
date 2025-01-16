@@ -41,7 +41,7 @@ public class MediaTransactionService implements MediaTransactionServiceInterface
 
 	@Override
 	public Collection<MediaTransaction> findLoansByUser(User user) {
-		return mediaTransactionRepository.findByUser(user);
+		return mediaTransactionRepository.findByUserAndStatus(user, MediaTransaction.TransactionStatus.LOANED);
 	}
 
 	@Override
@@ -66,13 +66,13 @@ public class MediaTransactionService implements MediaTransactionServiceInterface
 
 		// Fetch media and edition
 		Media media = mediaService.findById(mediaId);
-		List<Edition> availableEditions = editionService.findByMediaAndAvailable(media);
-		Edition selectedEdition = availableEditions.get(0);
 
-		if (selectedEdition == null) {
-			// no more available editions left
-			// TODO Reservierung zu einem späteren Zeitpunkt vorschlagen
+		// Check if editions are available for reservation
+		List<Edition> availableEditions = editionService.findAvailableEditions(media, LocalDate.now(), endDate);
+		if (availableEditions.isEmpty()) {
+			handleNoAvailableEditionError(media, LocalDate.now(), endDate);
 		}
+		Edition edition = availableEditions.get(0);
 
 		// Calculate return dates
 		User user = userService.getByUsername(username);
@@ -81,12 +81,12 @@ public class MediaTransactionService implements MediaTransactionServiceInterface
 
 		// Create and save transaction
 		MediaTransaction transaction =
-			new MediaTransaction(LocalDate.now(), endDate, lastPossibleReturnDate,
-				selectedEdition, user, null, null, MediaTransaction.TransactionStatus.ACTIVE);
+			new MediaTransaction(LocalDate.now(), endDate, lastPossibleReturnDate, edition, user, null, null,
+				MediaTransaction.TransactionStatus.LOANED);
 		mediaTransactionRepository.save(transaction);
 
 		// Update edition
-		editionService.markEditionAsUnavailable(selectedEdition, transaction.getEnd_date());
+		editionService.markEditionAsUnavailable(edition, transaction.getEnd_date());
 
 		return transaction;
 	}
@@ -139,31 +139,10 @@ public class MediaTransactionService implements MediaTransactionServiceInterface
 		Media media = mediaService.findById(mediaId);
 
 		// Check if editions are available for reservation
-		List<Edition> availableEditions = editionService.findAvailableForReserve(media, reserveStartDate,
+		List<Edition> availableEditions = editionService.findAvailableEditions(media, reserveStartDate,
 			reserveEndDate);
-
 		if (availableEditions.isEmpty()) {
-			// find first available date for given period, so that an edition of the given media can be reserved
-			List<MediaTransaction> reservedEditions =
-				mediaTransactionRepository.findReservedEditionsInPeriod(media, reserveStartDate,
-					reserveEndDate);
-			MediaTransaction transaction = reservedEditions.get(0);
-			LocalDate endDateOfEdition;
-			if (MediaTransaction.TransactionStatus.ACTIVE == transaction.getStatus()) {
-				endDateOfEdition = transaction.getEnd_date();
-			} else if (MediaTransaction.TransactionStatus.RESERVED == transaction.getStatus()) {
-				endDateOfEdition = transaction.getReserveEndDate();
-			} else {
-				throw new IllegalStateException(
-					String.format("Transaction %d has undefined status %s", transaction.getId(),
-						transaction.getStatus()));
-			}
-
-			throw new NoSuchElementException(
-				String.format(
-					"No available editions for media: %s (%s). Please select another time period. The first possible" +
-					" start date would be on %s", media.getName(), media.getMediaType().getType(),
-					endDateOfEdition.plusDays(1)));
+			handleNoAvailableEditionError(media, reserveStartDate, reserveEndDate);
 		}
 
 		// Reserve the first available edition
@@ -198,5 +177,29 @@ public class MediaTransactionService implements MediaTransactionServiceInterface
 			return diffInDays > 0 ? diffInDays * penaltyPerDay : 0.0; // Dynamische Gebühr pro Tag
 		}
 		return 0.0;
+	}
+
+	private void handleNoAvailableEditionError(Media media, LocalDate startDate,
+		LocalDate endDate) throws IllegalStateException, NoSuchElementException {
+		// find first available date for given period, so that an edition of the given media can be reserved
+		List<MediaTransaction> reservedEditions =
+			mediaTransactionRepository.findReservedEditionsInPeriod(media, startDate, endDate);
+		MediaTransaction transaction = reservedEditions.get(0);
+		LocalDate endDateOfEdition;
+		if (MediaTransaction.TransactionStatus.LOANED == transaction.getStatus()) {
+			endDateOfEdition = transaction.getEnd_date();
+		} else if (MediaTransaction.TransactionStatus.RESERVED == transaction.getStatus()) {
+			endDateOfEdition = transaction.getReserveEndDate();
+		} else {
+			throw new IllegalStateException(
+				String.format("Transaction %d has undefined status %s", transaction.getId(),
+					transaction.getStatus()));
+		}
+
+		throw new NoSuchElementException(
+			String.format(
+				"No available editions for media: %s (%s). Please select another time period. The first possible" +
+				" start date would be on %s", media.getName(), media.getMediaType().getType(),
+				endDateOfEdition.plusDays(1)));
 	}
 }

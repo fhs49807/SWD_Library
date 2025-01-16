@@ -1,18 +1,15 @@
 package at.ac.fhsalzburg.swd.spring.repository;
 
-import java.time.LocalDate;
-import java.util.Collection;
-import java.util.Date;
-import java.util.List;
-
+import at.ac.fhsalzburg.swd.spring.model.Edition;
+import at.ac.fhsalzburg.swd.spring.model.Media;
 import org.springframework.data.jpa.repository.Query;
 import org.springframework.data.repository.CrudRepository;
 import org.springframework.data.repository.query.Param;
 import org.springframework.stereotype.Repository;
 import org.springframework.transaction.annotation.Transactional;
 
-import at.ac.fhsalzburg.swd.spring.model.Edition;
-import at.ac.fhsalzburg.swd.spring.model.Media;
+import java.time.LocalDate;
+import java.util.List;
 
 @Repository
 public interface EditionRepository extends CrudRepository<Edition, Long> {
@@ -28,14 +25,25 @@ public interface EditionRepository extends CrudRepository<Edition, Long> {
 	@Query("SELECT e FROM Edition e WHERE e.media = :media AND e.available = true")
 	List<Edition> findByMediaAndAvailable(@Param("media") Media media);
 
-    @Query("SELECT e " +
-           "FROM Edition e left join MediaTransaction t on t.edition = e " +
-           "WHERE e.media = :media " +
-           "AND (t is null OR t.reserveStartDate > :endDate or t.reserveEndDate < :startDate" +
-           "    or t.end_date < :startDate)")
-    List<Edition> findAvailableForReserve(Media media, LocalDate startDate, LocalDate endDate);
+	@Query("SELECT e " +
+	       "FROM Edition e join MediaTransaction t on t.edition = e " +
+	       "WHERE e.media = :media" +
+	       "    and t.status = 'LOANED'" +
+	       "    and t.return_date is null" +
+	       "    and t.end_date >= :startDate")
+	List<Edition> findLoanedEditions(Media media, LocalDate startDate);
 
-    @Query("SELECT e.id FROM Media m JOIN m.editions e WHERE m.id = :mediaId")
+	@Query("SELECT e " +
+	       "FROM Edition e join MediaTransaction t on t.edition = e " +
+	       "WHERE e.media = :media" +
+	       "    and t.status = 'RESERVED'" +
+	       "    and t.return_date is null" +
+	       "    and t.reserveStartDate <= :endDate" +
+	       "    and t.reserveEndDate >= :startDate")
+	List<Edition> findReservedEditions(Media media, LocalDate startDate, LocalDate endDate);
+
+
+	@Query("SELECT e.id FROM Media m JOIN m.editions e WHERE m.id = :mediaId")
 	List<Long> findEditionIdsByMediaId(@Param("mediaId") Long mediaId);
 
 }

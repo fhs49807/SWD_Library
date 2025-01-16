@@ -32,8 +32,8 @@
                     <tbody>
                         <tr th:each="transaction : ${loans}">
                             <!-- Only show ACTIVE loans (status != COMPLETED) -->
-                            <td th:text="${transaction.edition.media.name}">Media Name</td>
-                            <td th:text="${#dates.format(transaction.last_possible_return_date, 'yyyy-MM-dd')}">
+                            <td th:text="${transaction.mediaName}">Media Name</td>
+                            <td th:text="${transaction.expirationDate}">
                                 Due Date</td>
                             <td>
 									<form th:action="@{/returnMedia}" method="post">
@@ -60,6 +60,7 @@
                     <thead>
                     <tr>
                         <th>Media Name</th>
+						<th>Start Date</th>
                         <th>Due Date</th>
                         <th>Action</th>
                     </tr>

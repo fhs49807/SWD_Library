@@ -18,10 +18,8 @@ import org.springframework.web.bind.annotation.*;
 import java.security.Principal;
 import java.time.LocalDate;
 import java.util.ArrayList;
-import java.util.Collection;
 import java.util.Date;
 import java.util.List;
-import java.util.stream.Collectors;
 
 import static java.time.temporal.ChronoUnit.DAYS;
 
@@ -75,7 +73,7 @@ public class MediaController extends BaseController {
 					return "loanSuccess";
 				}
 			} catch (Exception e) {
-				System.err.println("Error processing loan/reservation: " + e.getMessage());
+				e.printStackTrace();
 				return handleError("Error processing loan/reservation: " + e.getMessage(), selectedGenre, selectedType,
 					username, model);
 			}
@@ -95,13 +93,8 @@ public class MediaController extends BaseController {
 		// Weiterverarbeitung für eingeloggte Benutzer
 		User user = userService.getByUsername(principal.getName());
 
-		// Nur aktive Transaktionen anzeigen (status != COMPLETED)
-		Collection<MediaTransaction> loans = mediaTransactionService.findLoansByUser(user).stream()
-			.filter(transaction -> transaction.getStatus() != MediaTransaction.TransactionStatus.COMPLETED)
-			.collect(Collectors.toList());
-		model.addAttribute("loans", loans);
-
-		// Reservierungen einfügen, falls vorhanden
+		// Verleihungen und Reservierungen einfügen, falls vorhanden
+		fetchUserLoans(model, user);
 		fetchUserReservations(model, user);
 
 		return "returnMedia"; // Zeigt die Rückgabeseite an, wenn der Benutzer eingeloggt ist
@@ -203,8 +196,20 @@ public class MediaController extends BaseController {
 		return options;
 	}
 
+	private void fetchUserLoans(Model model, User user) {
+		// Nur aktive Transaktionen anzeigen (status != COMPLETED)
+		List<MediaTransactionDTO> loanDTOs = new ArrayList<>();
+		for (MediaTransaction transaction : mediaTransactionService.findLoansByUser(user)) {
+			MediaTransactionDTO dto = new MediaTransactionDTO(transaction.getId(),
+				transaction.getEdition().getMediaName(), null,
+				transaction.getReturnDate());
+			loanDTOs.add(dto);
+		}
+		model.addAttribute("loans", loanDTOs);
+	}
+
 	private void fetchUserReservations(Model model, User user) {
-		Collection<MediaTransactionDTO> mediaTransactionDTOs = new ArrayList<>();
+		List<MediaTransactionDTO> mediaTransactionDTOs = new ArrayList<>();
 		for (MediaTransaction transaction : mediaTransactionService.findReservationsForUser(user)) {
 			MediaTransactionDTO dto = new MediaTransactionDTO(transaction.getId(),
 				transaction.getEdition().getMediaName(), transaction.getReserveStartDate(),

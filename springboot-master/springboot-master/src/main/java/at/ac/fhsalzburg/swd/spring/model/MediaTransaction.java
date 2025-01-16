@@ -130,7 +130,7 @@ public class MediaTransaction {
 	public LocalDate getReserveStartDate() { return reserveStartDate; }
 
 	public enum TransactionStatus {
-		ACTIVE, COMPLETED, OVERDUE, RESERVED
+		LOANED, COMPLETED, RESERVED
 	}
 
 }
