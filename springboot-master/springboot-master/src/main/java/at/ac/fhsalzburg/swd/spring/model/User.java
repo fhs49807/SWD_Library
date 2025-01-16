@@ -1,15 +1,14 @@
 package at.ac.fhsalzburg.swd.spring.model;
 
+import lombok.Getter;
+import lombok.Setter;
+
+import javax.persistence.*;
 import java.util.Date;
-import javax.persistence.Entity;
-import javax.persistence.EnumType;
-import javax.persistence.Enumerated;
-import javax.persistence.GeneratedValue;
-import javax.persistence.GenerationType;
-import javax.persistence.Id;
-import javax.persistence.Table;
 
 @Entity
+@Getter
+@Setter
 @Table(name = "USERS")
 public class User {
 
@@ -35,7 +34,7 @@ public class User {
 	}
 
 	public User(String username, String fullname, String eMail, String tel, Date birth, String password,
-			String role, String jwtToken, CustomerType customerType, int loanLimit) {
+		String role, String jwtToken, CustomerType customerType, int loanLimit) {
 		this.username = username;
 		this.fullname = fullname;
 		this.eMail = eMail;
@@ -81,22 +80,6 @@ public class User {
 		this.fullname = fullname;
 	}
 
-	public void setEMail(String eMail) {
-		this.eMail = eMail;
-	}
-
-	public String getEMail() {
-		return this.eMail;
-	}
-
-	public String getTel() {
-		return tel;
-	}
-
-	public void setTel(String tel) {
-		this.tel = tel;
-	}
-
 	public Long getCredit() {
 		return credit;
 	}
@@ -119,10 +102,6 @@ public class User {
 
 	public Date getBirthDate() {
 		return birthDate;
-	}
-
-	public void setBirthDate(Date birthDate) {
-		this.birthDate = birthDate;
 	}
 
 	public String getRole() {

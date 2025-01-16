@@ -1,5 +1,6 @@
 package at.ac.fhsalzburg.swd.spring.test;
 
+import at.ac.fhsalzburg.swd.spring.enums.TransactionStatus;
 import at.ac.fhsalzburg.swd.spring.model.Edition;
 import at.ac.fhsalzburg.swd.spring.model.Media;
 import at.ac.fhsalzburg.swd.spring.model.MediaTransaction;
@@ -46,7 +47,6 @@ public class MediaTransactionServiceTest {
 	public void testReturnMediaWithLateReturn() {
 		// Erstelle eine verspätete Rückgabe-Edition
 		Edition edition = new Edition();
-		edition.setAvailable(false);
 
 		User user = new User();
 		user.setCredit(100L);
@@ -56,7 +56,7 @@ public class MediaTransactionServiceTest {
 			LocalDate.now(),
 			LocalDate.now().plusDays(2),
 			LocalDate.now().plusDays(1), // expirationDate (vor 1 Tag abgelaufen)
-			edition, user, null, null, MediaTransaction.TransactionStatus.LOANED
+			edition, user, null, null, TransactionStatus.LOANED
 		);
 
 		// Mock Repository Verhalten
@@ -68,11 +68,8 @@ public class MediaTransactionServiceTest {
 		// Führe Rückgabeoperation aus
 		mediaTransactionService.returnMedia(1L);
 
-		// Überprüfe, dass die Edition als verfügbar markiert wurde
-		assertTrue(transaction.getEdition().isAvailable());
-
 		// Überprüfe, dass der Transaktionsstatus auf "COMPLETED" gesetzt wurde
-		assertEquals(MediaTransaction.TransactionStatus.COMPLETED, transaction.getStatus());
+		assertEquals(TransactionStatus.COMPLETED, transaction.getStatus());
 
 		// Überprüfe, dass die Deduktionsmethode des InvoiceService aufgerufen wurde
 		verify(invoiceService, times(1)).deductAmount(Mockito.any(), Mockito.any());
@@ -108,7 +105,7 @@ public class MediaTransactionServiceTest {
 		assertEquals(user, persistedTransaction.getUser());
 		assertEquals(reserveStartDate, persistedTransaction.getReserveStartDate());
 		assertEquals(reserveEndDate, persistedTransaction.getReserveEndDate());
-		assertEquals(MediaTransaction.TransactionStatus.RESERVED, persistedTransaction.getStatus());
+		assertEquals(TransactionStatus.RESERVED, persistedTransaction.getStatus());
 	}
 
 	@Test
@@ -117,7 +114,7 @@ public class MediaTransactionServiceTest {
 
 		List<Edition> editions = new ArrayList<>();
 		editions.add(new Edition());
-		when(editionService.findByMediaAndAvailable(any())).thenReturn(editions);
+		when(editionService.findAvailableEditions(any(), any(), any())).thenReturn(editions);
 
 		User user = new User();
 		user.setCustomerType(User.CustomerType.STUDENT);
@@ -137,6 +134,6 @@ public class MediaTransactionServiceTest {
 		assertEquals(user, persistedTransaction.getUser());
 		assertNull(persistedTransaction.getReserveStartDate());
 		assertNull(persistedTransaction.getReserveEndDate());
-		assertEquals(MediaTransaction.TransactionStatus.LOANED, persistedTransaction.getStatus());
+		assertEquals(TransactionStatus.LOANED, persistedTransaction.getStatus());
 	}
 }

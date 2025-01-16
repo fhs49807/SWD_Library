@@ -201,7 +201,7 @@ public class MediaController extends BaseController {
 		List<MediaTransactionDTO> loanDTOs = new ArrayList<>();
 		for (MediaTransaction transaction : mediaTransactionService.findLoansByUser(user)) {
 			MediaTransactionDTO dto = new MediaTransactionDTO(transaction.getId(),
-				transaction.getEdition().getMediaName(), null,
+				transaction.getEdition().getMedia().getName(), null,
 				transaction.getReturnDate());
 			loanDTOs.add(dto);
 		}
@@ -212,7 +212,7 @@ public class MediaController extends BaseController {
 		List<MediaTransactionDTO> mediaTransactionDTOs = new ArrayList<>();
 		for (MediaTransaction transaction : mediaTransactionService.findReservationsForUser(user)) {
 			MediaTransactionDTO dto = new MediaTransactionDTO(transaction.getId(),
-				transaction.getEdition().getMediaName(), transaction.getReserveStartDate(),
+				transaction.getEdition().getMedia().getName(), transaction.getReserveStartDate(),
 				transaction.getReserveEndDate());
 			mediaTransactionDTOs.add(dto);
 		}
