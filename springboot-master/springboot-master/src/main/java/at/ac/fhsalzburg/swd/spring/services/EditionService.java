@@ -35,7 +35,7 @@ public class EditionService implements EditionServiceInterface {
 	}
 
 	@Override
-	public void markEditionAsUnavailable(Edition edition, Date dueDate) {
+	public void markEditionAsUnavailable(Edition edition, LocalDate dueDate) {
 		edition.setAvailable(false);
 		edition.setDueDate(dueDate);
 		editionRepository.save(edition);

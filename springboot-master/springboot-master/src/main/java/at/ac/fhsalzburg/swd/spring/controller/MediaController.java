@@ -23,6 +23,8 @@ import java.util.Date;
 import java.util.List;
 import java.util.stream.Collectors;
 
+import static java.time.temporal.ChronoUnit.DAYS;
+
 @Controller
 public class MediaController extends BaseController {
 
@@ -242,8 +244,7 @@ public class MediaController extends BaseController {
 
 	// Hilfsmethode zur Berechnung der Mahngebühr
 	private double calculatePenalty(MediaTransaction transaction) {
-		long overdueDays = (transaction.getReturnDate().getTime()
-		                    - transaction.getLast_possible_return_date().getTime()) / (1000 * 60 * 60 * 24);
+		long overdueDays = DAYS.between(transaction.getReturnDate(), transaction.getLast_possible_return_date());
 		return overdueDays > 0 ? overdueDays * 1.0 : 0.0; // Gebühr von 1€ pro verspätetem Tag
 	}
 

@@ -1,19 +1,7 @@
 package at.ac.fhsalzburg.swd.spring.model;
 
-import java.util.Date;
-
-import javax.persistence.Column;
-import javax.persistence.Entity;
-import javax.persistence.GeneratedValue;
-import javax.persistence.GenerationType;
-import javax.persistence.Id;
-import javax.persistence.JoinColumn;
-import javax.persistence.ManyToOne;
-import javax.persistence.Table;
-
-import org.springframework.format.annotation.DateTimeFormat;
-
-import lombok.NoArgsConstructor;
+import javax.persistence.*;
+import java.time.LocalDate;
 
 //edition = exemplar eines mediums
 
@@ -25,8 +13,7 @@ public class Edition {
 	@GeneratedValue(strategy = GenerationType.IDENTITY)
 	private Long id;
 
-	@DateTimeFormat(pattern = "yyyy-MM-dd")
-	private Date dueDate;// due date (return date) for specific edition of medium
+	private LocalDate dueDate; // due date (return date) for specific edition of medium
 
 	// TODO: add to class diagram
 	private boolean available;// availability status // TODO delete this
@@ -38,10 +25,10 @@ public class Edition {
 	private Media media;
 
 	@Column(name = "media_name")
-    private String mediaName; // Add the media name as a separate column
+	private String mediaName; // Add the media name as a separate column
 
 
-	public Edition(Media media, boolean available, Date dueDate) {
+	public Edition(Media media, boolean available, LocalDate dueDate) {
 		this.media = media;
 		this.available = available;
 		this.dueDate = dueDate;
@@ -53,21 +40,19 @@ public class Edition {
 
 
 	public Edition(Media media) {
-	    this.media = media;
-	    this.available = true;
-	}
-	 public String getMediaName() {
-	        return mediaName;
-	    }
-
-	    public void setMediaName(String mediaName) {
-	        this.mediaName = mediaName;
-	    }
-	public Date getDueDate() {
-		return dueDate;
+		this.media = media;
+		this.available = true;
 	}
 
-	public void setDueDate(Date dueDate) {
+	public String getMediaName() {
+		return mediaName;
+	}
+
+	public void setMediaName(String mediaName) {
+		this.mediaName = mediaName;
+	}
+
+	public void setDueDate(LocalDate dueDate) {
 		this.dueDate = dueDate;
 	}
 

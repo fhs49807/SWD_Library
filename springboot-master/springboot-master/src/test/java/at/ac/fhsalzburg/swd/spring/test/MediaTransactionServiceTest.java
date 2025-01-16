@@ -6,18 +6,15 @@ import at.ac.fhsalzburg.swd.spring.model.MediaTransaction;
 import at.ac.fhsalzburg.swd.spring.model.User;
 import at.ac.fhsalzburg.swd.spring.repository.MediaTransactionRepository;
 import at.ac.fhsalzburg.swd.spring.services.*;
-import at.ac.fhsalzburg.swd.spring.util.DateUtils;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
 import org.mockito.InjectMocks;
 import org.mockito.Mock;
 import org.mockito.Mockito;
 import org.mockito.junit.jupiter.MockitoExtension;
-import org.springframework.test.context.ActiveProfiles;
 
 import java.time.LocalDate;
 import java.util.ArrayList;
-import java.util.Date;
 import java.util.List;
 import java.util.Optional;
 
@@ -25,7 +22,6 @@ import static org.junit.jupiter.api.Assertions.*;
 import static org.mockito.Mockito.*;
 
 @ExtendWith(MockitoExtension.class)
-@ActiveProfiles("test")
 public class MediaTransactionServiceTest {
 
 	@Mock
@@ -57,9 +53,9 @@ public class MediaTransactionServiceTest {
 
 		// Erstelle eine Mock-Transaktion mit einer verspäteten Rückgabe
 		MediaTransaction transaction = new MediaTransaction(
-			new Date(),
-			new Date(), // TODO end_date is at least 1 day after start_date
-			new Date(System.currentTimeMillis() - 1000 * 60 * 60 * 24), // expirationDate (vor 1 Tag abgelaufen)
+			LocalDate.now(),
+			LocalDate.now().plusDays(2),
+			LocalDate.now().plusDays(1), // expirationDate (vor 1 Tag abgelaufen)
 			edition, user, null, null, MediaTransaction.TransactionStatus.ACTIVE
 		);
 
@@ -107,7 +103,7 @@ public class MediaTransactionServiceTest {
 
 		assertNull(persistedTransaction.getStart_date());
 		assertNull(persistedTransaction.getEnd_date());
-		//assertEquals(today.plusDays(43), persistedTransaction.getLast_possible_return_date());
+		assertEquals(today.plusDays(43), persistedTransaction.getLast_possible_return_date());
 		assertEquals(editions.get(0), persistedTransaction.getEdition());
 		assertEquals(user, persistedTransaction.getUser());
 		assertEquals(reserveStartDate, persistedTransaction.getReserveStartDate());
@@ -130,12 +126,13 @@ public class MediaTransactionServiceTest {
 		when(mediaTransactionRepository.save(any())).thenAnswer(i -> i.getArguments()[0]);
 
 		// testing #loanMedia
-		LocalDate endDate = LocalDate.now().plusDays(1);
+		LocalDate today = LocalDate.now();
+		LocalDate endDate = today.plusDays(1);
 		MediaTransaction persistedTransaction = mediaTransactionService.loanMedia("John", 1L, endDate);
 
-		assertEquals(new Date().getDate(), persistedTransaction.getStart_date().getDate());
-		assertEquals(endDate, DateUtils.getLocalDateFromDate(persistedTransaction.getEnd_date()));
-		//assertEquals(today.plusDays(43), persistedTransaction.getLast_possible_return_date());
+		assertEquals(today, persistedTransaction.getStart_date());
+		assertEquals(endDate, persistedTransaction.getEnd_date());
+		assertEquals(today.plusDays(43), persistedTransaction.getLast_possible_return_date());
 		assertEquals(editions.get(0), persistedTransaction.getEdition());
 		assertEquals(user, persistedTransaction.getUser());
 		assertNull(persistedTransaction.getReserveStartDate());
