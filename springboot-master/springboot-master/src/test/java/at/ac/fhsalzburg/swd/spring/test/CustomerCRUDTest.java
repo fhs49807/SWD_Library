@@ -22,32 +22,32 @@ public class CustomerCRUDTest {
 	@Test
 	public void testUserCRUDOperations() {
 		// CREATE
-		boolean created = userService.addUser("john.doe", "John Doe", "john.doe@example.com", "123456789", new Date(),
-			"securepassword", "Customer", CustomerType.REGULAR, 5);
+		boolean created = userService.addUser("johndoe", "John Doe", "john.doe@example.com", "123456789", new Date(),
+				"securepassword", "USER", CustomerType.REGULAR, 5);
+		assertTrue(created, "User should be created successfully");
 
 		// READ
-		assertTrue(created, "User should be created successfully");
-		User retrievedUser = userService.getByUsername("john.doe");
-		assertNotNull(retrievedUser, "User should be retrieved after creation");
-		assertEquals("John Doe", retrievedUser.getFullname(), "User full name should match");
-		assertEquals(5, retrievedUser.getLoanLimit(), "User loan limit should match");
-		assertEquals(CustomerType.REGULAR, retrievedUser.getCustomerType(), "User customer type should match");
-		System.out.println("User created: " + retrievedUser);
+		User retrievedUser = userService.getByUsername("johndoe");
+		assertNotNull(retrievedUser, "User should be retrievable after creation");
+		assertEquals("John Doe", retrievedUser.getFullname(), "Full name should match");
+		assertEquals(CustomerType.REGULAR, retrievedUser.getCustomerType(), "Customer type should match");
+		assertEquals(5, retrievedUser.getLoanLimit(), "Loan limit should match");
 
 		// UPDATE
-		retrievedUser.setFullname("Updated Name");
+		retrievedUser.setFullname("Jonathan Doe");
 		retrievedUser.setLoanLimit(10);
-		userService.addUser(retrievedUser); // Reuse addUser for updating
-		User updatedUser = userService.getByUsername("john.doe");
-		assertNotNull(updatedUser, "Updated user should not be null");
-		assertEquals("Updated Name", updatedUser.getFullname(), "User full name should be updated");
-		assertEquals(10, updatedUser.getLoanLimit(), "User loan limit should be updated");
-		System.out.println("User updated: " + updatedUser);
+		userService.updateUser(retrievedUser);
+
+		User updatedUser = userService.getByUsername("johndoe");
+		assertNotNull(updatedUser, "Updated user should be retrievable");
+		assertEquals("Jonathan Doe", updatedUser.getFullname(), "Updated full name should match");
+		assertEquals(10, updatedUser.getLoanLimit(), "Updated loan limit should match");
 
 		// DELETE
-		userService.deleteUser(updatedUser.getUsername());
-		User deletedUser = userService.getByUsername("john.doe");
-		assertNull(deletedUser, "User should be null after deletion");
-		System.out.println("User deleted with username: " + updatedUser.getUsername());
+		boolean deleted = userService.deleteUser("johndoe");
+		assertTrue(deleted, "User should be deleted successfully");
+
+		User deletedUser = userService.getByUsername("johndoe");
+		assertNull(deletedUser, "Deleted user should not be retrievable");
 	}
 }
