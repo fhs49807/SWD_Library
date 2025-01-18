@@ -41,4 +41,12 @@ public class Shelf {
 	public void setSection(Section section) {
 		this.section = section;
 	}
+
+	public Collection<Media> getMediaItems() {
+		return mediaItems;
+	}
+
+	public void setMediaItems(Collection<Media> mediaItems) {
+		this.mediaItems = mediaItems;
+	}
 }

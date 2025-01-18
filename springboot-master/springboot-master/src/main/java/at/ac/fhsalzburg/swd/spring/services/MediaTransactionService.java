@@ -80,6 +80,7 @@ public class MediaTransactionService implements MediaTransactionServiceInterface
 
 		// Check if editions are available for reservation
 		List<Edition> availableEditions = editionService.findAvailableEditions(media, LocalDate.now(), endDate);
+
 		if (availableEditions.isEmpty()) {
 			throw new NoSuchElementException(String.format(
 					"No available editions for media: %s (%s). Please select another time period. The first possible"
@@ -97,10 +98,6 @@ public class MediaTransactionService implements MediaTransactionServiceInterface
 		MediaTransaction transaction = new MediaTransaction(LocalDate.now(), endDate, lastPossibleReturnDate, edition,
 				user, null, null, TransactionStatus.LOANED);
 		mediaTransactionRepository.save(transaction);
-
-		// Check if a transaction is active before returning
-		System.out.println("Transaction open at end of loanMedia?: "
-				+ TransactionSynchronizationManager.isActualTransactionActive());
 
 		return transaction;
 	}
