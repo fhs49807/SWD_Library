@@ -39,4 +39,12 @@ public class Edition {
 		return id;
 	}
 
+	public void setId(Long id) {
+		this.id = id;
+	}
+
+	public void setMedia(Media media) {
+		this.media = media;
+	}
+
 }
