@@ -51,7 +51,7 @@
 - use case diagram kontrollieren obs passt & evtl fixen (tommy)
 - sequence diagram (tommy)
 - component diagram kontrollieren (mario)
-- class diagram fix (mario)
+- ✅class diagram fix (mario)
 
 ## Gegeben
 
