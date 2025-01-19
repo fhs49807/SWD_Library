@@ -29,4 +29,6 @@ public interface MediaTransactionRepository extends CrudRepository<MediaTransact
 	       "    OR t.start_date <= :endDate OR t.end_date >= :startDate)")
 	List<MediaTransaction> findEditionsInPeriod(Media media, LocalDate startDate, LocalDate endDate);
 
+	@Query("SELECT t FROM MediaTransaction t WHERE t.user = :user AND t.reserveStartDate IS NULL")
+	List<MediaTransaction> findActiveLoansByUser(User user);
 }

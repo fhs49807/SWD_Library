@@ -31,8 +31,8 @@ public class MediaTransactionService implements MediaTransactionServiceInterface
 	private final UserServiceInterface userService;
 
 	public MediaTransactionService(MediaTransactionRepository mediaTransactionRepository,
-			MediaServiceInterface mediaService, EditionServiceInterface editionService,
-			InvoiceServiceInterface invoiceService, UserServiceInterface userService) {
+		MediaServiceInterface mediaService, EditionServiceInterface editionService,
+		InvoiceServiceInterface invoiceService, UserServiceInterface userService) {
 		this.mediaTransactionRepository = mediaTransactionRepository;
 		this.mediaService = mediaService;
 		this.editionService = editionService;
@@ -51,13 +51,13 @@ public class MediaTransactionService implements MediaTransactionServiceInterface
 	@Override
 	public MediaTransaction findById(Long transactionId) {
 		return mediaTransactionRepository.findById(transactionId)
-				.orElseThrow(() -> new IllegalArgumentException("Transaction not found"));
+			.orElseThrow(() -> new IllegalArgumentException("Transaction not found"));
 	}
 
 	@Override
 	public Collection<MediaTransaction> getAllLoans() {
 		return StreamSupport.stream(mediaTransactionRepository.findAll().spliterator(), false)
-				.collect(Collectors.toList());
+			.collect(Collectors.toList());
 	}
 
 	@Override
@@ -65,7 +65,7 @@ public class MediaTransactionService implements MediaTransactionServiceInterface
 	public MediaTransaction loanMedia(String username, Long mediaId, LocalDate endDate) {
 		// Check if a transaction is active at the start of the method
 		System.out.println("Transaction open at start of loanMedia?: "
-				+ TransactionSynchronizationManager.isActualTransactionActive());
+		                   + TransactionSynchronizationManager.isActualTransactionActive());
 
 		User user = userService.getByUsername(username);
 
@@ -83,10 +83,10 @@ public class MediaTransactionService implements MediaTransactionServiceInterface
 
 		if (availableEditions.isEmpty()) {
 			throw new NoSuchElementException(String.format(
-					"No available editions for media: %s (%s). Please select another time period. The first possible"
-							+ " start date would be on %s",
-					media.getName(), media.getMediaType().getType(),
-					findFirstAvailableDateForMedia(media, LocalDate.now(), endDate)));
+				"No available editions for media: %s (%s). Please select another time period. The first possible"
+				+ " start date would be on %s",
+				media.getName(), media.getMediaType().getType(),
+				findFirstAvailableDateForMedia(media, LocalDate.now(), endDate)));
 		}
 		Edition edition = availableEditions.get(0);
 
@@ -96,7 +96,7 @@ public class MediaTransactionService implements MediaTransactionServiceInterface
 
 		// Create and save transaction
 		MediaTransaction transaction = new MediaTransaction(LocalDate.now(), endDate, lastPossibleReturnDate, edition,
-				user, null, null, TransactionStatus.LOANED);
+			user, null, null, TransactionStatus.LOANED);
 		mediaTransactionRepository.save(transaction);
 
 		return transaction;
@@ -105,7 +105,7 @@ public class MediaTransactionService implements MediaTransactionServiceInterface
 	@Override
 	public void returnMedia(Long transactionId) {
 		MediaTransaction transaction = mediaTransactionRepository.findById(transactionId)
-				.orElseThrow(() -> new IllegalArgumentException("Transaction not found"));
+			.orElseThrow(() -> new IllegalArgumentException("Transaction not found"));
 
 		// Setze das Rückgabedatum
 		transaction.setReturnDate(LocalDate.now());
@@ -136,27 +136,28 @@ public class MediaTransactionService implements MediaTransactionServiceInterface
 	@Override
 	public MediaTransaction getLatestReservation(Long mediaId, String username) {
 		return mediaTransactionRepository.findTopByEdition_Media_IdAndUser_UsernameOrderByIdDesc(mediaId, username)
-				.orElseThrow(() -> new IllegalArgumentException("No reservation found for the given user and media."));
+			.orElseThrow(() -> new IllegalArgumentException("No reservation found for the given user and media."));
 	}
 
 	@Override
 	@Transactional
 	public MediaTransaction reserveMediaForCustomer(String userName, Long mediaId, LocalDate reserveStartDate,
-			LocalDate reserveEndDate) throws IllegalStateException, NoSuchElementException {
+		LocalDate reserveEndDate) throws IllegalStateException, NoSuchElementException {
 		System.out.println("Transaction open at start of reserveMediaForCustomer?: "
-				+ TransactionSynchronizationManager.isActualTransactionActive());
+		                   + TransactionSynchronizationManager.isActualTransactionActive());
 
 		User user = userService.getByUsername(userName);
 		Media media = mediaService.findById(mediaId);
 
 		// Check if editions are available for reservation
-		List<Edition> availableEditions = editionService.findAvailableEditions(media, reserveStartDate, reserveEndDate);
+		List<Edition> availableEditions = editionService.findAvailableEditions(media, reserveStartDate,
+			reserveEndDate);
 		if (availableEditions.isEmpty()) {
 			throw new NoSuchElementException(String.format(
-					"No available editions for media: %s (%s). Please select another time period. The first possible"
-							+ " start date would be on %s",
-					media.getName(), media.getMediaType().getType(),
-					findFirstAvailableDateForMedia(media, reserveStartDate, reserveEndDate)));
+				"No available editions for media: %s (%s). Please select another time period. The first possible"
+				+ " start date would be on %s",
+				media.getName(), media.getMediaType().getType(),
+				findFirstAvailableDateForMedia(media, reserveStartDate, reserveEndDate)));
 		}
 
 		// Reserve the first available edition
@@ -164,10 +165,10 @@ public class MediaTransactionService implements MediaTransactionServiceInterface
 		LocalDate lastPossibleReturnDate = reserveStartDate.plusDays(maxLoanDays);
 
 		MediaTransaction reservation = new MediaTransaction(null, null, lastPossibleReturnDate,
-				availableEditions.get(0), user, reserveStartDate, reserveEndDate, TransactionStatus.RESERVED);
+			availableEditions.get(0), user, reserveStartDate, reserveEndDate, TransactionStatus.RESERVED);
 
 		System.out.println("Transaction open at end of reserveMediaForCustomer?: "
-				+ TransactionSynchronizationManager.isActualTransactionActive());
+		                   + TransactionSynchronizationManager.isActualTransactionActive());
 
 		return mediaTransactionRepository.save(reservation);
 	}
@@ -186,11 +187,17 @@ public class MediaTransactionService implements MediaTransactionServiceInterface
 		System.out.printf("Reservation %d was canceled.%n", reservationId);
 	}
 
+	@Override
+	public boolean canLoanReserve(User user) {
+		int activeLoanReserve = mediaTransactionRepository.findActiveLoansByUser(user).size();
+		return activeLoanReserve < user.getLoanLimit();
+	}
+
 	private double calculatePenalty(MediaTransaction transaction) {
 		// Wenn das Rückgabedatum nach dem fälligen Rückgabedatum liegt, berechne die
 		// Strafe
 		if (transaction.getReturnDate() != null
-				&& transaction.getReturnDate().isAfter(transaction.getLast_possible_return_date())) {
+		    && transaction.getReturnDate().isAfter(transaction.getLast_possible_return_date())) {
 			long diffInDays = DAYS.between(transaction.getReturnDate(), transaction.getLast_possible_return_date());
 			return diffInDays > 0 ? diffInDays * penaltyPerDay : 0.0; // Dynamische Gebühr pro Tag
 		}
@@ -198,12 +205,11 @@ public class MediaTransactionService implements MediaTransactionServiceInterface
 	}
 
 	/**
-	 * Find first date for media within given period when at least one edition is
-	 * available.
+	 * Find first date for media within given period when at least one edition is available.
 	 */
 	private LocalDate findFirstAvailableDateForMedia(Media media, LocalDate startDate, LocalDate endDate) {
 		List<MediaTransaction> reservedEditions = mediaTransactionRepository.findEditionsInPeriod(media, startDate,
-				endDate);
+			endDate);
 
 		LocalDate latestEndDate = startDate;
 		for (MediaTransaction transaction : reservedEditions) {

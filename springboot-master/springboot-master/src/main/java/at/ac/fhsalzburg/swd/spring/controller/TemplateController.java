@@ -70,7 +70,7 @@ public class TemplateController {
 	// correct action methods:
 	// https://springframework.guru/spring-requestmapping-annotation/#:~:text=%40RequestMapping%20is%20one%20of%20the,map%20Spring%20MVC%20controller%20methods.
 	public String index(Model model, HttpSession session,
-			@CurrentSecurityContext(expression = "authentication") Authentication authentication) {
+		@CurrentSecurityContext(expression = "authentication") Authentication authentication) {
 
 		logger.info("index called");
 
@@ -113,7 +113,7 @@ public class TemplateController {
 		return "index";
 	}
 
-	@RequestMapping(value = { "/login" })
+	@RequestMapping(value = {"/login"})
 	public String login(Model model) {
 		logger.info("login called");
 		return "login";
@@ -122,12 +122,17 @@ public class TemplateController {
 
 	@RequestMapping(value = "/loan", method = RequestMethod.GET)
 	public String showLoanPage(
-			@RequestParam(value = "selectedGenre", required = false, defaultValue = "") String selectedGenre,
-			@RequestParam(value = "selectedType", required = false, defaultValue = "") String selectedType, Model model,
-			@CurrentSecurityContext(expression = "authentication") Authentication authentication) {
+		@RequestParam(value = "selectedGenre", required = false, defaultValue = "") String selectedGenre,
+		@RequestParam(value = "selectedType", required = false, defaultValue = "") String selectedType, Model model,
+		@CurrentSecurityContext(expression = "authentication") Authentication authentication) {
 		if (!(authentication instanceof AnonymousAuthenticationToken)) {
 			String username = authentication.getName();
 			User user = userService.getByUsername(username);
+
+			if (!mediaTransactionService.canLoanReserve(user)) {
+				model.addAttribute("errorMessage", "You have exceeded your loan/reserve limit");
+				return "loan";
+			}
 
 			List<String> genres = addDefaultOption(libraryService.getAllGenres(), "All Genres");
 			List<String> mediaTypes = addDefaultOption(libraryService.getAllMediaTypes(), "All Media Types");
@@ -138,11 +143,11 @@ public class TemplateController {
 			model.addAttribute("selectedType", selectedType);
 			model.addAttribute("todayDate", LocalDate.now());
 			model.addAttribute("endDate", LocalDate.now().plusDays(1));
- 
+
 			List<Media> mediaList = StreamSupport
-					.stream(mediaService.searchMediaByGenreAndType(selectedGenre, selectedType, user).spliterator(),
-							false)
-					.collect(Collectors.toList());
+				.stream(mediaService.searchMediaByGenreAndType(selectedGenre, selectedType, user).spliterator(),
+					false)
+				.collect(Collectors.toList());
 			if (mediaList.isEmpty()) {
 				model.addAttribute("errorMessage", "No media found for the selected Genre and Media Type.");
 			}
@@ -156,9 +161,8 @@ public class TemplateController {
 	}
 
 	@GetMapping("/searchMedia")
-	public String searchMedia(@RequestParam(value = "genre", required = true) String genre,
-			@RequestParam(value = "type", required = true) String type, Model model,
-			@CurrentSecurityContext(expression = "authentication") Authentication authentication) {
+	public String searchMedia(@RequestParam(value = "genre") String genre, @RequestParam(value = "type") String type,
+		Model model, @CurrentSecurityContext(expression = "authentication") Authentication authentication) {
 		return showLoanPage(genre, type, model, authentication);
 	}
 
@@ -167,14 +171,14 @@ public class TemplateController {
 		return options;
 	}
 
-	@RequestMapping(value = { "/login-error" })
+	@RequestMapping(value = {"/login-error"})
 	public String loginError(Model model) {
 		logger.info("loginError called");
 		model.addAttribute("error", "Login error");
 		return "login";
 	}
 
-	@RequestMapping(value = { "/admin/addUser" }, method = RequestMethod.GET)
+	@RequestMapping(value = {"/admin/addUser"}, method = RequestMethod.GET)
 	public String showAddPersonPage(Model model, @RequestParam(value = "username", required = false) String username) {
 		logger.info("showAddPersonPage called");
 		User modUser = null;
@@ -196,9 +200,9 @@ public class TemplateController {
 		return "addUser";
 	}
 
-	@RequestMapping(value = { "/admin/addUser" }, method = RequestMethod.POST)
+	@RequestMapping(value = {"/admin/addUser"}, method = RequestMethod.POST)
 	public String addUser(Model model, //
-			@ModelAttribute("UserForm") UserDTO userDTO) { // The @ModelAttribute is
+		@ModelAttribute("UserForm") UserDTO userDTO) { // The @ModelAttribute is
 		// an annotation that binds
 		// a method parameter or
 		// method return value to a
