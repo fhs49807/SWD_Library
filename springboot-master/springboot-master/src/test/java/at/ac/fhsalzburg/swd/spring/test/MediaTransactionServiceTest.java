@@ -2,10 +2,7 @@ package at.ac.fhsalzburg.swd.spring.test;
 
 import at.ac.fhsalzburg.swd.spring.enums.CustomerType;
 import at.ac.fhsalzburg.swd.spring.enums.TransactionStatus;
-import at.ac.fhsalzburg.swd.spring.model.Edition;
-import at.ac.fhsalzburg.swd.spring.model.Media;
-import at.ac.fhsalzburg.swd.spring.model.MediaTransaction;
-import at.ac.fhsalzburg.swd.spring.model.User;
+import at.ac.fhsalzburg.swd.spring.model.*;
 import at.ac.fhsalzburg.swd.spring.repository.MediaTransactionRepository;
 import at.ac.fhsalzburg.swd.spring.services.*;
 import org.junit.jupiter.api.Test;
@@ -18,6 +15,7 @@ import org.mockito.junit.jupiter.MockitoExtension;
 import java.time.LocalDate;
 import java.util.ArrayList;
 import java.util.List;
+import java.util.NoSuchElementException;
 import java.util.Optional;
 
 import static org.junit.jupiter.api.Assertions.*;
@@ -82,9 +80,7 @@ public class MediaTransactionServiceTest {
 		user.setCustomerType(CustomerType.STUDENT);
 		when(userService.getByUsername(any())).thenReturn(user);
 
-		Media media = new Media();
-		media.setName("Dune");
-		when(mediaService.findById(any())).thenReturn(media);
+		when(mediaService.findById(any())).thenReturn(new Media());
 
 		List<Edition> editions = new ArrayList<>();
 		editions.add(new Edition());
@@ -106,6 +102,36 @@ public class MediaTransactionServiceTest {
 		assertEquals(reserveStartDate, persistedTransaction.getReserveStartDate());
 		assertEquals(reserveEndDate, persistedTransaction.getReserveEndDate());
 		assertEquals(TransactionStatus.RESERVED, persistedTransaction.getStatus());
+	}
+
+	@Test
+	void reserveMediaForCustomerNoAvailableEditions() {
+		User user = new User();
+		user.setCustomerType(CustomerType.STUDENT);
+		when(userService.getByUsername(any())).thenReturn(user);
+
+		Media media = new Media();
+		MediaType mediaType = new MediaType();
+		mediaType.setType("Book");
+		media.setMediaType(mediaType);
+		when(mediaService.findById(any())).thenReturn(media);
+
+		when(editionService.findAvailableEditions(any(), any(), any())).thenReturn(new ArrayList<>());
+
+		LocalDate today = LocalDate.now();
+		List<MediaTransaction> reservedEditions = new ArrayList<>();
+		MediaTransaction reservedEdition = new MediaTransaction();
+		reservedEdition.setReserveStartDate(today);
+		reservedEdition.setReserveEndDate(today.plusDays(3));
+		reservedEditions.add(reservedEdition);
+		when(mediaTransactionRepository.findEditionsInPeriod(any(), any(), any())).thenReturn(reservedEditions);
+
+
+		LocalDate reserveStartDate = today.plusDays(1);
+		LocalDate reserveEndDate = today.plusDays(2);
+
+		assertThrows(NoSuchElementException.class,
+			() -> mediaTransactionService.reserveMediaForCustomer("John", 1L, reserveStartDate, reserveEndDate));
 	}
 
 	@Test

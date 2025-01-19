@@ -1,10 +1,14 @@
 package at.ac.fhsalzburg.swd.spring.model;
 
-import java.util.List;
+import lombok.Getter;
+import lombok.Setter;
 
 import javax.persistence.*;
+import java.util.List;
 
 @Entity
+@Getter
+@Setter
 @Inheritance(strategy = InheritanceType.JOINED) // create tables for inhereting classes
 public class Media {
 
@@ -69,10 +73,6 @@ public class Media {
 		return price;
 	}
 
-	public void setPrice(double price) {
-		this.price = price;
-	}
-
 	public Genre getGenre() {
 		return genre;
 	}
@@ -102,10 +102,6 @@ public class Media {
 
 	public int getFSK() {
 		return FSK;
-	}
-
-	public void setFSK(int fSK) {
-		FSK = fSK;
 	}
 
 }
