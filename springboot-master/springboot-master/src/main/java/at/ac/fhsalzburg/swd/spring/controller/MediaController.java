@@ -95,7 +95,6 @@ public class MediaController extends BaseController {
 
 		// Verleihungen und Reservierungen einfügen, falls vorhanden
 		fetchUserLoans(model, user);
-		fetchUserReservations(model, user);
 
 		return "returnMedia"; // Zeigt die Rückgabeseite an, wenn der Benutzer eingeloggt ist
 	}
@@ -197,26 +196,19 @@ public class MediaController extends BaseController {
 	}
 
 	private void fetchUserLoans(Model model, User user) {
-		// Nur aktive Transaktionen anzeigen (status != COMPLETED)
-		List<MediaTransactionDTO> loanDTOs = new ArrayList<>();
-		for (MediaTransaction transaction : mediaTransactionService.findLoansByUser(user)) {
-			MediaTransactionDTO dto = new MediaTransactionDTO(transaction.getId(),
-				transaction.getEdition().getMedia().getName(), null,
-				transaction.getReturnDate());
-			loanDTOs.add(dto);
-		}
-		model.addAttribute("loans", loanDTOs);
-	}
-
-	private void fetchUserReservations(Model model, User user) {
-		List<MediaTransactionDTO> mediaTransactionDTOs = new ArrayList<>();
-		for (MediaTransaction transaction : mediaTransactionService.findReservationsForUser(user)) {
-			MediaTransactionDTO dto = new MediaTransactionDTO(transaction.getId(),
-				transaction.getEdition().getMedia().getName(), transaction.getReserveStartDate(),
-				transaction.getReserveEndDate());
-			mediaTransactionDTOs.add(dto);
-		}
-		model.addAttribute("reservations", mediaTransactionDTOs);
+	    // Nur aktive Transaktionen anzeigen (status != COMPLETED)
+	    List<MediaTransactionDTO> loanDTOs = new ArrayList<>();
+	    for (MediaTransaction transaction : mediaTransactionService.findLoansByUser(user)) {
+	        // Hier wird das expirationDate übergeben
+	        MediaTransactionDTO dto = new MediaTransactionDTO(
+	            transaction.getId(),
+	            transaction.getEdition().getMedia().getName(),
+	            transaction.getStart_date(),
+	            transaction.getEnd_date()
+	        );
+	        loanDTOs.add(dto);
+	    }
+	    model.addAttribute("loans", loanDTOs);
 	}
 
 	@GetMapping("/returnMediaSuccess")
