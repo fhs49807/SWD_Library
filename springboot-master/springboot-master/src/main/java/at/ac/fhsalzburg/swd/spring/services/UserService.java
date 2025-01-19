@@ -55,13 +55,6 @@ public class UserService implements UserServiceInterface {
 		return Period.between(birthDate, LocalDate.now()).getYears();
 	}
 
-	// checks if a customer can loan more based on their loanLimit
-	@Override
-	public boolean canLoanMore(User user) {
-		int currentLoans = repo.countActiveLoansByUser(user);
-		return currentLoans < user.getLoanLimit();
-	}
-
 	// checks if customer has any outstanding fees
 	@Override
 	public boolean hasOutstandingFees(User user) {

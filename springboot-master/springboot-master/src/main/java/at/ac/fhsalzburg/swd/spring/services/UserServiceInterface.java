@@ -1,11 +1,10 @@
 package at.ac.fhsalzburg.swd.spring.services;
 
-import java.util.Collection;
-
-import java.util.Date;
-
 import at.ac.fhsalzburg.swd.spring.enums.CustomerType;
 import at.ac.fhsalzburg.swd.spring.model.User;
+
+import java.util.Collection;
+import java.util.Date;
 
 public interface UserServiceInterface {
 
@@ -13,7 +12,7 @@ public interface UserServiceInterface {
 
 	// create customer
 	boolean addUser(String firstName, String lastName, String eMail, String Tel, Date BirthDate,
-			String password, String role, CustomerType customerType, int loanLimit);
+		String password, String role, CustomerType customerType, int loanLimit);
 
 	void addUser(User user);
 
@@ -31,9 +30,6 @@ public interface UserServiceInterface {
 
 	// retrieve age of customer
 	public abstract int getAge(User user);
-
-	// check if customer has reached loan limit
-	public abstract boolean canLoanMore(User user);
 
 	// check if customer has outstanding fees
 	public abstract boolean hasOutstandingFees(User user);

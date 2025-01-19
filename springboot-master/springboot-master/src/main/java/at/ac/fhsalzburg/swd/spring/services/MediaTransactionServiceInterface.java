@@ -21,11 +21,13 @@ public interface MediaTransactionServiceInterface {
 	MediaTransaction findById(Long transactionId);
 
 	MediaTransaction reserveMediaForCustomer(String userName, Long mediaId, LocalDate reserveStartDate,
-			LocalDate reserveEndDate) throws IllegalStateException, NotFoundException;
+		LocalDate reserveEndDate) throws IllegalStateException, NotFoundException;
 
 	MediaTransaction getLatestReservation(Long mediaId, String username);
 
 	List<MediaTransaction> findReservationsForUser(User user);
 
 	void cancelReservation(Long reservationId);
+
+	boolean canLoanReserve(User user);
 }
